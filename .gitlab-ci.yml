@@ -3,7 +3,7 @@ before_script:
   - echo "deb http://apt.roboception.de/stable $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-stable.list
   - if [ "$TESTING_DEBS" = "true" ]; then echo "deb http://apt.roboception.de/testing $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-testing.list ; fi
   - curl http://apt.roboception.de/archive.key | apt-key add -
-  - apt-get update -yq && apt-get -y lintian genicam # append packages required for your build here, e.g. cvkit
+  - apt-get update -yq && apt-get install -y lintian genicam # append packages required for your build here, e.g. cvkit
 
 #############
 # Templates
