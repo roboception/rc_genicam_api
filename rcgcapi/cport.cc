@@ -147,7 +147,7 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
     std::getline(in, slength, ';');
 
     uint64_t address=std::stoull(saddress, 0, 16);
-    uint64_t length=std::stoull(slength, 0, 16);
+    size_t length=static_cast<size_t>(std::stoull(slength, 0, 16));
 
     // read XML or ZIP from registers
 

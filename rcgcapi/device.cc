@@ -70,6 +70,7 @@ void Device::open(ACCESS access)
         mode=GenTL::DEVICE_ACCESS_CONTROL;
         break;
 
+      default:
       case EXCLUSIVE:
         mode=GenTL::DEVICE_ACCESS_EXCLUSIVE;
         break;
