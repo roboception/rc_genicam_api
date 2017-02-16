@@ -1,0 +1,11 @@
+build
+
+*~
+*.swp
+
+.idea
+*.cproject
+*.project
+*.externalToolBuilders
+.settings
+.metadata

@@ -1,0 +1,253 @@
+/*
+ * Roboception GmbH
+ * Munich, Germany
+ * www.roboception.com
+ *
+ * Copyright (c) 2017 Roboception GmbH
+ * All rights reserved
+ *
+ * Author: Heiko Hirschmueller
+ */
+
+#ifndef RCGCAPI_DEVICE
+#define RCGCAPI_DEVICE
+
+#include "interface.h"
+
+namespace rcg
+{
+
+class Stream;
+
+/**
+  The device class encapsulates a Genicam device.
+
+  NOTE: A GenTLException is thrown in case of a severe error.
+*/
+
+class Device : public std::enable_shared_from_this<Device>
+{
+  public:
+
+    enum ACCESS {READONLY, CONTROL, EXCLUSIVE};
+
+    /**
+      Constructs a device class. Devices must only be created by the
+      interface class.
+    */
+
+    Device(const std::shared_ptr<Interface> &parent,
+           const std::shared_ptr<const GenTLWrapper> &gentl, const char *id);
+    ~Device();
+
+    /**
+      Returns the pointer to the parent interface object.
+
+      @return Pointer to parent interface object.
+    */
+
+    std::shared_ptr<Interface> getParent() const;
+
+    /**
+      Get the internal ID of this device.
+
+      @return ID.
+    */
+
+    const std::string &getID() const;
+
+    /**
+      Opens the device for working with it. The interface may be opened
+      multiple times. However, for each open(), the close() method must be
+      called as well.
+    */
+
+    void open(ACCESS access);
+
+    /**
+      Closes the device. Each call of open() must be followed by a call to
+      close() at some point in time.
+    */
+
+    void close();
+
+    /**
+      Returns the currently available streams of this device.
+
+      NOTE: open() must be called before calling this method.
+
+      @return List of streams.
+    */
+
+    std::vector<std::shared_ptr<Stream> > getStreams();
+
+    /**
+      Returns the vendor of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Vendor.
+    */
+
+    std::string getVendor() const;
+
+    /**
+      Returns the model of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Model.
+    */
+
+    std::string getModel() const;
+
+    /**
+      Returns the transport layer type of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Transport layer type.
+    */
+
+    std::string getTLType() const;
+
+    /**
+      Returns the display name of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Display name.
+    */
+
+    std::string getDisplayName() const;
+
+    /**
+      Returns the access status of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Access status.
+    */
+
+    std::string getAccessStatus() const;
+
+    /**
+      Returns the user defined name of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return User defined name.
+    */
+
+    std::string getUserDefinedName() const;
+
+    /**
+      Returns the serial number of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Serial number.
+    */
+
+    std::string getSerialNumber() const;
+
+    /**
+      Returns the version of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Version.
+    */
+
+    std::string getVersion() const;
+
+    /**
+      Returns the timestamp frequency of the device.
+
+      NOTE: At least the parent object must have been opened before calling
+      this method.
+
+      @return Tick-frequency of the time stamp clock.
+    */
+
+    uint64_t getTimestampFrequency() const;
+
+    /**
+      Returns the node map of this object.
+
+      NOTE: open() must be called before calling this method. The returned
+      pointer remains valid until close() of this object is called.
+
+      @return Node map of this object.
+    */
+
+    std::shared_ptr<GenApi::CNodeMapRef> getNodeMap();
+
+    /**
+      Returns the node map of the remote device.
+
+      NOTE: open() must be called before calling this method. The returned
+      pointer remains valid until close() of this object is called.
+
+      @return Node map of this object.
+    */
+
+    std::shared_ptr<GenApi::CNodeMapRef> getRemoteNodeMap();
+
+    /**
+      Get internal interace handle.
+
+      @return Internal handle.
+    */
+
+    void *getHandle() const;
+
+  private:
+
+    Device(class Device &); // forbidden
+    Device &operator=(const Device &); // forbidden
+
+    std::shared_ptr<Interface> parent;
+    std::shared_ptr<const GenTLWrapper> gentl;
+    std::string id;
+
+    int n_open;
+    void *dev;
+    void *rp;
+
+    std::shared_ptr<CPort> cport, rport;
+    std::shared_ptr<GenApi::CNodeMapRef> nodemap, rnodemap;
+
+    std::vector<std::weak_ptr<Stream> > slist;
+};
+
+/**
+  Returns a list of all devices that are available on the across all transport
+  layers and interfaces.
+
+  @return List of available devices.
+*/
+
+std::vector<std::shared_ptr<Device> > getDevices();
+
+/**
+  Searches across all transport layers and interfaces for a device with the
+  given id.
+
+  @param devid Device ID.
+  @return      Device or null pointer.
+*/
+
+std::shared_ptr<Device> getDevice(const char *devid);
+
+}
+
+#endif
