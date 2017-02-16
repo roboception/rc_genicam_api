@@ -43,13 +43,13 @@ add_subdirectory(tools)
 # libraries that appear here, the following line should exist in a cmake
 # file in a sub directory:
 # install(TARGETS rcXXX EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)
-set(PROJECT_LIBRARIES)
+set(PROJECT_LIBRARIES rcgcapi)
 
 # Declare static libraries that are created by your project. For all
 # libraries that appear here, the following line should exist in a cmake
 # file in a sub directory:
 # install(TARGETS rcXXX_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
-set(PROJECT_STATIC_LIBRARIES)
+set(PROJECT_STATIC_LIBRARIES rcgcapi_static)
 
 # comment the following line if your project does not provide any library
 include(cmake/configure_link_libs.cmake)
