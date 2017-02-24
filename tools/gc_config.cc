@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        // discover and open device
+        // discover and open a specific device
 
         int i=1;
         std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i++]);

@@ -13,9 +13,12 @@
 #define RCGCAPI_STREAM
 
 #include "device.h"
+#include "buffer.h"
 
 namespace rcg
 {
+
+class Buffer;
 
 /**
   The stream class encapsulates a Genicam stream.
@@ -66,6 +69,30 @@ class Stream : public std::enable_shared_from_this<Stream>
     */
 
     void close();
+
+    /**
+      Allocates buffers and registers internal events if necessary and starts
+      streaming.
+    */
+
+    void startStreaming();
+
+    /**
+      Stops streaming.
+    */
+
+    void stopStreaming();
+
+    /**
+      Wait for the next image or data and return it in a buffer object. The
+      buffer is valid until the next call to grab.
+
+      @param timeout Timeout in ms. A value < 0 sets waiting time to infinite.
+      @return        Pointer to received buffer or 0 in case of an error or
+                     interrupt.
+    */
+
+    const Buffer *grab(int64_t timeout=-1);
 
     /**
       Returns some information about the stream.
@@ -210,7 +237,7 @@ class Stream : public std::enable_shared_from_this<Stream>
     std::shared_ptr<GenApi::CNodeMapRef> getNodeMap();
 
     /**
-      Get internal interace handle.
+      Get internal stream handle.
 
       @return Internal handle.
     */
@@ -222,12 +249,16 @@ class Stream : public std::enable_shared_from_this<Stream>
     Stream(class Stream &); // forbidden
     Stream &operator=(const Stream &); // forbidden
 
+    Buffer buffer;
+
     std::shared_ptr<Device> parent;
     std::shared_ptr<const GenTLWrapper> gentl;
     std::string id;
 
     int n_open;
     void *stream;
+    void *event;
+    size_t bn;
 
     std::shared_ptr<CPort> cport;
     std::shared_ptr<GenApi::CNodeMapRef> nodemap;
