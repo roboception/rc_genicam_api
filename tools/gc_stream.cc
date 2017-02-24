@@ -320,17 +320,17 @@ int main(int argc, char *argv[])
 
       std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[1]);
 
-      double freq=dev->getTimestampFrequency();
-
-      if (freq == 0)
-      {
-        freq=1000000000;
-      }
-
       if (dev)
       {
         dev->open(rcg::Device::EXCLUSIVE);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
+
+        double freq=dev->getTimestampFrequency();
+
+        if (freq == 0)
+        {
+          freq=1000000000;
+        }
 
         // set values as given on the command line
 
