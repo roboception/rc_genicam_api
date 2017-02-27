@@ -73,9 +73,11 @@ class Stream : public std::enable_shared_from_this<Stream>
     /**
       Allocates buffers and registers internal events if necessary and starts
       streaming.
+
+      @param na Number of buffers to acquire. Set <= 0 for infinity.
     */
 
-    void startStreaming();
+    void startStreaming(int na=-1);
 
     /**
       Stops streaming.

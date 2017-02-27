@@ -12,198 +12,9 @@
 #include <rcgcapi/system.h>
 #include <rcgcapi/interface.h>
 #include <rcgcapi/device.h>
+#include <rcgcapi/config.h>
 
 #include <iostream>
-
-namespace
-{
-
-/**
-  Set a string to a nodemap.
-
-  @param nodemap Nodemap.
-  @param key     Key of node in nodemap.
-  @param value   New value of node.
-*/
-
-void setString(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key, const char *value)
-{
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IString *val=dynamic_cast<GenApi::IString *>(node);
-
-  if (GenApi::IsWritable(val))
-  {
-    val->SetValue(value);
-  }
-  else
-  {
-    std::cerr << "Cannot set '" << key << "'" << std::endl;
-  }
-}
-
-/**
-  Set a formatted IP address, given as string to a nodemap.
-
-  @param nodemap Nodemap.
-  @param key     Key of node in nodemap.
-  @param value   IP address in the format xxx.xxx.xxx.xxx
-*/
-
-void setIP(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key, const char *value)
-{
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
-
-  if (GenApi::IsWritable(val))
-  {
-    int64_t ip=0;
-
-    std::stringstream in(value);
-    std::string elem;
-
-    getline(in, elem, '.');
-    ip=stoi(elem)&0xff;
-
-    getline(in, elem, '.');
-    ip=(ip<<8)|(stoi(elem)&0xff);
-
-    getline(in, elem, '.');
-    ip=(ip<<8)|(stoi(elem)&0xff);
-
-    getline(in, elem, '.');
-    ip=(ip<<8)|(stoi(elem)&0xff);
-
-    val->SetValue(ip);
-  }
-  else
-  {
-    std::cerr << "Cannot set '" << key << "'" << std::endl;
-  }
-}
-
-/**
-  Set 0 or != 0 as boolean value to a nodemap.
-
-  @param nodemap Nodemap.
-  @param key     Key of node in nodemap.
-  @param value   0 or != 0 as string.
-*/
-
-void setBoolean(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key, const char *value)
-{
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
-
-  if (GenApi::IsWritable(val))
-  {
-    val->SetValue(std::stoi(std::string(value)));
-  }
-  else
-  {
-    std::cerr << "Cannot set '" << key << "'" << std::endl;
-  }
-}
-
-/**
-  Retrieves a value from a string node.
-
-  @param nodemap Nodemap.
-  @param key     Key of node.
-  @return        Value of node.
-*/
-
-std::string getString(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key)
-{
-  std::string ret;
-
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IString *val=dynamic_cast<GenApi::IString *>(node);
-
-  if (GenApi::IsReadable(val))
-  {
-    ret=val->GetValue();
-  }
-
-  return ret;
-}
-
-/**
-  Retrieves a MAC address as string from an integer node.
-
-  @param nodemap Nodemap.
-  @param key     Key of node.
-  @return        Value of node.
-*/
-
-std::string getMac(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key)
-{
-  std::ostringstream ret;
-
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
-
-  if (GenApi::IsReadable(val))
-  {
-    int64_t v=val->GetValue();
-
-    ret << std::hex << ((v>>32)&0xff) << ':' << ((v>>30)&0xff) << ':'
-                    << ((v>>24)&0xff) << ':' << ((v>>16)&0xff) << ':'
-                    << ((v>>8)&0xff) << ':' << (v&0xff);
-  }
-
-  return ret.str();
-}
-
-/**
-  Retrieves an IP address as string from an integer node.
-
-  @param nodemap Nodemap.
-  @param key     Key of node.
-  @return        Value of node.
-*/
-
-std::string getIP(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key)
-{
-  std::ostringstream ret;
-
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
-
-  if (GenApi::IsReadable(val))
-  {
-    int64_t v=val->GetValue();
-
-    ret << ((v>>24)&0xff) << '.' << ((v>>16)&0xff) << '.'
-        << ((v>>8)&0xff) << '.' << (v&0xff);
-  }
-
-  return ret.str();
-}
-
-/**
-  Get a boolean value as string from a boolean node.
-
-  @param nodemap Nodemap.
-  @param key     Key of node.
-  @return        Value of node.
-*/
-
-std::string getBoolean(std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *key)
-{
-  std::ostringstream ret;
-
-  GenApi::INode *node=nodemap->_GetNode(key);
-  GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
-
-  if (GenApi::IsReadable(val))
-  {
-    ret << val->GetValue();
-  }
-
-  return ret.str();
-}
-
-}
 
 int main(int argc, char *argv[])
 {
@@ -275,45 +86,45 @@ int main(int argc, char *argv[])
 
             if (p == "-n") // change user defined device name
             {
-              setString(nodemap, "DeviceUserID", argv[i++]);
+              rcg::setString(nodemap, "DeviceUserID", argv[i++], true);
             }
             else if (p == "-d") // switch dhcp on or off
             {
-              setBoolean(nodemap, "GevCurrentIPConfigurationDHCP", argv[i++]);
+              rcg::setString(nodemap, "GevCurrentIPConfigurationDHCP", argv[i++], true);
             }
             else if (p == "-p") // switch persistent IP on or off
             {
-              setBoolean(nodemap, "GevCurrentIPConfigurationPersistentIP", argv[i++]);
+              rcg::setString(nodemap, "GevCurrentIPConfigurationPersistentIP", argv[i++], true);
             }
             else if (p == "-i") // set persistent IP address
             {
-              setIP(nodemap, "GevPersistentIPAddress", argv[i++]);
+              rcg::setString(nodemap, "GevPersistentIPAddress", argv[i++], true);
             }
             else if (p == "-s") // set persistent subnet mask
             {
-              setIP(nodemap, "GevPersistentSubnetMask", argv[i++]);
+              rcg::setString(nodemap, "GevPersistentSubnetMask", argv[i++], true);
             }
             else if (p == "-g") // set persistent gateway
             {
-              setIP(nodemap, "GevPersistentDefaultGateway", argv[i++]);
+              rcg::setString(nodemap, "GevPersistentDefaultGateway", argv[i++], true);
             }
           }
 
           // print network configuration of the device
 
-          std::cout << "Device ID:       " << getString(nodemap, "DeviceID") << std::endl;
-          std::cout << "User defined ID: " << getString(nodemap, "DeviceUserID") << std::endl;
-          std::cout << "MAC Address:     " << getMac(nodemap, "GevMACAddress") << std::endl;
+          std::cout << "Device ID:       " << rcg::getString(nodemap, "DeviceID") << std::endl;
+          std::cout << "User defined ID: " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
+          std::cout << "MAC Address:     " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
           std::cout << std::endl;
 
-          std::cout << "IP:              " << getIP(nodemap, "GevCurrentIPAddress") << std::endl;
-          std::cout << "Subnet mask:     " << getIP(nodemap, "GevCurrentSubnetMask") << std::endl;
-          std::cout << "Default gateway: " << getIP(nodemap, "GevCurrentDefaultGateway") << std::endl;
+          std::cout << "IP:              " << rcg::getString(nodemap, "GevCurrentIPAddress") << std::endl;
+          std::cout << "Subnet mask:     " << rcg::getString(nodemap, "GevCurrentSubnetMask") << std::endl;
+          std::cout << "Default gateway: " << rcg::getString(nodemap, "GevCurrentDefaultGateway") << std::endl;
           std::cout << std::endl;
 
-          std::cout << "Persistent IP:   " << getBoolean(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
-          std::cout << "DHCP:            " << getBoolean(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
-          std::cout << "Link local:      " << getBoolean(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
+          std::cout << "Persistent IP:   " << rcg::getString(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
+          std::cout << "DHCP:            " << rcg::getString(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
+          std::cout << "Link local:      " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
 
           dev->close();
         }

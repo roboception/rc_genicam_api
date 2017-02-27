@@ -10,6 +10,7 @@ set(src
   stream.cc
   cport.cc
   buffer.cc
+  config.cc
 )
 
 set(hh
@@ -19,6 +20,7 @@ set(hh
   device.h
   stream.h
   buffer.h
+  config.h
 )
 
 if (UNIX)

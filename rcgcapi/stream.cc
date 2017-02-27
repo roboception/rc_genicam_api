@@ -93,7 +93,7 @@ void Stream::close()
   }
 }
 
-void Stream::startStreaming()
+void Stream::startStreaming(int na)
 {
   buffer.setHandle(0);
 
@@ -159,8 +159,15 @@ void Stream::startStreaming()
 
   // start streaming
 
-  if (!err && gentl->DSStartAcquisition(stream, GenTL::ACQ_START_FLAGS_DEFAULT,
-      GENTL_INFINITE) != GenTL::GC_ERR_SUCCESS)
+  uint64_t n=GENTL_INFINITE;
+
+  if (na > 0)
+  {
+    n=static_cast<uint64_t>(na);
+  }
+
+  if (!err && gentl->DSStartAcquisition(stream, GenTL::ACQ_START_FLAGS_DEFAULT, n) !=
+      GenTL::GC_ERR_SUCCESS)
   {
     gentl->GCUnregisterEvent(stream, GenTL::EVENT_NEW_BUFFER);
     err=true;

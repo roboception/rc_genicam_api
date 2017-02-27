@@ -14,6 +14,7 @@
 #include <rcgcapi/device.h>
 #include <rcgcapi/stream.h>
 #include <rcgcapi/buffer.h>
+#include <rcgcapi/config.h>
 
 #define PFNC_INCLUDE_HELPERS
 #include <GenTL/PFNC.h>
@@ -24,83 +25,6 @@
 
 namespace
 {
-
-/**
-  Set a given value.
-
-  @param nodemap Nodemap.
-  @param key     Key of node to be changed.
-  @param value   Value to be set.
-*/
-
-void setValue(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const std::string &key,
-              const std::string &value)
-{
-  GenApi::INode *node=nodemap->_GetNode(key.c_str());
-
-  if (node == 0)
-  {
-    std::cerr << key << ": Does not exist!" << std::endl;
-    return;
-  }
-
-  if (!GenApi::IsWritable(node))
-  {
-    std::cerr << key << ": Is not writable!" << std::endl;
-    return;
-  }
-
-  switch (node->GetPrincipalInterfaceType())
-  {
-    case GenApi::intfIBoolean:
-      {
-        GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
-        val->SetValue(std::stoi(value));
-      }
-      break;
-
-    case GenApi::intfIString:
-      {
-        GenApi::IString *val=dynamic_cast<GenApi::IString *>(node);
-        val->SetValue(value.c_str());
-      }
-      break;
-
-    case GenApi::intfIEnumeration:
-      {
-        GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
-        GenApi::IEnumEntry *entry=val->GetEntryByName(value.c_str());
-
-        if (entry != 0)
-        {
-          val->SetIntValue(entry->GetValue());
-        }
-        else
-        {
-          std::cerr << key << ": Cannot find enum: " << value << std::endl;
-        }
-      }
-      break;
-
-    case GenApi::intfIFloat:
-      {
-        GenApi::IFloat *val=dynamic_cast<GenApi::IFloat *>(node);
-        val->SetValue(std::stof(value));
-      }
-      break;
-
-    case GenApi::intfIInteger:
-      {
-        GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
-        val->SetValue(std::stoi(value));
-      }
-      break;
-
-    default:
-      std::cerr << key << ": Cannot set values of that type" << std::endl;
-      break;
-  }
-}
 
 /**
   Clamp the given value to the range of 0 to 255 and cast to byte.
@@ -251,46 +175,6 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
         }
         break;
 
-      case YCbCr411_8_CbYYCrYY: // convert and store as color image
-        {
-          name << ".ppm";
-          std::ofstream out(name.str(), std::ios::binary);
-
-          out << "P6" << std::endl;
-          out << width << " " << height << std::endl;
-          out << 255 << "\n";
-
-          std::streambuf *sb=out.rdbuf();
-
-          for (int k=0; k<height && out.good(); k++)
-          {
-            for (int i=0; i<width; i+=4)
-            {
-              int Y[4]={p[1], p[2], p[4], p[5]};
-              int Cb=static_cast<int>(p[0])-128;
-              int Cr=static_cast<int>(p[3])-128;
-
-              int rc=static_cast<int>(1.40200*Cr+0.5);
-              int gc=static_cast<int>(-0.34414*Cb-0.71414*Cr+0.5);
-              int bc=static_cast<int>(1.77200*Cb+0.5);
-
-              for (int j=0; j<4; j++)
-              {
-                sb->sputc(clamp8(Y[j]+rc));
-                sb->sputc(clamp8(Y[j]+gc));
-                sb->sputc(clamp8(Y[j]+bc));
-              }
-
-              p+=6;
-            }
-
-            p+=px;
-          }
-
-          out.close();
-        }
-        break;
-
       default:
         std::cerr << "storeBuffer(): Unknown pixel format: "
                   << GetPixelFormatName(static_cast<PfncFormat>(buffer->getPixelFormat()))
@@ -353,11 +237,11 @@ int main(int argc, char *argv[])
 
           if (key == "n") // set number of images
           {
-            n=std::stoi(value);
+            n=std::max(1, std::stoi(value));
           }
           else // set key=value pair through GenICam
           {
-            setValue(nodemap, key, value);
+            rcg::setString(nodemap, key.c_str(), value.c_str(), true);
           }
         }
 
@@ -370,7 +254,7 @@ int main(int argc, char *argv[])
           // opening first stream
 
           stream[0]->open();
-          stream[0]->startStreaming();
+          stream[0]->startStreaming(n);
 
           for (int k=0; k<n; k++)
           {
