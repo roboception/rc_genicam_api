@@ -13,6 +13,8 @@
 
 #include <stdexcept>
 
+#include "Base/GCException.h"
+
 namespace rcg
 {
 
@@ -21,32 +23,42 @@ bool setBoolean(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
 {
   bool ret=false;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsWritable(node))
-    {
-      GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
+    GenApi::INode *node=nodemap->_GetNode(name);
 
-      if (val != 0)
+    if (node != 0)
+    {
+      if (GenApi::IsWritable(node))
       {
-        val->SetValue(value);
-        ret=true;
+        GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
+
+        if (val != 0)
+        {
+          val->SetValue(value);
+          ret=true;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not boolean: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not boolean: ")+name);
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -57,32 +69,42 @@ bool setInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
 {
   bool ret=false;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsWritable(node))
-    {
-      GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
+    GenApi::INode *node=nodemap->_GetNode(name);
 
-      if (val != 0)
+    if (node != 0)
+    {
+      if (GenApi::IsWritable(node))
       {
-        val->SetValue(value);
-        ret=true;
+        GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
+
+        if (val != 0)
+        {
+          val->SetValue(value);
+          ret=true;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not integer: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not integer: ")+name);
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -93,32 +115,42 @@ bool setFloat(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *n
 {
   bool ret=false;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsWritable(node))
-    {
-      GenApi::IFloat *val=dynamic_cast<GenApi::IFloat *>(node);
+    GenApi::INode *node=nodemap->_GetNode(name);
 
-      if (val != 0)
+    if (node != 0)
+    {
+      if (GenApi::IsWritable(node))
       {
-        val->SetValue(value);
-        ret=true;
+        GenApi::IFloat *val=dynamic_cast<GenApi::IFloat *>(node);
+
+        if (val != 0)
+        {
+          val->SetValue(value);
+          ret=true;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not float: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not float: ")+name);
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -129,43 +161,53 @@ bool setEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *na
 {
   bool ret=false;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsWritable(node))
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
     {
-      GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
-
-      if (val != 0)
+      if (GenApi::IsWritable(node))
       {
-        GenApi::IEnumEntry *entry=val->GetEntryByName(value);
+        GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
 
-        if (entry != 0)
+        if (val != 0)
         {
-          val->SetIntValue(entry->GetValue());
+          GenApi::IEnumEntry *entry=val->GetEntryByName(value);
 
-          return true;
+          if (entry != 0)
+          {
+            val->SetIntValue(entry->GetValue());
+
+            return true;
+          }
+          else if (exception)
+          {
+            throw std::invalid_argument(std::string("Enumeration '")+name+
+                                        "' does not contain: "+value);
+          }
         }
         else if (exception)
         {
-          throw std::invalid_argument(std::string("Enumeration '")+name+
-                                      "' does not contain: "+value);
+          throw std::invalid_argument(std::string("Feature not enumeration: ")+name);
         }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not enumeration: ")+name);
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -176,119 +218,129 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
 {
   bool ret=false;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsWritable(node))
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
     {
-      switch (node->GetPrincipalInterfaceType())
+      if (GenApi::IsWritable(node))
       {
-        case GenApi::intfIBoolean:
-          {
-            GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
-            p->SetValue(std::stoi(std::string(value)));
-          }
-          break;
-
-        case GenApi::intfIInteger:
-          {
-            GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(node);
-
-            switch (p->GetRepresentation())
+        switch (node->GetPrincipalInterfaceType())
+        {
+          case GenApi::intfIBoolean:
             {
-              case GenApi::HexNumber:
-                p->SetValue(std::stoll(std::string(value), 0, 16));
-                break;
+              GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
+              p->SetValue(std::stoi(std::string(value)));
+            }
+            break;
 
-              case GenApi::IPV4Address:
-                {
-                  int64_t ip=0;
+          case GenApi::intfIInteger:
+            {
+              GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(node);
 
-                  std::stringstream in(value);
-                  std::string elem;
+              switch (p->GetRepresentation())
+              {
+                case GenApi::HexNumber:
+                  p->SetValue(std::stoll(std::string(value), 0, 16));
+                  break;
 
-                  for (int i=0; i<4; i++)
+                case GenApi::IPV4Address:
                   {
-                    getline(in, elem, '.');
-                    ip=(ip<<8)|(stoi(elem)&0xff);
+                    int64_t ip=0;
+
+                    std::stringstream in(value);
+                    std::string elem;
+
+                    for (int i=0; i<4; i++)
+                    {
+                      getline(in, elem, '.');
+                      ip=(ip<<8)|(stoi(elem)&0xff);
+                    }
+
+                    p->SetValue(ip);
                   }
+                  break;
 
-                  p->SetValue(ip);
-                }
-                break;
-
-              case GenApi::MACAddress:
-                {
-                  int64_t mac=0;
-
-                  std::stringstream in(value);
-                  std::string elem;
-
-                  for (int i=0; i<4; i++)
+                case GenApi::MACAddress:
                   {
-                    getline(in, elem, ':');
-                    mac=(mac<<8)|(stoi(elem, 0, 16)&0xff);
+                    int64_t mac=0;
+
+                    std::stringstream in(value);
+                    std::string elem;
+
+                    for (int i=0; i<4; i++)
+                    {
+                      getline(in, elem, ':');
+                      mac=(mac<<8)|(stoi(elem, 0, 16)&0xff);
+                    }
+
+                    p->SetValue(mac);
                   }
+                  break;
 
-                  p->SetValue(mac);
-                }
-                break;
-
-              default:
-                p->SetValue(std::stoll(std::string(value)));
-                break;
+                default:
+                  p->SetValue(std::stoll(std::string(value)));
+                  break;
+              }
             }
-          }
-          break;
+            break;
 
-        case GenApi::intfIFloat:
-          {
-            GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
-            p->SetValue(std::stof(std::string(value)));
-          }
-          break;
-
-        case GenApi::intfIEnumeration:
-          {
-            GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
-            GenApi::IEnumEntry *entry=p->GetEntryByName(value);
-
-            if (entry != 0)
+          case GenApi::intfIFloat:
             {
-              p->SetIntValue(entry->GetValue());
+              GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
+              p->SetValue(std::stof(std::string(value)));
             }
-            else if (exception)
+            break;
+
+          case GenApi::intfIEnumeration:
             {
-              throw std::invalid_argument(std::string("Enumeration '")+name+
-                                          "' does not contain: "+value);
+              GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
+              GenApi::IEnumEntry *entry=p->GetEntryByName(value);
+
+              if (entry != 0)
+              {
+                p->SetIntValue(entry->GetValue());
+              }
+              else if (exception)
+              {
+                throw std::invalid_argument(std::string("Enumeration '")+name+
+                                            "' does not contain: "+value);
+              }
             }
-          }
-          break;
+            break;
 
-        case GenApi::intfIString:
-          {
-            GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
-            p->SetValue(value);
-          }
-          break;
+          case GenApi::intfIString:
+            {
+              GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
+              p->SetValue(value);
+            }
+            break;
 
-        default:
-          if (exception)
-          {
-            throw std::invalid_argument(std::string("Feature of unknown datatype: ")+name);
-          }
-          break;
+          default:
+            if (exception)
+            {
+              throw std::invalid_argument(std::string("Feature of unknown datatype: ")+name);
+            }
+            break;
+        }
+      }
+      else if (exception)
+      {
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -299,31 +351,41 @@ bool getBoolean(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
 {
   bool ret=false;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsReadable(node))
-    {
-      GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
+    GenApi::INode *node=nodemap->_GetNode(name);
 
-      if (val != 0)
+    if (node != 0)
+    {
+      if (GenApi::IsReadable(node))
       {
-        ret=val->GetValue();
+        GenApi::IBoolean *val=dynamic_cast<GenApi::IBoolean *>(node);
+
+        if (val != 0)
+        {
+          ret=val->GetValue();
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not boolean: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not boolean: ")+name);
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -337,34 +399,44 @@ int64_t getInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const ch
   if (vmin != 0) *vmin=0;
   if (vmax != 0) *vmax=0;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsReadable(node))
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
     {
-      GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
-
-      if (val != 0)
+      if (GenApi::IsReadable(node))
       {
-        ret=val->GetValue();
+        GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
 
-        if (vmin != 0) *vmin=val->GetMin();
-        if (vmax != 0) *vmax=val->GetMax();
+        if (val != 0)
+        {
+          ret=val->GetValue();
+
+          if (vmin != 0) *vmin=val->GetMin();
+          if (vmax != 0) *vmax=val->GetMax();
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not integer: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not integer: ")+name);
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -378,34 +450,44 @@ double getFloat(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
   if (vmin != 0) *vmin=0;
   if (vmax != 0) *vmax=0;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsReadable(node))
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
     {
-      GenApi::IFloat *val=dynamic_cast<GenApi::IFloat *>(node);
-
-      if (val != 0)
+      if (GenApi::IsReadable(node))
       {
-        ret=val->GetValue();
+        GenApi::IFloat *val=dynamic_cast<GenApi::IFloat *>(node);
 
-        if (vmin != 0) *vmin=val->GetMin();
-        if (vmax != 0) *vmax=val->GetMax();
+        if (val != 0)
+        {
+          ret=val->GetValue();
+
+          if (vmin != 0) *vmin=val->GetMin();
+          if (vmax != 0) *vmax=val->GetMax();
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not float: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not float: ")+name);
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -416,31 +498,41 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
 {
   std::string ret;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsReadable(node))
-    {
-      GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
+    GenApi::INode *node=nodemap->_GetNode(name);
 
-      if (val != 0)
+    if (node != 0)
+    {
+      if (GenApi::IsReadable(node))
       {
-        ret=val->GetCurrentEntry()->GetSymbolic();
+        GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
+
+        if (val != 0)
+        {
+          ret=val->GetCurrentEntry()->GetSymbolic();
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not enumeration: ")+name);
+        }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not enumeration: ")+name);
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -453,39 +545,49 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
 
   list.clear();
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsReadable(node))
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
     {
-      GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
-
-      if (val != 0)
+      if (GenApi::IsReadable(node))
       {
-        ret=val->GetCurrentEntry()->GetSymbolic();
+        GenApi::IEnumeration *val=dynamic_cast<GenApi::IEnumeration *>(node);
 
-        GenApi::StringList_t entry;
-        val->GetSymbolics(entry);
-
-        for (size_t i=0; i<entry.size(); i++)
+        if (val != 0)
         {
-          list.push_back(std::string(entry[i]));
+          ret=val->GetCurrentEntry()->GetSymbolic();
+
+          GenApi::StringList_t entry;
+          val->GetSymbolics(entry);
+
+          for (size_t i=0; i<entry.size(); i++)
+          {
+            list.push_back(std::string(entry[i]));
+          }
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not enumeration: ")+name);
         }
       }
       else if (exception)
       {
-        throw std::invalid_argument(std::string("Feature not enumeration: ")+name);
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;
@@ -496,87 +598,97 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
 {
   std::ostringstream out;
 
-  GenApi::INode *node=nodemap->_GetNode(name);
-
-  if (node != 0)
+  try
   {
-    if (GenApi::IsReadable(node))
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
     {
-      switch (node->GetPrincipalInterfaceType())
+      if (GenApi::IsReadable(node))
       {
-        case GenApi::intfIBoolean:
-          {
-            GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
-            out << p->GetValue();
-          }
-          break;
-
-        case GenApi::intfIInteger:
-          {
-            GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(node);
-            int64_t value=p->GetValue();
-
-            switch (p->GetRepresentation())
+        switch (node->GetPrincipalInterfaceType())
+        {
+          case GenApi::intfIBoolean:
             {
-              case GenApi::HexNumber:
-                out << std::hex << value;
-                break;
-
-              case GenApi::IPV4Address:
-                 out << ((value>>24)&0xff) << '.' << ((value>>16)&0xff) << '.'
-                     << ((value>>8)&0xff) << '.' << (value&0xff);
-                 break;
-
-              case GenApi::MACAddress:
-                 out << std::hex << ((value>>32)&0xff) << ':' << ((value>>30)&0xff) << ':'
-                                 << ((value>>24)&0xff) << ':' << ((value>>16)&0xff) << ':'
-                                 << ((value>>8)&0xff) << ':' << (value&0xff);
-                 break;
-
-              default:
-                out << value;
-                break;
+              GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
+              out << p->GetValue();
             }
-          }
-          break;
+            break;
 
-        case GenApi::intfIFloat:
-          {
-            GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
-            out << p->GetValue();
-          }
-          break;
+          case GenApi::intfIInteger:
+            {
+              GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(node);
+              int64_t value=p->GetValue();
 
-        case GenApi::intfIEnumeration:
-          {
-            GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
-            out << p->GetCurrentEntry()->GetSymbolic();
-          }
-          break;
+              switch (p->GetRepresentation())
+              {
+                case GenApi::HexNumber:
+                  out << std::hex << value;
+                  break;
 
-        case GenApi::intfIString:
-          {
-            GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
-            out << p->GetValue();
-          }
-          break;
+                case GenApi::IPV4Address:
+                   out << ((value>>24)&0xff) << '.' << ((value>>16)&0xff) << '.'
+                       << ((value>>8)&0xff) << '.' << (value&0xff);
+                   break;
 
-        default:
-          if (exception)
-          {
-            throw std::invalid_argument(std::string("Feature of unknown datatype: ")+name);
-          }
-          break;
+                case GenApi::MACAddress:
+                   out << std::hex << ((value>>32)&0xff) << ':' << ((value>>30)&0xff) << ':'
+                                   << ((value>>24)&0xff) << ':' << ((value>>16)&0xff) << ':'
+                                   << ((value>>8)&0xff) << ':' << (value&0xff);
+                   break;
+
+                default:
+                  out << value;
+                  break;
+              }
+            }
+            break;
+
+          case GenApi::intfIFloat:
+            {
+              GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
+              out << p->GetValue();
+            }
+            break;
+
+          case GenApi::intfIEnumeration:
+            {
+              GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
+              out << p->GetCurrentEntry()->GetSymbolic();
+            }
+            break;
+
+          case GenApi::intfIString:
+            {
+              GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
+              out << p->GetValue();
+            }
+            break;
+
+          default:
+            if (exception)
+            {
+              throw std::invalid_argument(std::string("Feature of unknown datatype: ")+name);
+            }
+            break;
+        }
+      }
+      else if (exception)
+      {
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
       }
     }
     else if (exception)
     {
-      throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
     }
   }
-  else if (exception)
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw std::invalid_argument(std::string("Feature not found: ")+name);
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return out.str();
