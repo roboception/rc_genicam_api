@@ -229,7 +229,7 @@ std::string Buffer::getFilename() const
   return getBufferString(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_FILENAME);
 }
 
-bool Buffer::getIsLittleEndian() const
+bool Buffer::isBigEndian() const
 {
   bool ret=false;
 
@@ -244,7 +244,7 @@ bool Buffer::getIsLittleEndian() const
                                &type, &v, &size);
 
     if (err == GenTL::GC_ERR_SUCCESS && type == GenTL::INFO_DATATYPE_INT32 &&
-        v == GenTL::PIXELENDIANNESS_LITTLE)
+        v == GenTL::PIXELENDIANNESS_BIG)
     {
       ret=true;
     }
@@ -260,8 +260,32 @@ size_t Buffer::getDataSize() const
 
 uint64_t Buffer::getTimestampNS() const
 {
-  return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
-                                  GenTL::BUFFER_INFO_TIMESTAMP_NS);
+  uint64_t ret=getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
+                                        GenTL::BUFFER_INFO_TIMESTAMP_NS);
+
+  // if timestamp in nano seconds is not available, then compute it from
+  // timestamp and device frequency
+
+  if (ret == 0)
+  {
+    const uint64_t ns_freq=1000000000ul;
+    uint64_t freq=parent->getParent()->getTimestampFrequency();
+
+    if (freq == 0)
+    {
+      freq=ns_freq;
+    }
+
+    ret=getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
+                                 GenTL::BUFFER_INFO_TIMESTAMP);
+
+    if (freq != ns_freq)
+    {
+      ret=ret/freq*ns_freq+(ns_freq*(ret%freq))/freq;
+    }
+  }
+
+  return ret;
 }
 
 bool Buffer::getDataLargerThanBuffer() const
@@ -279,6 +303,19 @@ bool Buffer::getContainsChunkdata() const
 void *Buffer::getHandle() const
 {
   return buffer;
+}
+
+bool isHostBigEndian()
+{
+  int p=1;
+  char *c=reinterpret_cast<char *>(&p);
+
+  if (c[0] == 1)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 }

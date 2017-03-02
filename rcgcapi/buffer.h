@@ -193,7 +193,7 @@ class Buffer
     size_t getDeliveredChunkPayloadSize() const;
     uint64_t getChunkLayoutID() const;
     std::string getFilename() const;
-    bool getIsLittleEndian() const;
+    bool isBigEndian() const;
     size_t getDataSize() const;
     uint64_t getTimestampNS() const;
     bool getDataLargerThanBuffer() const;
@@ -216,6 +216,8 @@ class Buffer
     std::shared_ptr<const GenTLWrapper> gentl;
     void *buffer;
 };
+
+bool isHostBigEndian();
 
 }
 
