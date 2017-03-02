@@ -81,7 +81,12 @@ GenTLWrapper::GenTLWrapper(const std::string &filename)
 {
   // open library
 
-  lib=dlopen(filename.c_str(), RTLD_NOW);
+  // NOTE: RTLD_DEEPBIND is necessary for resolving symbols of the loaded
+  // library locally before using global symbols. This is for example needed
+  // if rcgcapi is used in a ROS node or nodelet and a transport layer
+  // library internally uses boost in a different version as in ROS.
+
+  lib=dlopen(filename.c_str(), RTLD_NOW | RTLD_DEEPBIND);
 
   if (lib == 0)
   {
