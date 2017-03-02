@@ -103,15 +103,14 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
 
           // copy image data, pgm is always big endian
 
-          if (buffer->getIsLittleEndian())
+          if (buffer->isBigEndian())
           {
             for (int k=0; k<height && out.good(); k++)
             {
               for (int i=0; i<width; i++)
               {
-                sb->sputc(p[1]);
-                sb->sputc(p[0]);
-                p+=2;
+                sb->sputc(*p++);
+                sb->sputc(*p++);
               }
 
               p+=px;
@@ -123,8 +122,9 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
             {
               for (int i=0; i<width; i++)
               {
-                sb->sputc(*p++);
-                sb->sputc(*p++);
+                sb->sputc(p[1]);
+                sb->sputc(p[0]);
+                p+=2;
               }
 
               p+=px;
