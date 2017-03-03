@@ -96,6 +96,10 @@ int main(int argc, char *argv[])
             {
               rcg::setString(nodemap, "GevCurrentIPConfigurationPersistentIP", argv[i++], true);
             }
+            else if (p == "-t") // switch persistent IP on or off
+            {
+              rcg::setString(nodemap, "GevIEEE1588", argv[i++], true);
+            }
             else if (p == "-i") // set persistent IP address
             {
               rcg::setString(nodemap, "GevPersistentIPAddress", argv[i++], true);
@@ -125,6 +129,10 @@ int main(int argc, char *argv[])
           std::cout << "Persistent IP:   " << rcg::getString(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
           std::cout << "DHCP:            " << rcg::getString(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
           std::cout << "Link local:      " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
+          std::cout << std::endl;
+
+          std::cout << "PTP:             " << rcg::getString(nodemap, "GevIEEE1588") << std::endl;
+          std::cout << "PTP status:      " << rcg::getString(nodemap, "GevIEEE1588Status") << std::endl;
 
           dev->close();
         }
@@ -141,6 +149,7 @@ int main(int argc, char *argv[])
       std::cout << "-n <id>: Set user defined id" << std::endl;
       std::cout << "-d 1|0:  Switch DHCP on or off" << std::endl;
       std::cout << "-p 1|0:  Switch persistent IP on or off" << std::endl;
+      std::cout << "-t 1|0:  Switch precision time protocol (ptp) on or off" << std::endl;
       std::cout << "-i <ip>: Set persistent IP address" << std::endl;
       std::cout << "-s <ip>: Set subnet mask for persistent IP address" << std::endl;
       std::cout << "-g <ip>: Set default gateway for persistent IP address" << std::endl;
