@@ -11,6 +11,8 @@ set(src
   cport.cc
   buffer.cc
   config.cc
+  image.cc
+  imagelist.cc
 )
 
 set(hh
@@ -21,6 +23,8 @@ set(hh
   stream.h
   buffer.h
   config.h
+  image.h
+  imagelist.h
 )
 
 if (UNIX)
