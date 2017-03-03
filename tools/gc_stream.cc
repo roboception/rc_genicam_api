@@ -16,8 +16,7 @@
 #include <rcgcapi/buffer.h>
 #include <rcgcapi/config.h>
 
-#define PFNC_INCLUDE_HELPERS
-#include <GenTL/PFNC.h>
+#include <rcgcapi/pfnc.h>
 
 #include <iostream>
 #include <fstream>
@@ -66,8 +65,22 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
     switch (format)
     {
       case Mono8: // store 8 bit monochrome image
+      case Confidence8:
+      case Error8:
         {
-          name << ".pgm";
+          if (format == Mono8)
+          {
+            name << "image.pgm";
+          }
+          else if (format == Confidence8)
+          {
+            name << "conf.pgm";
+          }
+          else if (format == Error8)
+          {
+            name << "err.pgm";
+          }
+
           std::ofstream out(name.str(), std::ios::binary);
 
           out << "P5" << std::endl;
@@ -90,9 +103,9 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
         }
         break;
 
-      case Mono16: // store 16 bit monochrome image
+      case Coord3D_C16: // store 16 bit monochrome image
         {
-          name << ".pgm";
+          name << "disp.pgm";
           std::ofstream out(name.str(), std::ios::binary);
 
           out << "P5" << std::endl;
@@ -137,7 +150,7 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
 
       case YCbCr411_8: // convert and store as color image
         {
-          name << ".ppm";
+          name << "image.ppm";
           std::ofstream out(name.str(), std::ios::binary);
 
           out << "P6" << std::endl;
