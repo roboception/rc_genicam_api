@@ -101,121 +101,128 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
 {
   std::shared_ptr<GenApi::CNodeMapRef> nodemap(new GenApi::CNodeMapRef());
 
-  // get number of URLS that the given port provides
-
-  uint32_t n=0;
-  if (gentl->GCGetNumPortURLs(port, &n) != GenTL::GC_ERR_SUCCESS)
+  try
   {
-    throw GenTLException("allocNodeMap()", gentl);
-  }
+    // get number of URLS that the given port provides
 
-  if (n == 0)
-  {
-    return std::shared_ptr<GenApi::CNodeMapRef>();
-  }
-
-  // get the first URL
-
-  GenTL::INFO_DATATYPE type;
-  char tmp[1024]="";
-  size_t size=sizeof(tmp);
-
-  if (gentl->GCGetPortURLInfo(port, 0, GenTL::URL_INFO_URL, &type, tmp, &size) !=
-      GenTL::GC_ERR_SUCCESS)
-  {
-    throw GenTLException("allocNodeMap()", gentl);
-  }
-
-  // interpret the URL and load XML File
-
-  std::string url=tmp;
-  if (toLower(url, 0, 6) == "local:")
-  {
-    // interpret local URL
-
-    int i=6;
-    if (url.compare(i, 3, "///") == 0)
-    {
-      i+=3;
-    }
-
-    std::stringstream in(url.substr(i));
-    std::string name, saddress, slength;
-
-    std::getline(in, name, ';');
-    std::getline(in, saddress, ';');
-    std::getline(in, slength, ';');
-
-    uint64_t address=std::stoull(saddress, 0, 16);
-    size_t length=static_cast<size_t>(std::stoull(slength, 0, 16));
-
-    // read XML or ZIP from registers
-
-    std::unique_ptr<char[]> buffer(new char[length+1]);
-
-    if (gentl->GCReadPort(port, address, buffer.get(), &length) != GenTL::GC_ERR_SUCCESS)
+    uint32_t n=0;
+    if (gentl->GCGetNumPortURLs(port, &n) != GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("allocNodeMap()", gentl);
     }
 
-    buffer.get()[length]='\0';
-
-    // load XML or ZIP from registers
-
-    if (name.size() > 4 && toLower(name, name.size()-4, 4) == ".zip")
+    if (n == 0)
     {
-      nodemap->_LoadXMLFromZIPData(buffer.get(), length);
+      return std::shared_ptr<GenApi::CNodeMapRef>();
+    }
+
+    // get the first URL
+
+    GenTL::INFO_DATATYPE type;
+    char tmp[1024]="";
+    size_t size=sizeof(tmp);
+
+    if (gentl->GCGetPortURLInfo(port, 0, GenTL::URL_INFO_URL, &type, tmp, &size) !=
+        GenTL::GC_ERR_SUCCESS)
+    {
+      throw GenTLException("allocNodeMap()", gentl);
+    }
+
+    // interpret the URL and load XML File
+
+    std::string url=tmp;
+    if (toLower(url, 0, 6) == "local:")
+    {
+      // interpret local URL
+
+      int i=6;
+      if (url.compare(i, 3, "///") == 0)
+      {
+        i+=3;
+      }
+
+      std::stringstream in(url.substr(i));
+      std::string name, saddress, slength;
+
+      std::getline(in, name, ';');
+      std::getline(in, saddress, ';');
+      std::getline(in, slength, ';');
+
+      uint64_t address=std::stoull(saddress, 0, 16);
+      size_t length=static_cast<size_t>(std::stoull(slength, 0, 16));
+
+      // read XML or ZIP from registers
+
+      std::unique_ptr<char[]> buffer(new char[length+1]);
+
+      if (gentl->GCReadPort(port, address, buffer.get(), &length) != GenTL::GC_ERR_SUCCESS)
+      {
+        throw GenTLException("allocNodeMap()", gentl);
+      }
+
+      buffer.get()[length]='\0';
+
+      // load XML or ZIP from registers
+
+      if (name.size() > 4 && toLower(name, name.size()-4, 4) == ".zip")
+      {
+        nodemap->_LoadXMLFromZIPData(buffer.get(), length);
+      }
+      else
+      {
+        gcstring xml=buffer.get();
+        nodemap->_LoadXMLFromString(xml);
+      }
+    }
+    else if (toLower(url, 0, 5) == "file:")
+    {
+      // interpret local URL
+
+      int i=6;
+      if (url.compare(i, 3, "///") == 0)
+      {
+        i+=3;
+      }
+
+      std::string name=url.substr(i);
+
+      // load XML or ZIP from file
+
+      if (name.size() > 4 && toLower(name, name.size()-4, 4) == ".zip")
+      {
+        gcstring file=name.c_str();
+        nodemap->_LoadXMLFromZIPFile(file);
+      }
+      else
+      {
+        gcstring file=name.c_str();
+        nodemap->_LoadXMLFromFile(file);
+      }
     }
     else
     {
-      gcstring xml=buffer.get();
-      nodemap->_LoadXMLFromString(xml);
+      throw GenTLException(("allocNodeMap(): Cannot interpret URL: "+url).c_str());
     }
-  }
-  else if (toLower(url, 0, 5) == "file:")
-  {
-    // interpret local URL
 
-    int i=6;
-    if (url.compare(i, 3, "///") == 0)
+    // get port name
+
+    size=sizeof(tmp);
+
+    if (gentl->GCGetPortInfo(port, GenTL::PORT_INFO_PORTNAME, &type, tmp, &size) !=
+        GenTL::GC_ERR_SUCCESS)
     {
-      i+=3;
+      throw GenTLException("allocNodeMap()", gentl);
     }
 
-    std::string name=url.substr(i);
-
-    // load XML or ZIP from file
-
-    if (name.size() > 4 && toLower(name, name.size()-4, 4) == ".zip")
+    gcstring portname=tmp;
+    if (!nodemap->_Connect(cport, portname))
     {
-      gcstring file=name.c_str();
-      nodemap->_LoadXMLFromZIPFile(file);
-    }
-    else
-    {
-      gcstring file=name.c_str();
-      nodemap->_LoadXMLFromFile(file);
+      throw GenTLException((std::string("allocNodeMap(): Cannot connect port: ")+tmp).c_str());
     }
   }
-  else
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
-    throw GenTLException(("allocNodeMap(): Cannot interpret URL: "+url).c_str());
-  }
-
-  // get port name
-
-  size=sizeof(tmp);
-
-  if (gentl->GCGetPortInfo(port, GenTL::PORT_INFO_PORTNAME, &type, tmp, &size) !=
-      GenTL::GC_ERR_SUCCESS)
-  {
-    throw GenTLException("allocNodeMap()", gentl);
-  }
-
-  gcstring portname=tmp;
-  if (!nodemap->_Connect(cport, portname))
-  {
-    throw GenTLException((std::string("allocNodeMap(): Cannot connect port: ")+tmp).c_str());
+    throw GenTLException(ex.what());
   }
 
   return nodemap;

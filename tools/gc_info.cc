@@ -374,10 +374,6 @@ int main(int argc, char *argv[])
   {
     std::cerr << ex.what() << std::endl;
   }
-  catch (const GENICAM_NAMESPACE::GenericException &ex)
-  {
-    std::cerr << ex.what() << std::endl;
-  }
 
   return 0;
 }
