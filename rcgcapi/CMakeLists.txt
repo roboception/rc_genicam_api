@@ -25,6 +25,7 @@ set(hh
   config.h
   image.h
   imagelist.h
+  pfnc.h
 )
 
 if (UNIX)
