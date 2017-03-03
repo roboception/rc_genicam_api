@@ -14,6 +14,7 @@
 #include <rcgcapi/device.h>
 #include <rcgcapi/stream.h>
 #include <rcgcapi/buffer.h>
+#include <rcgcapi/image.h>
 #include <rcgcapi/config.h>
 
 #include <rcgcapi/pfnc.h>
@@ -24,18 +25,6 @@
 
 namespace
 {
-
-/**
-  Clamp the given value to the range of 0 to 255 and cast to byte.
-*/
-
-unsigned char clamp8(int v)
-{
-  if (v < 0) v=0;
-  if (v > 255) v=255;
-
-  return static_cast<unsigned char>(v);
-}
 
 /**
   Store image given in buffer in PGM or PPM format.
@@ -70,15 +59,15 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
         {
           if (format == Mono8)
           {
-            name << "image.pgm";
+            name << "_mono.pgm";
           }
           else if (format == Confidence8)
           {
-            name << "conf.pgm";
+            name << "_conf.pgm";
           }
           else if (format == Error8)
           {
-            name << "err.pgm";
+            name << "_err.pgm";
           }
 
           std::ofstream out(name.str(), std::ios::binary);
@@ -105,7 +94,7 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
 
       case Coord3D_C16: // store 16 bit monochrome image
         {
-          name << "disp.pgm";
+          name << "_disp.pgm";
           std::ofstream out(name.str(), std::ios::binary);
 
           out << "P5" << std::endl;
@@ -150,7 +139,7 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
 
       case YCbCr411_8: // convert and store as color image
         {
-          name << "image.ppm";
+          name << "_color.ppm";
           std::ofstream out(name.str(), std::ios::binary);
 
           out << "P6" << std::endl;
@@ -159,29 +148,21 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
 
           std::streambuf *sb=out.rdbuf();
 
+          size_t pstep=(width>>2)*6+px;
           for (int k=0; k<height && out.good(); k++)
           {
             for (int i=0; i<width; i+=4)
             {
-              int Y[4]={p[0], p[1], p[3], p[4]};
-              int Cb=static_cast<int>(p[2])-128;
-              int Cr=static_cast<int>(p[5])-128;
+              uint8_t rgb[12];
+              rcg::convYCbCr411toQuadRGB(rgb, p, i);
 
-              int rc=static_cast<int>(1.40200*Cr+0.5);
-              int gc=static_cast<int>(-0.34414*Cb-0.71414*Cr+0.5);
-              int bc=static_cast<int>(1.77200*Cb+0.5);
-
-              for (int j=0; j<4; j++)
+              for (int j=0; j<12; j++)
               {
-                sb->sputc(clamp8(Y[j]+rc));
-                sb->sputc(clamp8(Y[j]+gc));
-                sb->sputc(clamp8(Y[j]+bc));
+                sb->sputc(rgb[j]);
               }
-
-              p+=6;
             }
 
-            p+=px;
+            p+=pstep;
           }
 
           out.close();
