@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 {
   try
   {
-    if (argc == 2)
+    if (argc == 2 || argc == 3)
     {
       if (std::string(argv[1]) == "-l")
       {
@@ -329,6 +329,12 @@ int main(int argc, char *argv[])
 
         std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[1]);
 
+        const char *xml=0;
+        if (argc == 3)
+        {
+          xml=argv[2];
+        }
+
         if (dev)
         {
           dev->open(rcg::Device::EXCLUSIVE);
@@ -354,7 +360,7 @@ int main(int argc, char *argv[])
 
           std::cout << std::endl;
           std::cout << "Available features:" << std::endl;
-          std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
+          std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap(xml);
           printNode(std::string("  "), nodemap->_GetNode("Root"));
 
           dev->close();
@@ -367,7 +373,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l|<device-id>" << std::endl;
+      std::cout << argv[0] << " -l | (<device-id> [<name_for_xml_file>])" << std::endl;
     }
   }
   catch (const std::exception &ex)

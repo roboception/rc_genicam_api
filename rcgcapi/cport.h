@@ -47,12 +47,14 @@ class CPort : public GenApi::IPort
   @param gentl Pointer to GenTL Wrapper.
   @param port  Pointer to module or remote port.
   @param cport Pointer to CPort Wrapper.
+  @param xml   Path and name for storing the received XML file or 0 if xml file
+               should not be stored.
   @return      Allocated node map object or 0 if it cannot be allocated. The
                pointer must be freed by the calling function with delete.
 */
 
 std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWrapper> gentl,
-                                                  void *port, CPort *cport);
+                                                  void *port, CPort *cport, const char *xml=0);
 
 }
 

@@ -197,10 +197,12 @@ class Device : public std::enable_shared_from_this<Device>
       NOTE: open() must be called before calling this method. The returned
       pointer remains valid until close() of this object is called.
 
-      @return Node map of this object.
+      @param xml Path and name for storing the received XML file or 0 if xml
+                 file should not be stored.
+      @return    Node map of this object.
     */
 
-    std::shared_ptr<GenApi::CNodeMapRef> getRemoteNodeMap();
+    std::shared_ptr<GenApi::CNodeMapRef> getRemoteNodeMap(const char *xml=0);
 
     /**
       Get internal interace handle.

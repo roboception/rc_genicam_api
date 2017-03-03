@@ -347,14 +347,14 @@ std::shared_ptr<GenApi::CNodeMapRef> Device::getNodeMap()
   return nodemap;
 }
 
-std::shared_ptr<GenApi::CNodeMapRef> Device::getRemoteNodeMap()
+std::shared_ptr<GenApi::CNodeMapRef> Device::getRemoteNodeMap(const char *xml)
 {
   if (dev != 0 && !rnodemap)
   {
     if (gentl->DevGetPort(dev, &rp) == GenTL::GC_ERR_SUCCESS)
     {
       rport=std::shared_ptr<CPort>(new CPort(gentl, &rp));
-      rnodemap=allocNodeMap(gentl, rp, rport.get());
+      rnodemap=allocNodeMap(gentl, rp, rport.get(), xml);
     }
   }
 

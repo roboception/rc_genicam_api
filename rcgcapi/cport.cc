@@ -10,10 +10,9 @@
  */
 
 #include "cport.h"
-
 #include "exception.h"
 
-#include "locale.h"
+#include <fstream>
 
 namespace rcg
 {
@@ -97,7 +96,7 @@ inline std::string toLower(const std::string &s, size_t start, size_t size)
 }
 
 std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWrapper> gentl,
-                                                  void *port, CPort *cport)
+                                                  void *port, CPort *cport, const char *xml)
 {
   std::shared_ptr<GenApi::CNodeMapRef> nodemap(new GenApi::CNodeMapRef());
 
@@ -161,6 +160,15 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
       }
 
       buffer.get()[length]='\0';
+
+      // store XML file
+
+      if (xml != 0)
+      {
+        std::ofstream out(xml, std::ios::binary);
+
+        out.rdbuf()->sputn(buffer.get(), length);
+      }
 
       // load XML or ZIP from registers
 
