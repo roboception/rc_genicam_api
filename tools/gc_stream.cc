@@ -42,7 +42,7 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
 
   // store image (see e.g. the sv tool of cvkit for show images)
 
-  if (buffer->getImagePresent())
+  if (!buffer->getIsIncomplete() && buffer->getImagePresent())
   {
     int width=buffer->getWidth();
     int height=buffer->getHeight();
@@ -177,7 +177,12 @@ std::string storeBuffer(const rcg::Buffer *buffer, double freq)
         break;
     }
   }
-  else
+  else if (!buffer->getImagePresent())
+  {
+    std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
+    return std::string();
+  }
+  else if (buffer->getIsIncomplete())
   {
     std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
     return std::string();
