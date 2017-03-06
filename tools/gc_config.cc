@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
               {
                 std::cout << "  " << device[j]->getID();
 
-                std::string uname=device[j]->getUserDefinedName();
+                std::string uname=device[j]->getDisplayName();
 
                 if (uname.size() > 0)
                 {
