@@ -72,7 +72,7 @@ void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i)
   int Y=row[j+js];
   if (js > 1)
   {
-    Y=row[i+js+1];
+    Y=row[j+js+1];
   }
 
   const int Cb=static_cast<int>(row[j+2])-128;
