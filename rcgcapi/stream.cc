@@ -131,7 +131,7 @@ void Stream::startStreaming(int na)
 
   bool err=false;
 
-  bn=std::max(static_cast<size_t>(2), getBufAnnounceMin());
+  bn=std::max(static_cast<size_t>(8), getBufAnnounceMin());
   for (size_t i=0; i<bn; i++)
   {
     GenTL::BUFFER_HANDLE p=0;
