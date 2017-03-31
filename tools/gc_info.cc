@@ -166,7 +166,7 @@ void printNode(const std::string &prefix, GenApi::INode *node)
           if (GenApi::IsReadable(p))
           {
             std::cout << "[" << p->GetMin() << ", "
-                      << p->GetMax() << "] "
+                      << p->GetMax() << "]: "
                       << p->GetValue() << " " << p->GetUnit();
           }
 
