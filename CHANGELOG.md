@@ -1,3 +1,13 @@
+Version 1.1.2 (2017-04-10)
+--------------------------
+
+- Streaming with at least 8 buffers by default
+- Additionally show display name when listing devices with gc_config -l
+
+Version 1.1.1 (2017-03-06)
+--------------------------
+
+- Fixed bug in YCbCr411 to RGB conversion
 
 Version 1.1.0 (2017-03-05)
 --------------------------
