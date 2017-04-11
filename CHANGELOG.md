@@ -1,3 +1,9 @@
+Version 1.1.3 (2017-04-11)
+--------------------------
+
+- Catching exceptions in destructors of Device and Stream
+- Added changing of GenICam parameters through gc_config
+
 Version 1.1.2 (2017-04-10)
 --------------------------
 
