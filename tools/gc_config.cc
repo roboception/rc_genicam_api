@@ -80,37 +80,62 @@ int main(int argc, char *argv[])
 
           std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
-          while (i+1 < argc)
+          while (i < argc)
           {
             std::string p=argv[i++];
 
-            if (p == "-n") // change user defined device name
+            if (p[0] == '-' && i < argc)
             {
-              rcg::setString(nodemap, "DeviceUserID", argv[i++], true);
+              if (p == "-n") // change user defined device name
+              {
+                rcg::setString(nodemap, "DeviceUserID", argv[i++], true);
+              }
+              else if (p == "-d") // switch dhcp on or off
+              {
+                rcg::setString(nodemap, "GevCurrentIPConfigurationDHCP", argv[i++], true);
+              }
+              else if (p == "-p") // switch persistent IP on or off
+              {
+                rcg::setString(nodemap, "GevCurrentIPConfigurationPersistentIP", argv[i++], true);
+              }
+              else if (p == "-t") // switch persistent IP on or off
+              {
+                rcg::setString(nodemap, "GevIEEE1588", argv[i++], true);
+              }
+              else if (p == "-i") // set persistent IP address
+              {
+                rcg::setString(nodemap, "GevPersistentIPAddress", argv[i++], true);
+              }
+              else if (p == "-s") // set persistent subnet mask
+              {
+                rcg::setString(nodemap, "GevPersistentSubnetMask", argv[i++], true);
+              }
+              else if (p == "-g") // set persistent gateway
+              {
+                rcg::setString(nodemap, "GevPersistentDefaultGateway", argv[i++], true);
+              }
+              else
+              {
+                std::cerr << "Unknown parameter: " << p << std::endl;
+                exit(1);
+              }
             }
-            else if (p == "-d") // switch dhcp on or off
+            else if (p.find('=') != std::string::npos)
             {
-              rcg::setString(nodemap, "GevCurrentIPConfigurationDHCP", argv[i++], true);
+              // split argument in key and value
+
+              size_t k=p.find('=');
+              std::string value=p.substr(k+1);
+              std::string key=p.substr(0, k);
+
+              // set key=value pair through GenICam
+
+              rcg::setString(nodemap, key.c_str(), value.c_str(), true);
             }
-            else if (p == "-p") // switch persistent IP on or off
+            else
             {
-              rcg::setString(nodemap, "GevCurrentIPConfigurationPersistentIP", argv[i++], true);
-            }
-            else if (p == "-t") // switch persistent IP on or off
-            {
-              rcg::setString(nodemap, "GevIEEE1588", argv[i++], true);
-            }
-            else if (p == "-i") // set persistent IP address
-            {
-              rcg::setString(nodemap, "GevPersistentIPAddress", argv[i++], true);
-            }
-            else if (p == "-s") // set persistent subnet mask
-            {
-              rcg::setString(nodemap, "GevPersistentSubnetMask", argv[i++], true);
-            }
-            else if (p == "-g") // set persistent gateway
-            {
-              rcg::setString(nodemap, "GevPersistentDefaultGateway", argv[i++], true);
+              std::cerr << "Missing '=': " << p << std::endl;
+              exit(1);
             }
           }
 
@@ -153,6 +178,8 @@ int main(int argc, char *argv[])
       std::cout << "-i <ip>: Set persistent IP address" << std::endl;
       std::cout << "-s <ip>: Set subnet mask for persistent IP address" << std::endl;
       std::cout << "-g <ip>: Set default gateway for persistent IP address" << std::endl;
+      std::cout << std::endl;
+      std::cout << "<key>=<value>: Set GenICam key to given value." << std::endl;
     }
   }
   catch (const std::exception &ex)
