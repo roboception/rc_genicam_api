@@ -37,7 +37,13 @@ Device::~Device()
 {
   if (n_open > 0)
   {
-    gentl->DevClose(dev);
+    try
+    {
+      gentl->DevClose(dev);
+    }
+    catch (...) // do not throw exceptions in destructor
+    { }
+
     parent->close();
   }
 }

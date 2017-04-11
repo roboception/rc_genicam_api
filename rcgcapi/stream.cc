@@ -36,12 +36,17 @@ Stream::Stream(const std::shared_ptr<Device> &_parent,
 
 Stream::~Stream()
 {
-  stopStreaming();
-
-  if (stream != 0)
+  try
   {
-    gentl->DSClose(stream);
+    stopStreaming();
+
+    if (stream != 0)
+    {
+      gentl->DSClose(stream);
+    }
   }
+  catch (...) // do not throw exceptions in destructor
+  { }
 }
 
 std::shared_ptr<Device> Stream::getParent() const
