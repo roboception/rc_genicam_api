@@ -1,3 +1,9 @@
+Version 1.1.4 (2017-04-13)
+--------------------------
+
+- Check if device name is not empty before looking for the device
+- Fixed formating of MAC addresses as string
+
 Version 1.1.3 (2017-04-11)
 --------------------------
 
