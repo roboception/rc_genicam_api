@@ -408,24 +408,27 @@ std::shared_ptr<Device> getDevice(const char *devid)
 {
   std::shared_ptr<Device> ret;
 
-  std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
-
-  for (size_t i=0; i<system.size() && !ret; i++)
+  if (devid != 0 && *devid != '\0')
   {
-    system[i]->open();
+    std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
 
-    std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
-
-    for (size_t k=0; k<interf.size() && !ret; k++)
+    for (size_t i=0; i<system.size() && !ret; i++)
     {
-      interf[k]->open();
+      system[i]->open();
 
-      ret=interf[k]->getDevice(devid);
+      std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
 
-      interf[k]->close();
+      for (size_t k=0; k<interf.size() && !ret; k++)
+      {
+        interf[k]->open();
+
+        ret=interf[k]->getDevice(devid);
+
+        interf[k]->close();
+      }
+
+      system[i]->close();
     }
-
-    system[i]->close();
   }
 
   return ret;
