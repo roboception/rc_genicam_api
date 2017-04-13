@@ -12,6 +12,7 @@
 #include "config.h"
 
 #include <stdexcept>
+#include <iomanip>
 
 #include "Base/GCException.h"
 
@@ -632,9 +633,13 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
                    break;
 
                 case GenApi::MACAddress:
-                   out << std::hex << ((value>>32)&0xff) << ':' << ((value>>30)&0xff) << ':'
-                                   << ((value>>24)&0xff) << ':' << ((value>>16)&0xff) << ':'
-                                   << ((value>>8)&0xff) << ':' << (value&0xff);
+                   out << std::hex << std::setfill('0');
+                   out << std::setw(2) << ((value>>40)&0xff) << ':'
+                       << std::setw(2) << ((value>>32)&0xff) << ':'
+                       << std::setw(2) << ((value>>24)&0xff) << ':'
+                       << std::setw(2) << ((value>>16)&0xff) << ':'
+                       << std::setw(2) << ((value>>8)&0xff) << ':'
+                       << std::setw(2) << (value&0xff);
                    break;
 
                 default:
