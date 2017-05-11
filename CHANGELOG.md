@@ -1,3 +1,8 @@
+Version 1.1.5 (2017-05-11)
+--------------------------
+
+- Enforced using IPv4 format for setting persistent IPs and improved output of gc_config
+
 Version 1.1.4 (2017-04-13)
 --------------------------
 
