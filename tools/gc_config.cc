@@ -98,21 +98,21 @@ int main(int argc, char *argv[])
               {
                 rcg::setString(nodemap, "GevCurrentIPConfigurationPersistentIP", argv[i++], true);
               }
-              else if (p == "-t") // switch persistent IP on or off
+              else if (p == "-t") // switch precision time protocol on or off
               {
                 rcg::setString(nodemap, "GevIEEE1588", argv[i++], true);
               }
               else if (p == "-i") // set persistent IP address
               {
-                rcg::setString(nodemap, "GevPersistentIPAddress", argv[i++], true);
+                rcg::setIPV4Address(nodemap, "GevPersistentIPAddress", argv[i++], true);
               }
               else if (p == "-s") // set persistent subnet mask
               {
-                rcg::setString(nodemap, "GevPersistentSubnetMask", argv[i++], true);
+                rcg::setIPV4Address(nodemap, "GevPersistentSubnetMask", argv[i++], true);
               }
               else if (p == "-g") // set persistent gateway
               {
-                rcg::setString(nodemap, "GevPersistentDefaultGateway", argv[i++], true);
+                rcg::setIPV4Address(nodemap, "GevPersistentDefaultGateway", argv[i++], true);
               }
               else
               {
@@ -141,23 +141,26 @@ int main(int argc, char *argv[])
 
           // print network configuration of the device
 
-          std::cout << "Device ID:       " << rcg::getString(nodemap, "DeviceID") << std::endl;
-          std::cout << "User defined ID: " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
-          std::cout << "MAC Address:     " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
+          std::cout << "Device ID:                " << rcg::getString(nodemap, "DeviceID") << std::endl;
+          std::cout << "User defined ID:          " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
+          std::cout << "MAC Address:              " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
           std::cout << std::endl;
 
-          std::cout << "IP:              " << rcg::getString(nodemap, "GevCurrentIPAddress") << std::endl;
-          std::cout << "Subnet mask:     " << rcg::getString(nodemap, "GevCurrentSubnetMask") << std::endl;
-          std::cout << "Default gateway: " << rcg::getString(nodemap, "GevCurrentDefaultGateway") << std::endl;
+          std::cout << "Current IP:               " << rcg::getString(nodemap, "GevCurrentIPAddress") << std::endl;
+          std::cout << "Current subnet mask:      " << rcg::getString(nodemap, "GevCurrentSubnetMask") << std::endl;
+          std::cout << "Current gateway:          " << rcg::getString(nodemap, "GevCurrentDefaultGateway") << std::endl;
           std::cout << std::endl;
 
-          std::cout << "Persistent IP:   " << rcg::getString(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
-          std::cout << "DHCP:            " << rcg::getString(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
-          std::cout << "Link local:      " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
+          std::cout << "Persistent IP on/off:     " << rcg::getString(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
+          std::cout << "  Persistent IP:          " << rcg::getString(nodemap, "GevPersistentIPAddress") << std::endl;
+          std::cout << "  Persistent subnet mask: " << rcg::getString(nodemap, "GevPersistentSubnetMask") << std::endl;
+          std::cout << "  Persistent gateway:     " << rcg::getString(nodemap, "GevPersistentDefaultGateway") << std::endl;
+          std::cout << "DHCP on/off:              " << rcg::getString(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
+          std::cout << "Link local on/off:        " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
           std::cout << std::endl;
 
-          std::cout << "PTP:             " << rcg::getString(nodemap, "GevIEEE1588") << std::endl;
-          std::cout << "PTP status:      " << rcg::getString(nodemap, "GevIEEE1588Status") << std::endl;
+          std::cout << "PTP:                      " << rcg::getString(nodemap, "GevIEEE1588") << std::endl;
+          std::cout << "PTP status:               " << rcg::getString(nodemap, "GevIEEE1588Status") << std::endl;
 
           dev->close();
         }

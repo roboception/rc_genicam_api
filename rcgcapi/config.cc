@@ -111,6 +111,63 @@ bool setInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
   return ret;
 }
 
+bool setIPV4Address(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                    const char *value, bool exception)
+{
+  bool ret=false;
+
+  try
+  {
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
+    {
+      if (GenApi::IsWritable(node))
+      {
+        GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
+
+        if (val != 0)
+        {
+          int64_t ip=0;
+
+          std::stringstream in(value);
+          std::string elem;
+
+          for (int i=0; i<4; i++)
+          {
+            getline(in, elem, '.');
+            ip=(ip<<8)|(stoi(elem)&0xff);
+          }
+
+          val->SetValue(ip);
+          ret=true;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not integer: ")+name);
+        }
+      }
+      else if (exception)
+      {
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      }
+    }
+    else if (exception)
+    {
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
+    }
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+
+  return ret;
+}
+
 bool setFloat(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
               double value, bool exception)
 {
