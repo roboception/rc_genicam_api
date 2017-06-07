@@ -221,7 +221,10 @@ std::string cDevGetInfo(const Device *obj, const std::shared_ptr<const GenTLWrap
 
   if (err == GenTL::GC_ERR_SUCCESS && type == GenTL::INFO_DATATYPE_STRING)
   {
-    ret=tmp;
+    for (size_t i=0; i<tmp_size && tmp[i] != '\0'; i++)
+    {
+      ret.push_back(tmp[i]);
+    }
   }
 
   return ret;
