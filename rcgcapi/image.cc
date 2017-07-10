@@ -56,10 +56,8 @@ namespace
 
 inline unsigned char clamp8(int v)
 {
-  if (v < 0) v=0;
-  if (v > 255) v=255;
-
-  return static_cast<unsigned char>(v);
+  const int v2=v<0 ? 0:v;
+  return static_cast<unsigned char>(v2>255 ? 255:v);
 }
 
 }
@@ -78,9 +76,9 @@ void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i)
   const int Cb=static_cast<int>(row[j+2])-128;
   const int Cr=static_cast<int>(row[j+5])-128;
 
-  const int rc=static_cast<int>(1.40200*Cr+0.5);
-  const int gc=static_cast<int>(-0.34414*Cb-0.71414*Cr+0.5);
-  const int bc=static_cast<int>(1.77200*Cb+0.5);
+  const int rc=(90*Cr+32)>>6;
+  const int gc=(-22*Cb-46*Cr+32)>>6;
+  const int bc=(113*Cb+32)>>6;
 
   rgb[0]=clamp8(Y+rc);
   rgb[1]=clamp8(Y+gc);
@@ -95,9 +93,9 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
   const int Cb=static_cast<int>(row[i+2])-128;
   const int Cr=static_cast<int>(row[i+5])-128;
 
-  const int rc=static_cast<int>(1.40200*Cr+0.5);
-  const int gc=static_cast<int>(-0.34414*Cb-0.71414*Cr+0.5);
-  const int bc=static_cast<int>(1.77200*Cb+0.5);
+  const int rc=(90*Cr+32)>>6;
+  const int gc=(-22*Cb-46*Cr+32)>>6;
+  const int bc=(113*Cb+32)>>6;
 
   for (int j=0; j<4; j++)
   {
