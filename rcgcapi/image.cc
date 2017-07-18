@@ -57,7 +57,7 @@ namespace
 inline unsigned char clamp8(int v)
 {
   const int v2=v<0 ? 0:v;
-  return static_cast<unsigned char>(v2>255 ? 255:v);
+  return static_cast<unsigned char>(v2>255 ? 255:v2);
 }
 
 }
