@@ -407,27 +407,60 @@ std::vector<std::shared_ptr<Device> > getDevices()
   return ret;
 }
 
-std::shared_ptr<Device> getDevice(const char *devid)
+std::shared_ptr<Device> getDevice(const char *id)
 {
   std::shared_ptr<Device> ret;
 
-  if (devid != 0 && *devid != '\0')
+  if (id != 0 && *id != '\0')
   {
+    // split into interface and device id
+
+    std::string interfid;
+    std::string devid=id;
+
+    size_t p=devid.find(':');
+    if (p != std::string::npos)
+    {
+      interfid=devid.substr(0, p);
+      devid=devid.substr(p+1);
+    }
+
+    // go through all systems
+
     std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
 
     for (size_t i=0; i<system.size() && !ret; i++)
     {
       system[i]->open();
 
+      // get all interfaces
+
       std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
 
-      for (size_t k=0; k<interf.size() && !ret; k++)
+      if (interfid.size() > 0)
       {
-        interf[k]->open();
+        // if an interface is defined, then only search this interface
 
-        ret=interf[k]->getDevice(devid);
+        for (size_t k=0; k<interf.size() && !ret; k++)
+        {
+          if (interf[k]->getID() == interfid)
+          {
+            interf[k]->open();
+            ret=interf[k]->getDevice(devid.c_str());
+            interf[k]->close();
+          }
+        }
+      }
+      else
+      {
+        // if interface is not defined, then check all interfaces
 
-        interf[k]->close();
+        for (size_t k=0; k<interf.size() && !ret; k++)
+        {
+          interf[k]->open();
+          ret=interf[k]->getDevice(devid.c_str());
+          interf[k]->close();
+        }
       }
 
       system[i]->close();

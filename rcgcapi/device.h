@@ -232,8 +232,8 @@ class Device : public std::enable_shared_from_this<Device>
 };
 
 /**
-  Returns a list of all devices that are available on the across all transport
-  layers and interfaces.
+  Returns a list of all devices that are available across all transport layers
+  and interfaces.
 
   @return List of available devices.
 */
@@ -241,8 +241,10 @@ class Device : public std::enable_shared_from_this<Device>
 std::vector<std::shared_ptr<Device> > getDevices();
 
 /**
-  Searches across all transport layers and interfaces for a device with the
-  given id.
+  Searches across all transport layers and interfaces for a device. This method
+  accepts optionally specifying the interface ID as prefix, followed by ':',
+  i.e. "[<interfaca_id>[:]]<device_id>". If the interface ID is not given, then
+  all interfaces are sought and the first device with the given ID returned.
 
   @param devid Device ID.
   @return      Device or null pointer.
