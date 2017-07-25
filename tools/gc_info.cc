@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l | (<device-id> [<name_for_xml_file>])" << std::endl;
+      std::cout << argv[0] << " -l | ([interface-id>:]<device-id> [<name_for_xml_file>])" << std::endl;
     }
   }
   catch (const std::exception &ex)

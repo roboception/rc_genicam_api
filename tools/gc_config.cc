@@ -46,16 +46,16 @@ int main(int argc, char *argv[])
             {
               if (device[j]->getTLType() == "GEV")
               {
-                std::cout << "  " << device[j]->getID();
+                std::cout << "  " << interf[k]->getID() << ":" << device[j]->getID() << " (";
 
                 std::string uname=device[j]->getDisplayName();
 
                 if (uname.size() > 0)
                 {
-                  std::cout << " (" << uname << ")";
+                  std::cout << uname << ", ";
                 }
 
-                std::cout << std::endl;
+                std::cout << device[j]->getSerialNumber() << ")" << std::endl;
               }
             }
 
@@ -141,7 +141,9 @@ int main(int argc, char *argv[])
 
           // print network configuration of the device
 
-          std::cout << "Device ID:                " << rcg::getString(nodemap, "DeviceID") << std::endl;
+          std::cout << "ID:                       " << dev->getParent()->getID() << ":"
+                                                    << dev->getID() << std::endl;
+          std::cout << "Serial number:            " << rcg::getString(nodemap, "DeviceID") << std::endl;
           std::cout << "User defined ID:          " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
           std::cout << "MAC Address:              " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
           std::cout << std::endl;
@@ -172,7 +174,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l|(<device-id> <options>)" << std::endl;
+      std::cout << argv[0] << " -l|([interface-id>:]<device-id> <options>)" << std::endl;
       std::cout << std::endl;
       std::cout << "-n <id>: Set user defined id" << std::endl;
       std::cout << "-d 1|0:  Switch DHCP on or off" << std::endl;

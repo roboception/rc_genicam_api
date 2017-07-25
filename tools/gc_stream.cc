@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
     {
       // show help
 
-      std::cout << argv[0] << " <device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
+      std::cout << argv[0] << " [interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
       std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
