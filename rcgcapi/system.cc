@@ -28,7 +28,7 @@ System::~System()
     gentl->TLClose(tl);
   }
 
-//  gentl->GCCloseLib(); // ??? fails for Baumer GEV TL
+  gentl->GCCloseLib();
 }
 
 namespace
@@ -106,6 +106,11 @@ std::vector<std::shared_ptr<System> > System::getSystems()
   }
 
   return ret;
+}
+
+void System::clearSystems()
+{
+  slist.clear();
 }
 
 const std::string &System::getFilename() const

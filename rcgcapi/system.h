@@ -36,7 +36,7 @@ class System : public std::enable_shared_from_this<System>
 
     ~System();
 
-    /*
+    /**
       Returns a list of systems (i.e. transport layers) that is currently
       available. For discovering available transport layers, the environment
       variable GENICAM_GENTL32_PATH or GENICAM_GENTL64_PATH (depending on the
@@ -48,6 +48,13 @@ class System : public std::enable_shared_from_this<System>
     */
 
     static std::vector<std::shared_ptr<System> > getSystems();
+
+    /**
+      Clears the internal list of systems. This may be called before exit so
+      that all resources are cleaned before leaving the main function.
+    */
+
+    static void clearSystems();
 
     /**
       Get file name from which this system was created.
