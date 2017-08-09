@@ -381,5 +381,7 @@ int main(int argc, char *argv[])
     std::cerr << ex.what() << std::endl;
   }
 
+  rcg::System::clearSystems();
+
   return 0;
 }
