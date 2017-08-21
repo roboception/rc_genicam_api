@@ -4,7 +4,7 @@ Roboception GenICam Wrapper API
 This package provides an API for easy camera configuration and image streaming
 via GenICam and an underlying GenTL layer. It is based on the GenICam reference
 implementation (i.e., http://www.emva.org/standards-technology/genicam/genicam-downloads/),
-which is required to compile this code.
+which is included in this package.
 
 At runtime, a GenTL producer >= version 1.5 is required. A GenTL producer is a
 shared library that follows the naming schema '*.cti'. The environment variable

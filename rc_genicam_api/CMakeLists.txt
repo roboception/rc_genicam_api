@@ -45,5 +45,5 @@ endif ()
 
 install(TARGETS rc_genicam_api EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)
 set_target_properties(rc_genicam_api PROPERTIES SOVERSION ${abiversion})
-install(TARGETS rc_genicam_api_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
+#install(TARGETS rc_genicam_api_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
 install(FILES ${hh} COMPONENT dev DESTINATION include/rc_genicam_api)

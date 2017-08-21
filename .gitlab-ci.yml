@@ -1,9 +1,6 @@
 before_script:
   - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME
-  - echo "deb http://apt.roboception.de/stable $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-stable.list
-  - if [ "$TESTING_DEBS" = "true" ]; then echo "deb http://apt.roboception.de/testing $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-testing.list ; fi
-  - curl http://apt.roboception.de/archive.key | apt-key add -
-  - apt-get update -yq && apt-get install -y lintian genicam # append packages required for your build here, e.g. cvkit
+  - apt-get update -yq && apt-get install -y lintian
 
 #############
 # Templates
@@ -40,27 +37,6 @@ before_script:
     - cmake ..
     - make -j 4
     - CTEST_OUTPUT_ON_FAILURE=1 make test
-
-# run test script with latest debs from testing installed
-.test_latest_t: &test_latest
-  <<: *test
-  variables:
-    TESTING_DEBS: "true"
-
-# run test script with released debs from stable installed (allowed to fail)
-.test_stable_t: &test_stable
-  <<: *test
-  allow_failure: true
-  except:
-    - /^v[0-9]+\.[0-9]+\.[0-9]+/
-
-# run test script with released debs from stable (only for releases, mustn't fail)
-.test_release_t: &test_release
-  <<: *test
-  only:
-    - /^v[0-9]+\.[0-9]+\.[0-9]+/
-  except:
-    - branches
 
 .package_testing_t: &package_testing
   stage: deploy
@@ -115,41 +91,23 @@ gen_dox:
   tags:
     - docs
 
-# Test against latest (on every commit)
-#######################################
+# Test (on every commit)
+########################
 test_amd64:
   <<: *amd64_job
-  <<: *test_latest
+  <<: *test
 
 test_armhf:
   <<: *armhf_job
-  <<: *test_latest
+  <<: *test
 
 test_xenial_amd64:
   <<: *amd64_xenial_job
-  <<: *test_latest
+  <<: *test
 
 test_xenial_armhf:
   <<: *armhf_xenial_job
-  <<: *test_latest
-
-# Test against stable (is allowed to fail)
-##########################################
-test_stable_amd64:
-  <<: *amd64_job
-  <<: *test_stable
-
-test_stable_armhf:
-  <<: *armhf_job
-  <<: *test_stable
-
-test_stable_xenial_amd64:
-  <<: *amd64_xenial_job
-  <<: *test_stable
-
-test_stable_xenial_armhf:
-  <<: *armhf_xenial_job
-  <<: *test_stable
+  <<: *test
 
 # Deploy testing (only on master)
 #################################
@@ -168,24 +126,6 @@ package_testing_xenial_amd64:
 package_testing_xenial_armhf:
   <<: *armhf_xenial_job
   <<: *package_testing
-
-# Test against stable if it is a release
-########################################
-test_release_amd64:
-  <<: *amd64_job
-  <<: *test_release
-
-test_release_armhf:
-  <<: *armhf_job
-  <<: *test_release
-
-test_release_xenial_amd64:
-  <<: *amd64_xenial_job
-  <<: *test_release
-
-test_release_xenial_armhf:
-  <<: *armhf_xenial_job
-  <<: *test_release
 
 # Deploy stable (only for releases, version tags)
 #################################################

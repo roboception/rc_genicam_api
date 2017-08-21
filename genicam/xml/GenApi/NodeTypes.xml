@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2005 U (http://www.xmlspy.com) by Heike Skrzynski-Fox (Basler AG) -->
+<!-- ***************************************************************************
+*  (c) 2004 by Basler Vision Technologies
+*  Section: Vision Components
+*  Project: GenApi
+*  Author:  Fritz Dierks
+*  $Header$
+******************************************************************************** -->
+<NodeTypes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="NodeTypes.xsd">
+	<Node Name="Node">
+		<CppClass>CValueNode</CppClass>
+		<CppInterface>IValue</CppInterface>
+		<CppReference>CValueRef</CppReference>
+	</Node>
+	<Node Name="Category">
+		<CppClass>CCategory</CppClass>
+		<CppInterface>ICategory</CppInterface>
+		<CppReference>CCategoryRef</CppReference>
+	</Node>
+	<Node Name="Integer">
+		<CppClass>CInteger</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+	<Node Name="Enumeration">
+		<CppClass>CEnumeration</CppClass>
+		<CppInterface>IEnumeration</CppInterface>
+		<CppReference>CEnumerationTRef</CppReference>
+	</Node>
+	<Node Name="EnumEntry">
+		<CppClass>CEnumEntry</CppClass>
+		<CppInterface>IEnumEntry</CppInterface>
+		<CppReference>CEnumEntryRef</CppReference>
+	</Node>
+	<Node Name="MaskedIntReg">
+		<CppClass>CMaskedIntReg</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+	<Node Name="Register">
+		<CppClass>CRegister</CppClass>
+		<CppInterface>IRegister</CppInterface>
+		<CppReference>CRegisterRef</CppReference>
+	</Node>
+	<Node Name="IntReg">
+		<CppClass>CIntReg</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+	<Node Name="Float">
+		<CppClass>CFloat</CppClass>
+		<CppInterface>IFloat</CppInterface>
+		<CppReference>CFloatRef</CppReference>
+	</Node>
+	<Node Name="FloatReg">
+		<CppClass>CFltReg</CppClass>
+		<CppInterface>IFloat</CppInterface>
+		<CppReference>CFloatRef</CppReference>
+	</Node>
+	<Node Name="SwissKnife">
+		<CppClass>CSwissKnife</CppClass>
+		<CppInterface>IFloat</CppInterface>
+		<CppReference>CFloatRef</CppReference>
+	</Node>
+	<Node Name="IntSwissKnife">
+		<CppClass>CIntSwissKnife</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+	<Node Name="IntKey">
+		<CppClass>CIntKey</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+	<Node Name="TextDesc">
+		<CppClass>CTxtKey</CppClass>
+		<CppInterface>IString</CppInterface>
+		<CppReference>CStringRef</CppReference>
+	</Node>
+	<Node Name="Port">
+		<CppClass>CPort</CppClass>
+		<CppInterface>IPort</CppInterface>
+		<CppReference>CPortRecorderRef</CppReference>
+	</Node>
+	<Node Name="ConfRom">
+		<CppClass>CIEEE1212Parser</CppClass>
+		<CppInterface>IRegister</CppInterface>
+		<CppReference>CRegisterRef</CppReference>
+	</Node>
+	<Node Name="AdvFeatureLock">
+		<CppClass>CDcamAccessCtrlReg</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+	<Node Name="SmartFeature">
+		<CppClass>CSmartFeature</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+  <Node Name="String">
+    <CppClass>CStringNode</CppClass>
+    <CppInterface>IString</CppInterface>
+    <CppReference>CStringRef</CppReference>
+  </Node>
+  <Node Name="StringReg">
+		<CppClass>CStringRegister</CppClass>
+		<CppInterface>IString</CppInterface>
+		<CppReference>CStringRef</CppReference>
+	</Node>
+	<Node Name="Boolean">
+		<CppClass>CBoolean</CppClass>
+		<CppInterface>IBoolean</CppInterface>
+		<CppReference>CBooleanRef</CppReference>
+	</Node>
+	<Node Name="Command">
+		<CppClass>CCommand</CppClass>
+		<CppInterface>ICommand</CppInterface>
+		<CppReference>CCommandRef</CppReference>
+	</Node>
+	<Node Name="Converter">
+		<CppClass>CConverter</CppClass>
+		<CppInterface>IFloat</CppInterface>
+		<CppReference>CFloatRef</CppReference>
+	</Node>
+	<Node Name="IntConverter">
+		<CppClass>CIntConverter</CppClass>
+		<CppInterface>IInteger</CppInterface>
+		<CppReference>CIntegerRef</CppReference>
+	</Node>
+</NodeTypes>

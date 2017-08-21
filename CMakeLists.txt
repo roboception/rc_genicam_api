@@ -11,12 +11,7 @@ include(cmake/project_version.cmake)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR})
-
-# - Find manditory packages -
-
-find_package(GENICAM 1.0.0 REQUIRED)
-
-include_directories(${GENICAM_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/genicam/library/CPP/include)
 
 # - Configuration for code optimization -
 
@@ -34,6 +29,7 @@ add_definitions(-std=c++11)
 
 # - Build individual parts -
 
+add_subdirectory(genicam)
 add_subdirectory(rc_genicam_api)
 add_subdirectory(tools)
 
@@ -49,7 +45,7 @@ set(PROJECT_LIBRARIES rc_genicam_api)
 # libraries that appear here, the following line should exist in a cmake
 # file in a sub directory:
 # install(TARGETS rcXXX_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
-set(PROJECT_STATIC_LIBRARIES rc_genicam_api_static)
+#set(PROJECT_STATIC_LIBRARIES rc_genicam_api_static)
 
 # comment the following line if your project does not provide any library
 include(cmake/configure_link_libs.cmake)
@@ -67,6 +63,8 @@ add_subdirectory(doc)
 #set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.name@roboception.de>")
 
 # optionally specify dependencies of the debian package here (comma separated!)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "genicam (>= 1.0.0)")
+#set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
+set(CPACK_DEBIAN_PACKAGE_CONFLICTS "genicam, rcgcapi")
+set(CPACK_DEBIAN_PACKAGE_REPLACES "rcgcapi")
 
 include(cmake/package_debian.cmake)
