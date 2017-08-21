@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_CPORT
-#define RCGCAPI_CPORT
+#ifndef RC_GENICAM_API_CPORT
+#define RC_GENICAM_API_CPORT
 
 #include "gentl_wrapper.h"
 

@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_STREAM
-#define RCGCAPI_STREAM
+#ifndef RC_GENICAM_API_STREAM
+#define RC_GENICAM_API_STREAM
 
 #include "device.h"
 #include "buffer.h"

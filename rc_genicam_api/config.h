@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_CONFIG
-#define RCGCAPI_CONFIG
+#ifndef RC_GENICAM_API_CONFIG
+#define RC_GENICAM_API_CONFIG
 
 #include <GenApi/GenApi.h>
 

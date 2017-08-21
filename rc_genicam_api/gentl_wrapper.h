@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_GENTL_WRAPPER
-#define RCGCAPI_GENTL_WRAPPER
+#ifndef RC_GENICAM_API_GENTL_WRAPPER
+#define RC_GENICAM_API_GENTL_WRAPPER
 
 #include <GenTL/GenTL_v1_5.h>
 

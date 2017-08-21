@@ -9,15 +9,15 @@
  * Author: Heiko Hirschmueller
  */
 
-#include <rcgcapi/system.h>
-#include <rcgcapi/interface.h>
-#include <rcgcapi/device.h>
-#include <rcgcapi/stream.h>
-#include <rcgcapi/buffer.h>
-#include <rcgcapi/image.h>
-#include <rcgcapi/config.h>
+#include <rc_genicam_api/system.h>
+#include <rc_genicam_api/interface.h>
+#include <rc_genicam_api/device.h>
+#include <rc_genicam_api/stream.h>
+#include <rc_genicam_api/buffer.h>
+#include <rc_genicam_api/image.h>
+#include <rc_genicam_api/config.h>
 
-#include <rcgcapi/pfnc.h>
+#include <rc_genicam_api/pfnc.h>
 
 #include <iostream>
 #include <fstream>

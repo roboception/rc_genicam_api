@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_IMAGELIST
-#define RCGCAPI_IMAGELIST
+#ifndef RC_GENICAM_API_IMAGELIST
+#define RC_GENICAM_API_IMAGELIST
 
 #include "image.h"
 

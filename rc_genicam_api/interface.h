@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_INTERFACE
-#define RCGCAPI_INTERFACE
+#ifndef RC_GENICAM_API_INTERFACE
+#define RC_GENICAM_API_INTERFACE
 
 #include "system.h"
 

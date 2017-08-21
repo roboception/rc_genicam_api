@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_PFNC
-#define RCGCAPI_PFNC
+#ifndef RC_GENICAM_API_PFNC
+#define RC_GENICAM_API_PFNC
 
 // definition of standard pixel formats
 

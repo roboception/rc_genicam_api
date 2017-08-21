@@ -5,7 +5,7 @@ if(POLICY CMP0048)
   cmake_policy(SET CMP0048 OLD)
 endif()
 
-project(rcgcapi)
+project(rc_genicam_api)
 include(cmake/project_version.cmake)
 
 enable_testing()
@@ -34,7 +34,7 @@ add_definitions(-std=c++11)
 
 # - Build individual parts -
 
-add_subdirectory(rcgcapi)
+add_subdirectory(rc_genicam_api)
 add_subdirectory(tools)
 
 # export project targets
@@ -43,13 +43,13 @@ add_subdirectory(tools)
 # libraries that appear here, the following line should exist in a cmake
 # file in a sub directory:
 # install(TARGETS rcXXX EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)
-set(PROJECT_LIBRARIES rcgcapi)
+set(PROJECT_LIBRARIES rc_genicam_api)
 
 # Declare static libraries that are created by your project. For all
 # libraries that appear here, the following line should exist in a cmake
 # file in a sub directory:
 # install(TARGETS rcXXX_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
-set(PROJECT_STATIC_LIBRARIES rcgcapi_static)
+set(PROJECT_STATIC_LIBRARIES rc_genicam_api_static)
 
 # comment the following line if your project does not provide any library
 include(cmake/configure_link_libs.cmake)

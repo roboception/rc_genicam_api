@@ -9,10 +9,10 @@
  * Author: Heiko Hirschmueller
  */
 
-#include <rcgcapi/system.h>
-#include <rcgcapi/interface.h>
-#include <rcgcapi/device.h>
-#include <rcgcapi/stream.h>
+#include <rc_genicam_api/system.h>
+#include <rc_genicam_api/interface.h>
+#include <rc_genicam_api/device.h>
+#include <rc_genicam_api/stream.h>
 
 #include <iostream>
 

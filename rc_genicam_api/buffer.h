@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_BUFFER
-#define RCGCAPI_BUFFER
+#ifndef RC_GENICAM_API_BUFFER
+#define RC_GENICAM_API_BUFFER
 
 #include <memory>
 

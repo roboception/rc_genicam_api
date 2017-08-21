@@ -9,8 +9,8 @@
  * Author: Heiko Hirschmueller
  */
 
-#ifndef RCGCAPI_EXCEPTION
-#define RCGCAPI_EXCEPTION
+#ifndef RC_GENICAM_API_EXCEPTION
+#define RC_GENICAM_API_EXCEPTION
 
 #include <memory>
 
