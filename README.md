@@ -9,7 +9,9 @@ which is included in this package.
 At runtime, a GenTL producer >= version 1.5 is required. A GenTL producer is a
 shared library that follows the naming schema '*.cti'. The environment variable
 GENICAM_GENTL64_PATH (or GENICAM_GENTL32_PATH on 32 Bit systems) must be set to
-path(s) that contain GenTL producers.
+path(s) that contain GenTL producers. In case the environment variable is not
+set or is empty, a default path is used, which points to the GenTL layer that
+is bundled with this package.
 
 This repository provides a library with wrapper classes for the GenTL producer.
 The tools are provided as examples for showing how to use the wrapper classes

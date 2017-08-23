@@ -64,7 +64,9 @@ class System : public std::enable_shared_from_this<System>
       Returns a list of systems (i.e. transport layers) that is currently
       available. For discovering available transport layers, the environment
       variable GENICAM_GENTL32_PATH or GENICAM_GENTL64_PATH (depending on the
-      compilation with 32 or 64 bit) is used.
+      compilation with 32 or 64 bit) is used. In case the environment variable
+      is not set or is empty, a default path is used, which points to the
+      GenTL layer that is bundled with rc_genicam_api.
 
       NOTE: This is the only method that can instantiate System objects.
 

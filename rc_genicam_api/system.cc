@@ -91,7 +91,14 @@ std::vector<std::shared_ptr<System> > System::getSystems()
     env="GENICAM_GENTL32_PATH";
   }
 
-  std::vector<std::string> name=getAvailableGenTLs(std::getenv(env));
+  const char *path=std::getenv(env);
+
+  if (path == 0 || *path == '\0')
+  {
+    path=GENTL_INSTALL_PATH;
+  }
+
+  std::vector<std::string> name=getAvailableGenTLs(path);
 
   // create list of systems according to the list, using either existing
   // systems or instantiating new ones

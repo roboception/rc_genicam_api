@@ -33,6 +33,9 @@
 
 project(rc_genicam_api CXX)
 
+string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
+add_definitions("-DGENTL_INSTALL_PATH=\"${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME_LOWER}\"")
+
 set(src
   exception.cc
   system.cc
