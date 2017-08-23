@@ -180,7 +180,6 @@ namespace GENAPI_NAMESPACE
         if (FeatureBag.m_Names.size() == FeatureBag.m_Values.size())
         {
             const gcstring_vector::const_iterator endNames = FeatureBag.m_Names.end();
-            const gcstring_vector::const_iterator endValues = FeatureBag.m_Values.end();
             for ( /**/; pName != endNames; ++pName, ++pValue)
             {
                 gcstring Name(*pName);
