@@ -11,12 +11,16 @@ shared library that follows the naming schema '*.cti'. The environment variable
 GENICAM_GENTL64_PATH (or GENICAM_GENTL32_PATH on 32 Bit systems) must be set to
 path(s) that contain GenTL producers.
 
-This repository provides wrapper classes in a library. The tools are provided
-as examples for showing how to use the wrapper classes and the GenICam
-reference implementation.
+This repository provides a library with wrapper classes for the GenTL producer.
+The tools are provided as examples for showing how to use the wrapper classes
+and the GenICam reference implementation.
 
 Tools
 -----
+
+The tools do not offer a graphical user interface. They are meant to be called
+from a shell and controlled by command line parameters. Calling the tools
+without any parameters prints a help text on the standard output.
 
 * gc_info
 
@@ -27,7 +31,8 @@ Tools
 * gc_config
 
   Can be used to list network specific information of GigE Vision cameras. The
-  network settings can also be changed.
+  network settings as well as all other parameters provided via GenICam can be
+  changed.
 
 * gc_stream
 
