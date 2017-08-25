@@ -1,3 +1,13 @@
+Version 1.2.0 (2017-08-15)
+--------------------------
+
+- rename rcgcapi to rc_genicam_api
+- getDevice() now accepts specification if interface as prefix
+- Added possibility to clean all resources before exit to avoid crashes of GenTL
+- add all GenICam files/libs instead of depending on external package
+- rename pfnc.h to pixel_formats.h
+- bundle GenTL lib from Baumer as fallback if GENICAM_GENTL64_PATH is not set
+
 Version 1.1.5 (2017-05-11)
 --------------------------
 
