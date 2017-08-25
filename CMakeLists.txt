@@ -62,6 +62,7 @@ add_definitions(-std=c++11)
 
 # - Build individual parts -
 
+add_subdirectory(baumer)
 add_subdirectory(genicam)
 add_subdirectory(rc_genicam_api)
 add_subdirectory(tools)

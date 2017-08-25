@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ConfigFile VendorName="Baumer" MajorVersion="2" MinorVersion="2" SubMinorVersion="0">
+  <FileVersion>2.3.0.0</FileVersion>
+  <Resend>
+    <Version>1</Version>
+    <Version1>
+      <!--Set the maximum number of resend requests per packet (default 3)-->
+      <MaxResendsPerPacket>3</MaxResendsPerPacket>
+      <ResendRetryThreshold>20</ResendRetryThreshold>
+      <ResendHostTimeout>1000</ResendHostTimeout>
+      <ThroughputCalculationEntrys>25</ThroughputCalculationEntrys>
+      <!--Set the maximum number of resend requests per image (default 500)-->
+      <MaxResendsPerImage>500</MaxResendsPerImage>
+      <!--Set the number of packets to wait before sending the first resend requests (default 0)-->
+      <FirstResendWaitPackets>0</FirstResendWaitPackets>
+      <!--Set the number of packets to wait before sending the first resend requests if the camera sends the data over two physical links (default 20)-->
+      <FirstResendWaitPacketsDualLink>20</FirstResendWaitPacketsDualLink>
+      <!--Set the time in ms to wait before sending the first resend requests (default 150)-->
+      <FirstResendWaitTime>150</FirstResendWaitTime>
+      <!--Set the number of packets to wait before sending the next resend requests (default 20)-->
+      <NextResendWaitPackets>20</NextResendWaitPackets>
+      <!--Set the number of packets to wait before sending the next resend requests if the camera sends the data over two physical links (default 20)-->
+      <NextResendWaitPacketsDualLink>20</NextResendWaitPacketsDualLink>
+      <!--Set the time in ms to wait before sending the next resend requests (default 100)-->
+      <NextResendWaitTime>100</NextResendWaitTime>
+      <!--Set socket read timeout, prevent cpu load, 0 not allowed and set to 1 (default 50)-->
+      <SocketReadTimeout>100</SocketReadTimeout>
+      <!--Packet dropper enable with 1, disable with 0(default 0)-->
+      <PacketDropperEnable>0</PacketDropperEnable>
+    </Version1>
+  </Resend>
+  <GVCP>
+    <!--Set Timeout (in ms) and number of retries for control channel
+        0 = the pending timeout register of camera is used for control channel timeout (default)
+        1..60000 = timeout value
+    -->
+    <ControlChannelTimeout>0</ControlChannelTimeout>
+    <!--The number of retries of commands on the control channel before the GigE Producer stops sending any further commands 
+        valid values:   0..4294967295 (0xffffffff)
+        default value: 3
+    -->
+    <ControlChannelRetries>3</ControlChannelRetries>
+    <!--After a failed command the control channel is locked, that means no further commands were transmitted. This feature controls this locking mechanism.
+        valid values:  1 - the GigE Producer locks the control channel after a failing command. No further command were transmitted.
+                       0 - the GigE Producer doesn't lock the control channel after a failing command. All further commands were transmitted.
+        default value: 1
+    -->
+    <UseControlChannelLocking>1</UseControlChannelLocking>
+
+    <!--Set Timeout(in ms) and number of retries for asynchronous messages from the camera (if supported) -->
+    <MessageChannelTimeout>100</MessageChannelTimeout>
+    <MessageChannelRetries>2</MessageChannelRetries>
+  </GVCP>
+  <GEV>
+      <!--Maximum packet size for GigE transmission. This value is used as upper limitation for 
+          automatic MTU (maximum transmission unit) detection. Set this value to 0 the MTU detection 
+          uses the preferred maximum of 9000. The smallest possible value is 576 and the highest value is 16380.
+          If you set a value outside this range the preferred maximum of 9000 is used. (default 9000)
+      --> 
+      <DeviceStreamChannelPacketSizeMax>9000</DeviceStreamChannelPacketSizeMax>
+      <!--
+      0 means enable automatic MTU (maximum transmission unit) detection. If you specify this value the
+      MTU detection is disabled and the value DeviceStreamChannelPacketSizeMax is ignored. 
+      The specified value is used directly as packet size. 
+      The smallest possible value is 576 and the highest value is 16380. If you set a value outside the range
+      the minimum packet size of 576 is used.
+      -->
+      <DeviceStreamChannelPacketSizeFix>0</DeviceStreamChannelPacketSizeFix>
+
+      <!--
+      This value controls the size of socket buffer for the control sockets. The memory is calculated by 2^n.
+      The smallest possible value is 14 for 16384 bytes and the higest value is 26 for 67108864 bytes. If you 
+      set a value outside the range the minimum or maximum value is used.
+      -->
+      <ControlSocketBufferSize>21</ControlSocketBufferSize>
+      <!--
+      This value controls the size of socket buffer for the stream sockets. The memory is calculated by 2^n.
+      The smallest possible value is 14 for 16384 bytes and the higest value is 26 for 67108864 bytes. If you 
+      set a value outside the range the minimum or maximum value is used.
+      -->
+      <StreamSocketBufferSize>25</StreamSocketBufferSize>
+      <!--
+      This value controls the size of socket buffer for the message sockets. The memory is calculated by 2^n.
+      The smallest possible value is 14 for 16384 bytes and the higest value is 26 for 67108864 bytes. If you 
+      set a value outside the range the minimum or maximum value is used.
+      -->
+      <MessageStreamSocketBufferSize>21</MessageStreamSocketBufferSize>
+      <!--
+      This value controls the size of the filter driver packet queue. Choose a value between 10 and 100,000 or
+      the defaut value of 5000 will be used.
+      -->
+      <FilterDriverBufferCount>5000</FilterDriverBufferCount>
+      <!--
+      This value controls the interval for sending packets on the stream channnel. This behavior is used to allow stream data to bypass firewalls.
+      Setting this value to 0 will stop sending packets on the stream channel.
+      -->
+      <StreamChannelSendInterval>30</StreamChannelSendInterval>
+      <!--
+      This value controls the interval for sending packets on the message channnel. This behavior is used to allow event data to bypass firewalls.
+      Setting this value to 0 will stop sending packets on the message channel.
+      -->
+      <MessageChannelSendInterval>30</MessageChannelSendInterval>
+  </GEV>
+  <SYSTEM>
+      <IncreaseThreadPriority>0</IncreaseThreadPriority>
+      <IncreasePriorityClass>0</IncreasePriorityClass>
+  </SYSTEM>
+
+</ConfigFile>
+<!-- EOF -->
+
