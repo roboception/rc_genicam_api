@@ -41,7 +41,7 @@
 #include <rc_genicam_api/image.h>
 #include <rc_genicam_api/config.h>
 
-#include <rc_genicam_api/pfnc.h>
+#include <rc_genicam_api/pixel_formats.h>
 
 #include <iostream>
 #include <fstream>

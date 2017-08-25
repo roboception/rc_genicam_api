@@ -59,7 +59,7 @@ set(hh
   config.h
   image.h
   imagelist.h
-  pfnc.h
+  pixel_formats.h
 )
 
 if (UNIX)

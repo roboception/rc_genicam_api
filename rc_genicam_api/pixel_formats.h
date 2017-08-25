@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RC_GENICAM_API_PFNC
-#define RC_GENICAM_API_PFNC
+#ifndef RC_GENICAM_API_PIXEL_FORMATS
+#define RC_GENICAM_API_PIXEL_FORMATS
 
 // definition of standard pixel formats
 

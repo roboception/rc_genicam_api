@@ -211,7 +211,7 @@ class Buffer
     bool getImagePresent() const;
     size_t getImageOffset() const;
     size_t getPayloadType() const; // see PAYLOADTYPE_INFO_IDS above
-    uint64_t getPixelFormat() const; // see PFNC.h if namespace is PIXELFORMAT_NAMESPACE_PFNC_32BIT
+    uint64_t getPixelFormat() const; // see pixel_formats.h if namespace is PIXELFORMAT_NAMESPACE_PFNC_32BIT
     uint64_t getPixelFormatNamespace() const; // see PIXELFORMAT_NAMESPACE_IDS above
     size_t getDeliveredImageHeight() const;
     size_t getDeliveredChunkPayloadSize() const;
