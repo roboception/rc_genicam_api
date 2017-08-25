@@ -13,6 +13,16 @@ if (${ARCHITECTURE} STREQUAL "armv7l")
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux32_ARMhf/libXmlParser_gcc46_v3_0.so
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux32_ARMhf/libLog_gcc46_v3_0.so
   )
+elseif (${ARCHITECTURE} STREQUAL "i686")
+  set(GENICAM_LIBRARIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/libGCBase_gcc421_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/libMathParser_gcc421_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/libGenApi_gcc421_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/libNodeMapData_gcc421_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/liblog4cpp_gcc421_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/libXmlParser_gcc421_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_i86/libLog_gcc421_v3_0.so
+  )
 elseif (${ARCHITECTURE} STREQUAL "x86_64")
   set(GENICAM_LIBRARIES
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_x64/libGCBase_gcc421_v3_0.so
