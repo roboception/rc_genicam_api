@@ -11,3 +11,5 @@ elseif (${ARCHITECTURE} STREQUAL "i686")
 else ()
   message(FATAL_ERROR "Unknown architecture")
 endif ()
+
+install(FILES bsysgige.xml COMPONENT bin DESTINATION lib/rc_genicam_api)
