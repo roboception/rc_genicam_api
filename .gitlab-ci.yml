@@ -61,7 +61,7 @@ before_script:
   script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake -DCMAKE_INSTALL_PREFIX="/usr" ..
     - make -j 4
     - make package
     - upload_deb.sh $DISTRO_CODENAME-stable *.deb
