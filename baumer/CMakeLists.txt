@@ -3,7 +3,7 @@ EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE
 message(STATUS "Detected architecture ${ARCHITECTURE}")
 
 if (${ARCHITECTURE} STREQUAL "armv7l")
-  message(STATUS "No GenTL producer library provided for ARM")
+  install(FILES Ubuntu-14.04/armv7l/libbgapi2_gige.cti COMPONENT bin DESTINATION lib/rc_genicam_api)
 elseif (${ARCHITECTURE} STREQUAL "x86_64")
   install(FILES Ubuntu-14.04/x86_64/libbgapi2_gige.cti COMPONENT bin DESTINATION lib/rc_genicam_api)
 elseif (${ARCHITECTURE} STREQUAL "i686")
