@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 
         if (dev)
         {
-          dev->open(rcg::Device::EXCLUSIVE);
+          dev->open(rcg::Device::READONLY);
 
           std::cout << "Device:        " << dev->getID() << std::endl;
           std::cout << "Vendor:        " << dev->getVendor() << std::endl;
