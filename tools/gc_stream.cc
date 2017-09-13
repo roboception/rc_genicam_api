@@ -54,13 +54,13 @@ namespace
   Store image given in buffer in PGM or PPM format.
 */
 
-std::string storeBuffer(const rcg::Buffer *buffer, double freq)
+std::string storeBuffer(const rcg::Buffer *buffer)
 {
   // prepare file name
 
   std::ostringstream name;
 
-  double t=buffer->getTimestamp()/freq;
+  double t=buffer->getTimestampNS()/1000000000.0;
 
   name << "image_" << std::setprecision(16) << t;
 
@@ -232,13 +232,6 @@ int main(int argc, char *argv[])
         dev->open(rcg::Device::EXCLUSIVE);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
-        double freq=dev->getTimestampFrequency();
-
-        if (freq == 0)
-        {
-          freq=1000000000;
-        }
-
         // set values as given on the command line
 
         int n=1;
@@ -287,7 +280,7 @@ int main(int argc, char *argv[])
 
             if (buffer != 0)
             {
-              std::string name=storeBuffer(buffer, freq);
+              std::string name=storeBuffer(buffer);
 
               if (name.size() > 0)
               {
