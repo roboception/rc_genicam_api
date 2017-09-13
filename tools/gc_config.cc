@@ -98,7 +98,14 @@ int main(int argc, char *argv[])
 
         if (dev != 0)
         {
-          dev->open(rcg::Device::EXCLUSIVE);
+          if (i < argc)
+          {
+            dev->open(rcg::Device::CONTROL);
+          }
+          else
+          {
+            dev->open(rcg::Device::READONLY);
+          }
 
           // change setting according to given parameters
 
