@@ -203,33 +203,21 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
 std::shared_ptr<Device> Interface::getDevice(const char *devid)
 {
+  // get list of all devices
+
+  std::vector<std::shared_ptr<Device> > list=getDevices();
+
+  // find requested device by ID or user defined name
+
   std::shared_ptr<Device> ret;
 
-  // check if the device is already available
-
-  for (size_t i=0; i<dlist.size(); i++)
+  for (size_t i=0; i<list.size(); i++)
   {
-    std::shared_ptr<Device> p=dlist[i].lock();
+    std::shared_ptr<Device> p=list[i];
 
-    if (p && p->getID() == devid)
+    if (p && (p->getID() == devid || p->getUserDefinedName() == devid))
     {
       ret=p;
-    }
-  }
-
-  // find new device by opening it
-
-  if (!ret && ifh != 0)
-  {
-    GenTL::DEV_HANDLE dev=0;
-    if (gentl->IFOpenDevice(ifh, devid, GenTL::DEVICE_ACCESS_READONLY, &dev) ==
-        GenTL::GC_ERR_SUCCESS)
-    {
-      gentl->DevClose(dev);
-
-      ret=std::shared_ptr<Device>(new Device(shared_from_this(), gentl, devid));
-
-      dlist.push_back(ret);
     }
   }
 
