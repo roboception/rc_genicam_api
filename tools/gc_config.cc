@@ -200,6 +200,8 @@ int main(int argc, char *argv[])
     {
       std::cout << argv[0] << " -l|([interface-id>:]<device-id> <options>)" << std::endl;
       std::cout << std::endl;
+      std::cout << "Configuration of a device via GenICam" << std::endl;
+      std::cout << std::endl;
       std::cout << "-n <id>: Set user defined id" << std::endl;
       std::cout << "-d 1|0:  Switch DHCP on or off" << std::endl;
       std::cout << "-p 1|0:  Switch persistent IP on or off" << std::endl;

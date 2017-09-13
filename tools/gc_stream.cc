@@ -322,6 +322,8 @@ int main(int argc, char *argv[])
 
       std::cout << argv[0] << " [interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
+      std::cout << "Stores n images from the specified device after applying the given values" << std::endl;
+      std::cout << std::endl;
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
       std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
       std::cout << "<key>=<value> Values set via GenICam before streaming images" << std::endl;

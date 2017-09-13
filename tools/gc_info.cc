@@ -398,6 +398,8 @@ int main(int argc, char *argv[])
     else
     {
       std::cout << argv[0] << " -l | ([interface-id>:]<device-id> [<name_for_xml_file>])" << std::endl;
+      std::cout << std::endl;
+      std::cout << "Lists all reachable devices or all GenICam parameters of the specified device" << std::endl;
     }
   }
   catch (const std::exception &ex)
