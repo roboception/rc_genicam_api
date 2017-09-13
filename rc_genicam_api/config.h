@@ -237,6 +237,19 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
 std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                       bool exception=false);
 
+
+/*
+  Checks the value of given feature and throws an exception in case of a mismatch.
+  The check succeeds if the feature does not exist.
+
+  @param nodemap Feature nodemap.
+  @param name    Name of feature.
+  @param value   Expected value of feature.
+*/
+
+void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                  const char *value);
+
 }
 
 #endif

@@ -780,4 +780,17 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
   return out.str();
 }
 
+void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                  const char *value)
+{
+  std::string cvalue=rcg::getString(nodemap, name, true);
+
+  if (cvalue != "" && cvalue != value)
+  {
+    std::ostringstream out;
+    out << name << " == " << value << " expected: " << cvalue;
+    throw std::invalid_argument(out.str());
+  }
+}
+
 }
