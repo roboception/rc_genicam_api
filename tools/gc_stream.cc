@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 
       if (dev)
       {
-        dev->open(rcg::Device::EXCLUSIVE);
+        dev->open(rcg::Device::CONTROL);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
         // set values as given on the command line
