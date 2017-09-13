@@ -124,6 +124,21 @@ void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i);
 
 void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i);
 
+/**
+  Expects an image in Mono8 or YCbCr411_8 format and returns the color as RGB
+  value at the given pixel location. The downscale factor ds can be greater
+  than one. In this case, the given pixel location refers to the downscaled
+  image and the returned color is averaged over ds x ds pixels.
+
+  @param rgb  Array of size 3 for returning the color.
+  @param img  Pointer to image.
+  @param ds   Downscale factor, i.e. >= 1
+  @param i, k Pixel location in downscaled coordinates.
+*/
+
+void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
+              uint32_t ds, uint32_t i, uint32_t k);
+
 }
 
 #endif

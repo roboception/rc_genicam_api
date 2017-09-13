@@ -36,6 +36,7 @@
 #include "image.h"
 
 #include "exception.h"
+#include "pixel_formats.h"
 
 #include <cstring>
 
@@ -126,6 +127,64 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
     *rgb++=clamp8(Y[j]+rc);
     *rgb++=clamp8(Y[j]+gc);
     *rgb++=clamp8(Y[j]+bc);
+  }
+}
+
+void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
+              uint32_t ds, uint32_t i, uint32_t k)
+{
+  i*=ds;
+  k*=ds;
+
+  if (img->getPixelFormat() == Mono8) // convert from monochrome
+  {
+    size_t lstep=img->getWidth()+img->getXPadding();
+    const uint8_t *p=img->getPixels()+k*lstep+i;
+
+    uint32_t g=0, n=0;
+
+    for (uint32_t kk=0; kk<ds; kk++)
+    {
+      for (uint32_t ii=0; ii<ds; ii++)
+      {
+        g+=p[ii];
+        n++;
+      }
+
+      p+=lstep;
+    }
+
+    rgb[2]=rgb[1]=rgb[0]=g/n;
+  }
+  else if (img->getPixelFormat() == YCbCr411_8) // convert from YUV
+  {
+    size_t lstep=(img->getWidth()>>2)*6+img->getXPadding();
+    const uint8_t *p=img->getPixels()+k*lstep;
+
+    uint32_t r=0;
+    uint32_t g=0;
+    uint32_t b=0;
+    uint32_t n=0;
+
+    for (uint32_t kk=0; kk<ds; kk++)
+    {
+      for (uint32_t ii=0; ii<ds; ii++)
+      {
+        uint8_t v[3];
+        rcg::convYCbCr411toRGB(v, p, i+ii);
+
+        r+=v[0];
+        g+=v[1];
+        b+=v[2];
+        n++;
+      }
+
+      p+=lstep;
+    }
+
+    rgb[0]=r/n;
+    rgb[1]=g/n;
+    rgb[2]=b/n;
   }
 }
 
