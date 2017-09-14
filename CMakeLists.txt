@@ -60,12 +60,17 @@ add_definitions(-Wall)
 add_definitions(-Wno-unknown-pragmas)
 add_definitions(-std=c++11)
 
+# - Options -
+
+option(BUILD_TOOLS "Build commandline tools" ON)
+option(BUILD_DOC "Add target for building doxygen docs" ON)
+option(BUILD_SHARED_LIBS "Build shared libs" ON)
+
 # - Build individual parts -
 
 add_subdirectory(baumer)
 add_subdirectory(genicam)
 add_subdirectory(rc_genicam_api)
-option(BUILD_TOOLS "Build commandline tools" ON)
 if (BUILD_TOOLS)
   add_subdirectory(tools)
 endif ()
@@ -76,7 +81,9 @@ endif ()
 # libraries that appear here, the following line should exist in a cmake
 # file in a sub directory:
 # install(TARGETS rcXXX EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)
-set(PROJECT_LIBRARIES rc_genicam_api)
+if (BUILD_SHARED_LIBS)
+  set(PROJECT_LIBRARIES rc_genicam_api)
+endif ()
 
 # Declare static libraries that are created by your project. For all
 # libraries that appear here, the following line should exist in a cmake
@@ -84,11 +91,10 @@ set(PROJECT_LIBRARIES rc_genicam_api)
 # install(TARGETS rcXXX_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
 #set(PROJECT_STATIC_LIBRARIES rc_genicam_api_static)
 
-# comment the following line if your project does not provide any library
+
 include(cmake/configure_link_libs.cmake)
 
 # add a target to generate API documentation with Doxygen
-option(BUILD_DOC "Add target for building doxygen docs" ON)
 if (BUILD_DOC)
   add_subdirectory(doc)
 endif()

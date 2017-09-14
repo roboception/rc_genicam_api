@@ -40,4 +40,8 @@ endif ()
 set(GENICAM_LIBRARIES ${GENICAM_LIBRARIES} PARENT_SCOPE)
 
 install(FILES ${GENICAM_LIBRARIES} COMPONENT bin DESTINATION lib)
-install(DIRECTORY library/CPP/include/ COMPONENT dev DESTINATION include/rc_genicam_api/genicam)
+
+# only install headers if we build and install the shared lib
+if (BUILD_SHARED_LIBS)
+  install(DIRECTORY library/CPP/include/ COMPONENT dev DESTINATION include/rc_genicam_api/genicam)
+endif ()

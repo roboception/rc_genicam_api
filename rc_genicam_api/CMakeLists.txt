@@ -68,16 +68,24 @@ endif ()
 
 add_library(rc_genicam_api_static STATIC ${src})
 target_link_libraries(rc_genicam_api_static ${GENICAM_LIBRARIES})
-
-add_library(rc_genicam_api SHARED ${src})
-target_link_libraries(rc_genicam_api LINK_PRIVATE ${GENICAM_LIBRARIES})
-
 if (UNIX)
-target_link_libraries(rc_genicam_api_static dl)
-target_link_libraries(rc_genicam_api LINK_PRIVATE dl)
+  target_link_libraries(rc_genicam_api_static dl)
 endif ()
 
-install(TARGETS rc_genicam_api EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)
-set_target_properties(rc_genicam_api PROPERTIES SOVERSION ${abiversion})
 #install(TARGETS rc_genicam_api_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
-install(FILES ${hh} COMPONENT dev DESTINATION include/rc_genicam_api)
+
+if (BUILD_SHARED_LIBS)
+  add_library(rc_genicam_api SHARED ${src})
+  target_link_libraries(rc_genicam_api LINK_PRIVATE ${GENICAM_LIBRARIES})
+  if (UNIX)
+    target_link_libraries(rc_genicam_api LINK_PRIVATE dl)
+  endif ()
+  set_target_properties(rc_genicam_api PROPERTIES SOVERSION ${abiversion})
+
+  install(TARGETS rc_genicam_api EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)
+endif ()
+
+# only install headers if we build and install the shared lib
+if (BUILD_SHARED_LIBS)
+  install(FILES ${hh} COMPONENT dev DESTINATION include/rc_genicam_api)
+endif ()
