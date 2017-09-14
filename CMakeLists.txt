@@ -91,7 +91,6 @@ endif ()
 # install(TARGETS rcXXX_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)
 #set(PROJECT_STATIC_LIBRARIES rc_genicam_api_static)
 
-
 include(cmake/configure_link_libs.cmake)
 
 # add a target to generate API documentation with Doxygen

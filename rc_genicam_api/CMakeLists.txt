@@ -47,6 +47,7 @@ set(src
   config.cc
   image.cc
   imagelist.cc
+  ${CMAKE_CURRENT_BINARY_DIR}/project_version.cc
 )
 
 set(hh
@@ -60,6 +61,7 @@ set(hh
   image.h
   imagelist.h
   pixel_formats.h
+  ${CMAKE_CURRENT_BINARY_DIR}/project_version.h
 )
 
 if (UNIX)
