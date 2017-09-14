@@ -215,8 +215,16 @@ std::shared_ptr<Device> Interface::getDevice(const char *devid)
   {
     std::shared_ptr<Device> p=list[i];
 
-    if (p && (p->getID() == devid || p->getUserDefinedName() == devid))
+    if (p && (p->getID() == devid || p->getDisplayName() == devid))
     {
+      if (ret)
+      {
+        std::cerr << "There is more than one device with ID or user defined name: " << devid
+                  << std::endl;
+        ret=0;
+        break;
+      }
+
       ret=p;
     }
   }
