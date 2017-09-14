@@ -43,8 +43,8 @@ include(cmake/project_version.cmake)
 
 enable_testing()
 
-include_directories(${CMAKE_SOURCE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/genicam/library/CPP/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/genicam/library/CPP/include)
 
 # - Configuration for code optimization -
 
@@ -65,7 +65,10 @@ add_definitions(-std=c++11)
 add_subdirectory(baumer)
 add_subdirectory(genicam)
 add_subdirectory(rc_genicam_api)
-add_subdirectory(tools)
+option(BUILD_TOOLS "Build commandline tools" ON)
+if (BUILD_TOOLS)
+  add_subdirectory(tools)
+endif ()
 
 # export project targets
 
