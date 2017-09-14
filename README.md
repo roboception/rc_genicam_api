@@ -26,9 +26,9 @@ without any parameters prints a help text on the standard output.
 
 * gc_info
 
-  Lists information about all producers and cameras available on the system. If
-  a device ID is provided, all information about the device including current
-  settings are listed.
+  Lists all available devices with some information. If a device ID is
+  provided, all information about the device including current settings are
+  listed.
 
 * gc_config
 
@@ -42,4 +42,16 @@ without any parameters prints a help text on the standard output.
   features can be configured directly from the command line. Images will be
   stored in PGM or PPM format, dependig on the image format.
 
-  NOTE: The sv tool of cvkit can be used to view images in this format.
+  NOTE: Many image viewers can display PGM and PPM format. The sv tool of cvkit
+  (https://github.com/roboception/cvkit) can also be used.
+
+* gc_pointcloud
+
+  This tool streams the left image, disparity, confidence and error. It takes
+  the first set of time synchroneous images, computes a colored point cloud
+  and stores it in PLY ASCII format. This tool demonstrates how to stream
+  corresponding images (e.g. left image and disparity with the same time
+  stamp).
+
+  NOTE: PLY is a standard format for scanned 3D data. The plyv tool of cvkit
+  (https://github.com/roboception/cvkit) can also be used for visualization.
