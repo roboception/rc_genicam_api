@@ -333,7 +333,6 @@ int main(int argc, char *argv[])
               std::cout << "        TL type:       " << device[j]->getTLType() << std::endl;
               std::cout << "        Display name:  " << device[j]->getDisplayName() << std::endl;
               std::cout << "        Access status: " << device[j]->getAccessStatus() << std::endl;
-              std::cout << "        User name:     " << device[j]->getUserDefinedName() << std::endl;
               std::cout << "        Serial number: " << device[j]->getSerialNumber() << std::endl;
               std::cout << "        Version:       " << device[j]->getVersion() << std::endl;
               std::cout << "        TS Frequency:  " << device[j]->getTimestampFrequency() << std::endl;
