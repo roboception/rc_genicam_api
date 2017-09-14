@@ -109,7 +109,7 @@ void Device::open(ACCESS access)
     if (gentl->IFOpenDevice(parent->getHandle(), id.c_str(), mode, &dev) != GenTL::GC_ERR_SUCCESS)
     {
       parent->close();
-      throw GenTLException("Device::open()", gentl);
+      throw GenTLException("Device::open() failed", gentl);
     }
   }
 
