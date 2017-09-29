@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
           // prepare buffers for time synchronization of images (buffer at most
           // 25 images in each list)
 
-          rcg::ImageList left_list(25);
+          rcg::ImageList left_list(50);
           rcg::ImageList disp_list(25);
           rcg::ImageList conf_list(25);
           rcg::ImageList error_list(25);
