@@ -55,3 +55,58 @@ without any parameters prints a help text on the standard output.
 
   NOTE: PLY is a standard format for scanned 3D data. The plyv tool of cvkit
   (https://github.com/roboception/cvkit) can also be used for visualization.
+
+Troubleshooting
+---------------
+
+When images are received at a lower rate than set/exepected the most
+likely problem is that this (user space) library can't read the many UDP packets
+fast enough resulting in incomplete image buffers.
+
+### Test Script
+
+The `net_perf_check.sh` script performs some simple checks and should be run
+while or after streaming images via GigE Vision.
+
+    ./net_perf_check.sh --help
+
+### Jumbo Frames
+
+First of all increasing the UDP packet size (using jubo frames) is strongly recommended!
+Increase the MTU of your network interface to 9000, e.g.
+
+    sudo ifconfig eth0 mtu 9000
+
+Also make sure that all network devices/switches beween your host and the sensor support this.
+
+### sysctl settings
+
+There are several Linux sysctl options that can be modified to increase
+performance for the GigE Vision usecase.
+
+These values can be changed during runtime with `sysctl` or written to
+`/etc/sysctl.conf` for persistence across reboots.
+
+#### rmem_max
+
+If the number of UDP RcvbufErrors increases while streaming, increasing the socket receive buffer size usually fixes the problem.
+
+Check the RcvbufErrors with `net_perf_check.sh` or
+
+    netstat -us | grep RcvbufErrors
+
+Increase max receive buffer size:
+
+    sudo sysctl -w net.core.rmem_max=33554432
+
+
+#### softirq
+
+Changing these values is usually not necessary, but can help if the kernel
+is already dropping packets.
+
+Check with `net_perf_check.sh` and increase the values if needed:
+
+    sudo sysctl -w net.core.netdev_max_backlog=2000
+    sudo sysctl -w net.core.netdev_budget=600
+
