@@ -18,9 +18,9 @@
       <!--Set the time in ms to wait before sending the first resend requests (default 150)-->
       <FirstResendWaitTime>150</FirstResendWaitTime>
       <!--Set the number of packets to wait before sending the next resend requests (default 20)-->
-      <NextResendWaitPackets>20</NextResendWaitPackets>
+      <NextResendWaitPackets>200</NextResendWaitPackets>
       <!--Set the number of packets to wait before sending the next resend requests if the camera sends the data over two physical links (default 20)-->
-      <NextResendWaitPacketsDualLink>20</NextResendWaitPacketsDualLink>
+      <NextResendWaitPacketsDualLink>200</NextResendWaitPacketsDualLink>
       <!--Set the time in ms to wait before sending the next resend requests (default 100)-->
       <NextResendWaitTime>100</NextResendWaitTime>
       <!--Set socket read timeout, prevent cpu load, 0 not allowed and set to 1 (default 50)-->
