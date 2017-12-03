@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
   }
   catch (const std::exception &ex)
   {
-    std::cerr << ex.what() << std::endl;
+    std::cerr << "Exception: " << ex.what() << std::endl;
   }
 
   rcg::System::clearSystems();

@@ -313,7 +313,20 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
           case GenApi::intfIBoolean:
             {
               GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
-              p->SetValue(std::stoi(std::string(value)));
+
+              std::string v=std::string(value);
+              if (v == "true" || v == "True" || v == "TRUE")
+              {
+                p->SetValue(1);
+              }
+              else if (v == "false" || v == "False" || v == "FALSE")
+              {
+                p->SetValue(0);
+              }
+              else
+              {
+                p->SetValue(std::stoi(v));
+              }
             }
             break;
 
