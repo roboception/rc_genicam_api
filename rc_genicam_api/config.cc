@@ -442,7 +442,7 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
 }
 
 bool getBoolean(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
-                bool exception)
+                bool exception, bool igncache)
 {
   bool ret=false;
 
@@ -458,7 +458,7 @@ bool getBoolean(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
 
         if (val != 0)
         {
-          ret=val->GetValue();
+          ret=val->GetValue(false, igncache);
         }
         else if (exception)
         {
@@ -487,7 +487,7 @@ bool getBoolean(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
 }
 
 int64_t getInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
-                   int64_t *vmin, int64_t *vmax, bool exception)
+                   int64_t *vmin, int64_t *vmax, bool exception, bool igncache)
 {
   int64_t ret=0;
 
@@ -506,7 +506,7 @@ int64_t getInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const ch
 
         if (val != 0)
         {
-          ret=val->GetValue();
+          ret=val->GetValue(false, igncache);
 
           if (vmin != 0) *vmin=val->GetMin();
           if (vmax != 0) *vmax=val->GetMax();
@@ -538,7 +538,7 @@ int64_t getInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const ch
 }
 
 double getFloat(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
-                double *vmin, double *vmax, bool exception)
+                double *vmin, double *vmax, bool exception, bool igncache)
 {
   double ret=0;
 
@@ -557,7 +557,7 @@ double getFloat(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char 
 
         if (val != 0)
         {
-          ret=val->GetValue();
+          ret=val->GetValue(false, igncache);
 
           if (vmin != 0) *vmin=val->GetMin();
           if (vmax != 0) *vmax=val->GetMax();
@@ -689,7 +689,7 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
 }
 
 std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
-                      bool exception)
+                      bool exception, bool igncache)
 {
   std::ostringstream out;
 
@@ -706,14 +706,14 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
           case GenApi::intfIBoolean:
             {
               GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
-              out << p->GetValue();
+              out << p->GetValue(false, igncache);
             }
             break;
 
           case GenApi::intfIInteger:
             {
               GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(node);
-              int64_t value=p->GetValue();
+              int64_t value=p->GetValue(false, igncache);
 
               switch (p->GetRepresentation())
               {
@@ -746,7 +746,7 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
           case GenApi::intfIFloat:
             {
               GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
-              out << p->GetValue();
+              out << p->GetValue(false, igncache);
             }
             break;
 
@@ -760,7 +760,7 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
           case GenApi::intfIString:
             {
               GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
-              out << p->GetValue();
+              out << p->GetValue(false, igncache);
             }
             break;
 
@@ -794,9 +794,9 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
 }
 
 void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
-                  const char *value)
+                  const char *value, bool igncache)
 {
-  std::string cvalue=rcg::getString(nodemap, name, true);
+  std::string cvalue=rcg::getString(nodemap, name, true, igncache);
 
   if (cvalue != "" && cvalue != value)
   {
