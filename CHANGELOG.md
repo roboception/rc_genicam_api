@@ -1,3 +1,53 @@
+Version 1.3.0 (2017-12-05)
+--------------------------
+
+New tools / examples:
+
+- Added tool gc_pointcloud that demonstrates synchroneous streaming and 3D
+  reconstruction
+
+Improvements of convenience layer:
+
+- Accept true and false for boolean GenICam values additionally to 1 and 0
+- Added option to ignore cache when reading parameter
+- Added convenience function getColor()
+- Added convience function checkFeature()
+- Changing request for timestamp in gc_stream tool
+- Fixed finding devices by user defined name
+
+Improvement of help texts and messages:
+
+- Improved help for command line tools
+- Improved exception description
+- Added printing components with enabled status in gc_stream tool
+- Removed output of user name in gc_info as this is not the name that can be
+  defined via gc_config -n
+
+Changes of access mode to permit parallel read access:
+
+- Open device in gc_info readonly so that it can be used in parallel to an
+  open device
+- Open device in gc_config readonly if no parameter changes are requested
+- Opening device in gc_stream with access mode control
+- Changed getDevice() function so that exclusively opened devices are
+  discovered as well
+
+Configuration and optimization:
+
+- [baumer] increase NextResendWaitPackets to 200
+- add net_perf_check.sh script
+
+Changes in build configuration:
+
+- Ensure that the install directory lib/rc_genicam_api is accessible for
+  everybody
+- option to disable building of tools
+- option for building shared libs
+- generate version info
+- add option to disable doc target
+- Switched off vectorization and looking for CUDA as it is not necessary
+- add Baumer GenTL lib for armv7l
+
 Version 1.2.0 (2017-08-15)
 --------------------------
 
