@@ -261,6 +261,32 @@ int main(int argc, char *argv[])
           }
         }
 
+        // print enabled streams
+
+        {
+          std::vector<std::string> component;
+
+          rcg::getEnum(nodemap, "ComponentSelector", component, false);
+
+          if (component.size() > 0)
+          {
+            std::cout << std::endl;
+            std::cout << "Available components (1 means enabled, 0 means disabled):" << std::endl;
+            std::cout << std::endl;
+
+            for (size_t i=0; i<component.size(); i++)
+            {
+              rcg::setEnum(nodemap, "ComponentSelector", component[i].c_str(), true);
+
+              std::cout << component[i] << ": ";
+              std::cout << rcg::getBoolean(nodemap, "ComponentEnable", true, true);
+              std::cout << std::endl;
+            }
+
+            std::cout << std::endl;
+          }
+        }
+
         // open stream and get n images
 
         std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
@@ -315,7 +341,8 @@ int main(int argc, char *argv[])
 
       std::cout << argv[0] << " [interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
-      std::cout << "Stores n images from the specified device after applying the given values" << std::endl;
+      std::cout << "Stores n images from the specified device after applying the given values." << std::endl;
+      std::cout << "Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
       std::cout << std::endl;
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
       std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
