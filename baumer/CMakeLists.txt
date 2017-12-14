@@ -1,16 +1,29 @@
 
-EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+if (UNIX)
+  EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+elseif (WIN32)
+  if ("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
+    set(ARCHITECTURE WIN32_i86)
+  else ()
+    set(ARCHITECTURE WIN64_x64)
+  endif ()
+endif ()
+
 message(STATUS "Detected architecture ${ARCHITECTURE}")
 
 install(DIRECTORY DESTINATION lib/rc_genicam_api
         DIRECTORY_PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
 
-if (${ARCHITECTURE} STREQUAL "armv7l")
+if ("${ARCHITECTURE}" STREQUAL "armv7l")
   install(FILES Ubuntu-14.04/armv7l/libbgapi2_gige.cti COMPONENT bin DESTINATION lib/rc_genicam_api)
-elseif (${ARCHITECTURE} STREQUAL "x86_64")
+elseif ("${ARCHITECTURE}" STREQUAL "x86_64")
   install(FILES Ubuntu-14.04/x86_64/libbgapi2_gige.cti COMPONENT bin DESTINATION lib/rc_genicam_api)
-elseif (${ARCHITECTURE} STREQUAL "i686")
+elseif ("${ARCHITECTURE}" STREQUAL "i686")
   install(FILES Ubuntu-14.04/i686/libbgapi2_gige.cti COMPONENT bin DESTINATION lib/rc_genicam_api)
+elseif ("${ARCHITECTURE}" STREQUAL "WIN32_i86")
+  install(FILES Win32_i86/bgapi2_gige.cti COMPONENT bin DESTINATION bin)
+elseif ("${ARCHITECTURE}" STREQUAL "WIN64_x64")
+  install(FILES Win64_x64/bgapi2_gige.cti COMPONENT bin DESTINATION bin)
 else ()
   message(FATAL_ERROR "Unknown architecture")
 endif ()
