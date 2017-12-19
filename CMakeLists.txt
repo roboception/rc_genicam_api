@@ -66,11 +66,12 @@ endif ()
 # In case of Visual Studio, enable exporting all symbols and disable some
 # warnings
 
-if (MSVC)
+if (WIN32)
   add_definitions(/DGENICAM_NO_AUTO_IMPLIB)
-  
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-  
+endif ()
+
+if (MSVC)
   add_definitions("/wd4003")
   add_definitions("/wd4514")
   add_definitions("/wd4710")

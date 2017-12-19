@@ -112,7 +112,7 @@ inline std::string toLower(const std::string &s, size_t start, size_t size)
 {
   std::ostringstream out;
 
-  size_t end=min(s.size(), start+size);
+  size_t end=std::min(s.size(), start+size);
 
   while (start < end)
   {

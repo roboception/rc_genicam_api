@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 
           if (key == "n") // set number of images
           {
-            n=max(1, std::stoi(value));
+            n=std::max(1, std::stoi(value));
           }
           else // set key=value pair through GenICam
           {
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
         }
 
         // open stream and get n images
-        
+
         std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
 
         if (stream.size() > 0)
@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
                 std::cerr << "Cannot grab images" << std::endl;
                 break;
               }
-			  
+
 			  retry--;
 			}
           }

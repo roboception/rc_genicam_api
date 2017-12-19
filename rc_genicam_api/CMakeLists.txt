@@ -35,7 +35,7 @@ project(rc_genicam_api CXX)
 
 string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
 
-if (UINX)
+if (UNIX)
   add_definitions("-DGENTL_INSTALL_PATH=\"${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME_LOWER}\"")
 elseif (WIN32)
   add_definitions("-DGENTL_INSTALL_PATH=\"${CMAKE_INSTALL_PREFIX}/bin\"")
@@ -86,11 +86,11 @@ endif ()
 if (BUILD_SHARED_LIBS)
   add_library(rc_genicam_api SHARED ${src})
   target_link_libraries(rc_genicam_api LINK_PRIVATE ${GENICAM_LIBRARIES})
-  
+
   if (UNIX)
     target_link_libraries(rc_genicam_api LINK_PRIVATE dl)
   endif ()
-  
+
   set_target_properties(rc_genicam_api PROPERTIES SOVERSION ${abiversion})
 
   install(TARGETS rc_genicam_api EXPORT PROJECTTargets COMPONENT bin
