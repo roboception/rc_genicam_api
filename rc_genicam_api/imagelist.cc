@@ -35,6 +35,8 @@
 
 #include "imagelist.h"
 
+#include <algorithm>
+
 namespace rcg
 {
 
@@ -71,7 +73,7 @@ void ImageList::removeOld(uint64_t timestamp)
   {
     if (list[i]->getTimestampNS() <= timestamp)
     {
-      list.erase(list.begin()+i);
+      list.erase(list.begin()+static_cast<int>(i));
     }
     else
     {

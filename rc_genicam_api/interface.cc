@@ -123,7 +123,7 @@ int find(const std::vector<std::shared_ptr<Device> > &list, const std::string &i
   {
     if (list[i]->getID() == id)
     {
-      return i;
+      return static_cast<int>(i);
     }
   }
 
@@ -181,7 +181,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
       if (k >= 0)
       {
-        ret.push_back(current[k]);
+        ret.push_back(current[static_cast<size_t>(k)]);
       }
       else
       {
@@ -241,7 +241,7 @@ std::string cIFGetInfo(const Interface *obj,
 {
   std::string ret;
 
-  GenTL::INFO_DATATYPE type;
+  GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
   char tmp[1024]="";
   size_t tmp_size=sizeof(tmp);
   GenTL::GC_ERROR err=GenTL::GC_ERR_ERROR;

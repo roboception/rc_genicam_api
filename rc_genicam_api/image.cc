@@ -89,8 +89,8 @@ inline unsigned char clamp8(int v)
 
 void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i)
 {
-  const uint32_t j=(i>>2)*6;
-  const uint32_t js=i&0x3;
+  const uint32_t j=static_cast<uint32_t>((i>>2)*6);
+  const uint32_t js=static_cast<uint32_t>(i&0x3);
 
   int Y=row[j+js];
   if (js > 1)
@@ -154,7 +154,7 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
       p+=lstep;
     }
 
-    rgb[2]=rgb[1]=rgb[0]=g/n;
+    rgb[2]=rgb[1]=rgb[0]=static_cast<uint8_t>(g/n);
   }
   else if (img->getPixelFormat() == YCbCr411_8) // convert from YUV
   {
@@ -171,7 +171,7 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
       for (uint32_t ii=0; ii<ds; ii++)
       {
         uint8_t v[3];
-        rcg::convYCbCr411toRGB(v, p, i+ii);
+        rcg::convYCbCr411toRGB(v, p, static_cast<int>(i+ii));
 
         r+=v[0];
         g+=v[1];
@@ -182,9 +182,9 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
       p+=lstep;
     }
 
-    rgb[0]=r/n;
-    rgb[1]=g/n;
-    rgb[2]=b/n;
+    rgb[0]=static_cast<uint8_t>(r/n);
+    rgb[1]=static_cast<uint8_t>(g/n);
+    rgb[2]=static_cast<uint8_t>(b/n);
   }
 }
 

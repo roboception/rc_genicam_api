@@ -68,8 +68,8 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
   if (!buffer->getIsIncomplete() && buffer->getImagePresent())
   {
-    int width=buffer->getWidth();
-    int height=buffer->getHeight();
+    size_t width=buffer->getWidth();
+    size_t height=buffer->getHeight();
     const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
 
     size_t px=buffer->getXPadding();
@@ -102,11 +102,11 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
           std::streambuf *sb=out.rdbuf();
 
-          for (int k=0; k<height && out.good(); k++)
+          for (size_t k=0; k<height && out.good(); k++)
           {
-            for (int i=0; i<width; i++)
+            for (size_t i=0; i<width; i++)
             {
-              sb->sputc(*p++);
+              sb->sputc(static_cast<char>(*p++));
             }
 
             p+=px;
@@ -131,12 +131,12 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
           if (buffer->isBigEndian())
           {
-            for (int k=0; k<height && out.good(); k++)
+            for (size_t k=0; k<height && out.good(); k++)
             {
-              for (int i=0; i<width; i++)
+              for (size_t i=0; i<width; i++)
               {
-                sb->sputc(*p++);
-                sb->sputc(*p++);
+                sb->sputc(static_cast<char>(*p++));
+                sb->sputc(static_cast<char>(*p++));
               }
 
               p+=px;
@@ -144,12 +144,12 @@ std::string storeBuffer(const rcg::Buffer *buffer)
           }
           else
           {
-            for (int k=0; k<height && out.good(); k++)
+            for (size_t k=0; k<height && out.good(); k++)
             {
-              for (int i=0; i<width; i++)
+              for (size_t i=0; i<width; i++)
               {
-                sb->sputc(p[1]);
-                sb->sputc(p[0]);
+                sb->sputc(static_cast<char>(p[1]));
+                sb->sputc(static_cast<char>(p[0]));
                 p+=2;
               }
 
@@ -173,16 +173,16 @@ std::string storeBuffer(const rcg::Buffer *buffer)
           std::streambuf *sb=out.rdbuf();
 
           size_t pstep=(width>>2)*6+px;
-          for (int k=0; k<height && out.good(); k++)
+          for (size_t k=0; k<height && out.good(); k++)
           {
-            for (int i=0; i<width; i+=4)
+            for (size_t i=0; i<width; i+=4)
             {
               uint8_t rgb[12];
-              rcg::convYCbCr411toQuadRGB(rgb, p, i);
+              rcg::convYCbCr411toQuadRGB(rgb, p, static_cast<int>(i));
 
               for (int j=0; j<12; j++)
               {
-                sb->sputc(rgb[j]);
+                sb->sputc(static_cast<char>(rgb[j]));
               }
             }
 
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 
           if (key == "n") // set number of images
           {
-            n=std::max(1, std::stoi(value));
+            n=max(1, std::stoi(value));
           }
           else // set key=value pair through GenICam
           {
@@ -274,11 +274,11 @@ int main(int argc, char *argv[])
             std::cout << "Available components (1 means enabled, 0 means disabled):" << std::endl;
             std::cout << std::endl;
 
-            for (size_t i=0; i<component.size(); i++)
+            for (size_t k=0; k<component.size(); k++)
             {
-              rcg::setEnum(nodemap, "ComponentSelector", component[i].c_str(), true);
+              rcg::setEnum(nodemap, "ComponentSelector", component[k].c_str(), true);
 
-              std::cout << component[i] << ": ";
+              std::cout << component[k] << ": ";
               std::cout << rcg::getBoolean(nodemap, "ComponentEnable", true, true);
               std::cout << std::endl;
             }
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
         }
 
         // open stream and get n images
-
+        
         std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
 
         if (stream.size() > 0)
@@ -296,28 +296,35 @@ int main(int argc, char *argv[])
           // opening first stream
 
           stream[0]->open();
-          stream[0]->startStreaming(n);
+          stream[0]->startStreaming();
 
           for (int k=0; k<n; k++)
           {
             // grab next image with timeout of 3 seconds
 
-            const rcg::Buffer *buffer=stream[0]->grab(3000);
+			int retry=5;
+			while (retry > 0)
+			{
+              const rcg::Buffer *buffer=stream[0]->grab(3000);
 
-            if (buffer != 0)
-            {
-              std::string name=storeBuffer(buffer);
-
-              if (name.size() > 0)
+              if (buffer != 0)
               {
-                std::cout << "Image '" << name << "' stored" << std::endl;
+                std::string name=storeBuffer(buffer);
+
+                if (name.size() > 0)
+                {
+                  std::cout << "Image '" << name << "' stored" << std::endl;
+				  retry=0;
+                }
               }
-            }
-            else
-            {
-              std::cerr << "Cannot grab images" << std::endl;
-              break;
-            }
+              else
+              {
+                std::cerr << "Cannot grab images" << std::endl;
+                break;
+              }
+			  
+			  retry--;
+			}
           }
 
           stream[0]->stopStreaming();

@@ -57,8 +57,36 @@ include(cmake/optimization_flags.cmake)
 # - Standard definitions -
 
 add_definitions(-Wall)
-add_definitions(-Wno-unknown-pragmas)
 add_definitions(-std=c++11)
+
+if (CMAKE_COMPILER_IS_GNUCC)
+  add_definitions(-Wno-unknown-pragmas)
+endif ()
+
+# In case of Visual Studio, enable exporting all symbols and disable some
+# warnings
+
+if (MSVC)
+  add_definitions(/DGENICAM_NO_AUTO_IMPLIB)
+  
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+  
+  add_definitions("/wd4003")
+  add_definitions("/wd4514")
+  add_definitions("/wd4710")
+  add_definitions("/wd4820")
+  add_definitions("/wd4435")
+  add_definitions("/wd4668")
+  add_definitions("/wd4127")
+  add_definitions("/wd4265")
+  add_definitions("/wd4996")
+  add_definitions("/wd4437")
+  add_definitions("/wd4571")
+  add_definitions("/wd4355")
+  add_definitions("/wd4061")
+  add_definitions("/wd4800")
+  add_definitions("/wd4711")
+endif ()
 
 # - Options -
 

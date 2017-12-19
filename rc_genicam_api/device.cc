@@ -148,7 +148,7 @@ int find(const std::vector<std::shared_ptr<Stream> > &list, const std::string &i
   {
     if (list[i]->getID() == id)
     {
-      return i;
+      return static_cast<int>(i);
     }
   }
 
@@ -199,7 +199,7 @@ std::vector<std::shared_ptr<Stream> > Device::getStreams()
 
       if (k >= 0)
       {
-        ret.push_back(current[k]);
+        ret.push_back(current[static_cast<size_t>(k)]);
       }
       else
       {
@@ -228,7 +228,7 @@ std::string cDevGetInfo(const Device *obj, const std::shared_ptr<const GenTLWrap
 {
   std::string ret;
 
-  GenTL::INFO_DATATYPE type;
+  GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
   char tmp[1024]="";
   size_t tmp_size=sizeof(tmp);
   GenTL::GC_ERROR err=GenTL::GC_ERR_ERROR;
@@ -280,9 +280,9 @@ std::string Device::getAccessStatus() const
 {
   std::string ret;
 
-  GenTL::INFO_DATATYPE type;
+  GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
   int32_t status=-1;
-  size_t size=sizeof(ret);
+  size_t size=sizeof(status);
   GenTL::GC_ERROR err=GenTL::GC_ERR_ERROR;
 
   if (dev != 0)

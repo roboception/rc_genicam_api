@@ -40,6 +40,7 @@
 #include "cport.h"
 
 #include <iostream>
+#include <algorithm>
 
 namespace rcg
 {
@@ -147,12 +148,12 @@ void Stream::startStreaming(int na)
   }
   else
   {
-    std::shared_ptr<GenApi::CNodeMapRef> nodemap=parent->getRemoteNodeMap();
-    GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(nodemap->_GetNode("PayloadSize"));
+    std::shared_ptr<GenApi::CNodeMapRef> nmap=parent->getRemoteNodeMap();
+    GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(nmap->_GetNode("PayloadSize"));
 
     if (GenApi::IsReadable(p))
     {
-      size=p->GetValue();
+      size=static_cast<size_t>(p->GetValue());
     }
   }
 
@@ -160,7 +161,7 @@ void Stream::startStreaming(int na)
 
   bool err=false;
 
-  bn=std::max(static_cast<size_t>(8), getBufAnnounceMin());
+  bn=max(static_cast<size_t>(8), getBufAnnounceMin());
   for (size_t i=0; i<bn; i++)
   {
     GenTL::BUFFER_HANDLE p=0;
@@ -257,7 +258,7 @@ const Buffer *Stream::grab(int64_t _timeout)
   uint64_t timeout=GENTL_INFINITE;
   if (_timeout >= 0)
   {
-    timeout=_timeout;
+    timeout=static_cast<uint64_t>(_timeout);
   }
 
   // check that streaming had been started

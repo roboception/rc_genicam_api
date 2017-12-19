@@ -42,6 +42,12 @@
 
 #include <iostream>
 
+#ifdef WIN32
+#define NOMINMAX
+#include <Windows.h>
+#include <cstring>
+#endif
+
 namespace rcg
 {
 
@@ -66,7 +72,7 @@ int find(const std::vector<std::shared_ptr<System> > &list, const std::string &f
   {
     if (list[i]->getFilename() == filename)
     {
-      return i;
+      return static_cast<int>(i);
     }
   }
 
@@ -91,14 +97,41 @@ std::vector<std::shared_ptr<System> > System::getSystems()
     env="GENICAM_GENTL32_PATH";
   }
 
-  const char *path=std::getenv(env);
-
-  if (path == 0 || *path == '\0')
+  std::string path;
+  
+  const char *envpath=std::getenv(env);
+  if (envpath != 0)
   {
-    path=GENTL_INSTALL_PATH;
+    path=envpath;
   }
 
-  std::vector<std::string> name=getAvailableGenTLs(path);
+  if (path.size() == 0)
+  {
+	// as fallback if the environment variable is empty, use the absolute
+	// install path to the default transport layer
+	
+    path=GENTL_INSTALL_PATH;
+	
+#ifdef WIN32
+	// under Windows, also use the path to the current executable as
+	// fallback
+	
+	const size_t n=256;
+    char procpath[n];
+    if (GetModuleFileName(NULL, procpath, n-1) > 0)
+	{
+      procpath[n-1]='\0';
+	  
+	  char *p=strrchr(procpath, '\\');
+	  if (p != 0) *p='\0';
+	  
+      path+=";";
+      path+=procpath;
+	}
+#endif
+  }
+
+  std::vector<std::string> name=getAvailableGenTLs(path.c_str());
 
   // create list of systems according to the list, using either existing
   // systems or instantiating new ones
@@ -109,7 +142,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
     if (k >= 0)
     {
-      ret.push_back(slist[k]);
+      ret.push_back(slist[static_cast<size_t>(k)]);
     }
     else
     {
@@ -118,9 +151,9 @@ std::vector<std::shared_ptr<System> > System::getSystems()
         System *p=new System(name[i]);
         ret.push_back(std::shared_ptr<System>(p));
       }
-      catch (const std::exception &ex)
+      catch (const std::exception &)
       {
-        // ingnore transport layers that cannot be used
+        // ignore transport layers that cannot be used
       }
     }
   }
@@ -188,7 +221,7 @@ int find(const std::vector<std::shared_ptr<Interface> > &list, const std::string
   {
     if (list[i]->getID() == id)
     {
-      return i;
+      return static_cast<int>(i);
     }
   }
 
@@ -246,7 +279,7 @@ std::vector<std::shared_ptr<Interface> > System::getInterfaces()
 
       if (k >= 0)
       {
-        ret.push_back(current[k]);
+        ret.push_back(current[static_cast<size_t>(k)]);
       }
       else
       {
@@ -374,7 +407,7 @@ int System::getMajorVersion() const
     gentl->GCGetInfo(GenTL::TL_INFO_GENTL_VER_MAJOR, &type, &ret, &size);
   }
 
-  return ret;
+  return static_cast<int>(ret);
 }
 
 int System::getMinorVersion() const
@@ -393,7 +426,7 @@ int System::getMinorVersion() const
     gentl->GCGetInfo(GenTL::TL_INFO_GENTL_VER_MINOR, &type, &ret, &size);
   }
 
-  return ret;
+  return static_cast<int>(ret);
 }
 
 std::shared_ptr<GenApi::CNodeMapRef> System::getNodeMap()

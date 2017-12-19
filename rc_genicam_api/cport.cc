@@ -37,6 +37,9 @@
 #include "exception.h"
 
 #include <fstream>
+#include <sstream>
+#include <cctype>
+#include <string>
 
 namespace rcg
 {
@@ -52,7 +55,8 @@ void CPort::Read(void *buffer, int64_t addr, int64_t length)
 
   if (*port != 0)
   {
-    if (gentl->GCReadPort(*port, addr, buffer, &size) != GenTL::GC_ERR_SUCCESS)
+    if (gentl->GCReadPort(*port, static_cast<uint64_t>(addr), buffer, &size) !=
+	    GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("CPort::Read()", gentl);
     }
@@ -74,7 +78,8 @@ void CPort::Write(const void *buffer, int64_t addr, int64_t length)
 
   if (*port != 0)
   {
-    if (gentl->GCWritePort(*port, addr, buffer, &size) != GenTL::GC_ERR_SUCCESS)
+    if (gentl->GCWritePort(*port, static_cast<uint64_t>(addr), buffer, &size) !=
+	    GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("CPort::Write()", gentl);
     }
@@ -107,7 +112,7 @@ inline std::string toLower(const std::string &s, size_t start, size_t size)
 {
   std::ostringstream out;
 
-  size_t end=std::min(s.size(), start+size);
+  size_t end=min(s.size(), start+size);
 
   while (start < end)
   {
@@ -158,7 +163,7 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
     {
       // interpret local URL
 
-      int i=6;
+      size_t i=6;
       if (url.compare(i, 3, "///") == 0)
       {
         i+=3;
@@ -191,7 +196,7 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
       {
         std::ofstream out(xml, std::ios::binary);
 
-        out.rdbuf()->sputn(buffer.get(), length);
+        out.rdbuf()->sputn(buffer.get(), static_cast<std::streamsize>(length));
       }
 
       // load XML or ZIP from registers
@@ -202,15 +207,15 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
       }
       else
       {
-        gcstring xml=buffer.get();
-        nodemap->_LoadXMLFromString(xml);
+        gcstring sxml=buffer.get();
+        nodemap->_LoadXMLFromString(sxml);
       }
     }
     else if (toLower(url, 0, 5) == "file:")
     {
       // interpret local URL
 
-      int i=6;
+      size_t i=6;
       if (url.compare(i, 3, "///") == 0)
       {
         i+=3;

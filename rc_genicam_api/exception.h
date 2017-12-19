@@ -37,6 +37,7 @@
 #define RC_GENICAM_API_EXCEPTION
 
 #include <memory>
+#include <string>
 
 namespace rcg
 {

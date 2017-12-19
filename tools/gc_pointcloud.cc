@@ -77,10 +77,10 @@ void storePointCloud(double f, double t, double scale,
 {
   // get size and scale factor between left image and disparity image
 
-  uint32_t width=disp->getWidth();
-  uint32_t height=disp->getHeight();
+  size_t width=disp->getWidth();
+  size_t height=disp->getHeight();
   bool bigendian=disp->isBigEndian();
-  int ds=(left->getWidth()+disp->getWidth()-1)/disp->getWidth();
+  size_t ds=(left->getWidth()+disp->getWidth()-1)/disp->getWidth();
 
   // convert focal length factor into focal length in (disparity) pixels
 
@@ -94,10 +94,10 @@ void storePointCloud(double f, double t, double scale,
   // count number of valid disparities
 
   int n=0;
-  for (uint32_t k=0; k<height; k++)
+  for (size_t k=0; k<height; k++)
   {
     int j=0;
-    for (uint32_t i=0; i<width; i++)
+    for (size_t i=0; i<width; i++)
     {
       if ((dps[j]|dps[j+1]) != 0) n++;
       j+=2;
@@ -160,21 +160,21 @@ void storePointCloud(double f, double t, double scale,
 
   // create point cloud
 
-  for (uint32_t k=0; k<height; k++)
+  for (size_t k=0; k<height; k++)
   {
-    for (uint32_t i=0; i<width; i++)
+    for (size_t i=0; i<width; i++)
     {
       // convert disparity from fixed comma 16 bit integer into float value
 
       double d;
       if (bigendian)
       {
-        uint32_t j=i<<1;
+        size_t j=i<<1;
         d=scale*((dps[j]<<8)|dps[j+1]);
       }
       else
       {
-        uint32_t j=i<<1;
+        size_t j=i<<1;
         d=scale*((dps[j+1]<<8)|dps[j]);
       }
 
@@ -196,7 +196,8 @@ void storePointCloud(double f, double t, double scale,
         // get corresponding color value
 
         uint8_t rgb[3];
-        rcg::getColor(rgb, left, ds, i, k);
+        rcg::getColor(rgb, left, static_cast<uint32_t>(ds), static_cast<uint32_t>(i),
+		              static_cast<uint32_t>(k));
 
         // store colored point, optionally with confidence and error
 

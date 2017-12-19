@@ -37,6 +37,7 @@
 #define RC_GENICAM_API_BUFFER
 
 #include <memory>
+#include <string>
 
 namespace rcg
 {
