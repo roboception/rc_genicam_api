@@ -4,11 +4,11 @@ Roboception GenICam Convenience Layer
 This package combines the Roboception convenience layer for images with the
 GenICam reference implementation and a GigE Vision transport layer. It is a
 self contained package that permits configuration and image streaming of
-GigE Vision cameras like the Roboception rc_visard. The API is based on C++ 11
-and can be compiled under Linux and Windows.
+GenICam / GigE Vision 2.0 compatible cameras like the Roboception rc_visard.
+The API is based on C++ 11 and can be compiled under Linux and Windows.
 
 This package also provides some tools that can be called from the command line
-to for discovering cameras, changing their configuration and streaming images.
+for discovering cameras, changing their configuration and streaming images.
 Although the tools are meant to be useful when working in a shell or in a
 script, their main purpose is to serve as example on how to use the API for
 reading and setting parameters, streaming and synchronizing images.
@@ -16,12 +16,11 @@ reading and setting parameters, streaming and synchronizing images.
 Compiling and Installing
 ------------------------
 
-Linux
-.....
+### Linux
 
 Building follows the standard cmake build flow. Please make sure to set the
-install path *before* compiling. Otherwise it can happen that the GenTL layer
-is not found when calling the tools.
+install path *before* compiling. Otherwise it can happen that the transport
+layer is not found when calling the tools.
 
     cd <main-directory>
     mkdir build
@@ -30,24 +29,24 @@ is not found when calling the tools.
     make
     make install
 
-Windows and Visual Studio
-.........................
+### Windows and Visual Studio
 
 Building is based on cmake. Therefore, cmake must be downloaded and installed
 according to the operating system from https://cmake.org/download/ After
 starting the cmake-gui, the path to the rc_genicam_api source code directory
-must be specified. It is common to choose the sub-directory 'build' for the
+as well as the build directory must be specified. It is common to choose
+a sub-directory of the source code directory and name it 'build' for the
 the temporary files that are created during the build process. After setting
-both paths, the 'Configure' button should be pressed. In the up-coming dialog,
+both paths, the 'Configure' button must be pressed. In the up-coming dialog,
 it can be chosen for which version of Visual Studio and which platform (e.g.
 Win64) the project files should be generated. The dialog is closed by pressing
 'Finish'.
 
-After configuration, the value of the key 'CMAKE_INSTALL_PREFIX' may be changed
-to an install directory. By default, it is set to a path like
-'C:/Program Files/rc_genicam_api'. The 'Generate' button leads to creating the
-project file. Visual Studio can be opened with this project by pressing the
-'Open Project' button.
+After configuration, the value of the key with the name 'CMAKE_INSTALL_PREFIX'
+may be changed to an install directory. By default, the install directory is
+set to a path like 'C:/Program Files/rc_genicam_api'. The 'Generate' button
+leads to creating the project file. Visual Studio can be opened with this
+project by pressing the 'Open Project' button.
 
 By default, a 'Debug' version will be compiled. This can be changed to 'Release'
 for compiling an optimized version. The package can then be created, e.g. by
@@ -55,20 +54,20 @@ pressing 'F7'. For installing the compiled package, the 'INSTALL' target can be
 *created* in the project explorer.
 
 After installation, the install directory will contain three sub-directories.
-The 'bin' directory contains the tools, DLLs and the default transport layer.
-The include and lib sub-directories contain the headers and libraries for
-using the API in own programs.
+The 'bin' directory contains the tools, DLLs and the default transport layer
+including configuration. The 'include' and 'lib' sub-directories contain the
+headers and libraries for using the API in own programs.
 
 Tools
 -----
 
 The tools do not offer a graphical user interface. They are meant to be called
-from a shell (e.g. Power Shell under Windows) and controlled by command line
-parameters. Calling the tools without any parameters prints a help text on the
-standard output.
+from a shell (e.g. Power Shell under Windows) or script and controlled by
+command line parameters. Calling the tools without any parameters prints a help
+text on the standard output.
 
 NOTE: If any tool returns the error 'No transport layers found in path ...',
-      then read the section 'Transport Layer' below.
+then read the section 'Transport Layer' below.
 
 * gc_info
 
@@ -107,24 +106,28 @@ NOTE: If any tool returns the error 'No transport layers found in path ...',
   This tool demonstrates how to synchronize different images according to
   their timestamps.
 
-  NOTE: PLY is a standard format for scanned 3D data. The plyv tool of cvkit
-  (https://github.com/roboception/cvkit) can also be used for visualization.
+  NOTE: PLY is a standard format for scanned 3D data that can be read by many
+  programs. The plyv tool of cvkit (https://github.com/roboception/cvkit) can
+  also be used for visualization.
 
 Device ID
 ---------
 
-There are three ways of identifying a device:
+There are three ways of defining an ID to identify a device:
 
-1. If the given ID contains a colon (i.e. ':'), the part before the first colon
-   is interpreted as interface ID and the part after the first colon is the
-   treated as device ID. This is the format that 'gc_config -l' shows. The
-   device must be located on the specified interface.
+1. If the given ID contains a colon (i.e. ':'), the part before the (first)
+   colon is interpreted as interface ID and the part after the first colon is
+   treated as device ID. This is the format that 'gc_config -l' shows. A device
+   with the given ID is only sought on the specified interface. This can be
+   useful if there are several ways to reach a device from a host computer,
+   e.g. via wireless and wired network connection, but a certain connection
+   type (e.g. wired) is preferred due to higher bandwidth and lower latency.
 
 2. If the given ID does not contain a colon. The ID is interpreted as the
    device ID itself. A device with this ID is sought throughout all interfaces.
-   If the ID contains a colon, but should be interpreted as a device ID, it
-   must be preceded by a colon so that the interface ID is empty, e.g.
-   ':<device-id>'.
+   If the device ID itself contains one or more colons, it must be preceded by
+   a colon, e.g. ':<device-id>'. This effectively defines an empty interface ID
+   which triggers looking on all interfaces.
 
 3. The given ID can also be a user defined name, preceded by an interface ID or
    not as discussed above. The user defined name is set to 'rc_visard' by
@@ -132,8 +135,8 @@ There are three ways of identifying a device:
    
        gc_config <ID> -n <user-defined-name>
    
-   This fails if the devices cannot be uniquely identified in case there is
-   more than one sensor with the same name.
+   This way of identifying a device can fail if there is more than one device
+   with the same name. No device is returned in this case.
 
 Transport Layer
 ---------------
@@ -148,16 +151,17 @@ variable GENICAM_GENTL32_PATH (for 32 bit applications) or GENICAM_GENTL64_PATH
 layers. All transport layers are provided as systems to the application.
 
 For convenience, if the environment variable is not defined or empty, it is
-the internally redefined with the install path of the provided transport layer
-(as known at compile time!). If the package is not installed, the install path
-is changed after compilation or moved to another location after installation,
-then the transport layer may not be found. In this case, the tools show an
-error on 64 bit systems like:
+internally defined with the install path of the provided transport layer (as
+known at compile time!). If the package is not installed, the install path is
+changed after compilation or the package is moved to another location after
+installation, then the transport layer may not be found. In this case, the
+tools show an error that looks on 64 bit systems like:
 
     'No transport layers found in path GENICAM_GENTL64_PATH'
 
-In this case, the environment variable must be set to the directory in which
-the transport layer (i.e. file with suffix '.cti') resides.
+In this case, the corresponding environment variable (see above) must be set to
+the directory in which the transport layer (i.e. file with suffix '.cti')
+resides.
 
 Under Windows, as second fall back additionally to the install path, the
 directory of the executable is also added to the environment variable. Thus,
