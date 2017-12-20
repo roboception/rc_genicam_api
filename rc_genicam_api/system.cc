@@ -43,9 +43,10 @@
 #include <iostream>
 
 #ifdef WIN32
-#define NOMINMAX
 #include <Windows.h>
 #include <cstring>
+#undef min
+#undef max
 #endif
 
 namespace rcg

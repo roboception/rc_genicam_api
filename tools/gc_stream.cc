@@ -46,6 +46,12 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
+
+#ifdef WIN32
+#undef min
+#undef max
+#endif
 
 namespace
 {

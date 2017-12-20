@@ -40,6 +40,12 @@
 #include <sstream>
 #include <cctype>
 #include <string>
+#include <algorithm>
+
+#ifdef WIN32
+#undef min
+#undef max
+#endif
 
 namespace rcg
 {

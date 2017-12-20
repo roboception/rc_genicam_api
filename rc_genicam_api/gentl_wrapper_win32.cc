@@ -41,7 +41,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#define NOMINMAX
 #include <Windows.h>
 
 namespace rcg
