@@ -141,3 +141,12 @@ set(CPACK_DEBIAN_PACKAGE_CONFLICTS "genicam, rcgcapi")
 set(CPACK_DEBIAN_PACKAGE_REPLACES "rcgcapi")
 
 include(cmake/package_debian.cmake)
+
+set(INSTALL_CMAKE_DIR "share/cmake/${PROJECT_NAME}")
+install(
+    EXPORT PROJECTTargets
+    FILE "${PROJECT_NAME_UPPER}Targets.cmake"
+    #this is the target folder of RC_GENICAM_APIConfig.cmake
+    DESTINATION lib/rc_genicam_api
+)
+
