@@ -53,7 +53,7 @@ install(FILES
   COMPONENT dev
   DESTINATION lib/${PROJECT_NAME_LOWER})
 
-if (PROJECTTargets)
+if (PROJECT_LIBRARIES)
   install(EXPORT PROJECTTargets
           FILE ${PROJECT_NAME_UPPER}Targets.cmake
           DESTINATION lib/${PROJECT_NAME_LOWER})
