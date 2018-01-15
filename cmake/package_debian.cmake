@@ -11,6 +11,10 @@ else ()
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 endif ()
 
+# add date stamp to CPACK_PACKAGE_VERSION
+string(TIMESTAMP STAMP "%Y%m%d+%H%M%S")
+set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-0+${STAMP}")
+
 
 ###############################
 # debian package specific stuff
@@ -20,7 +24,7 @@ set(CPACK_GENERATOR "DEB")
 
 if (NOT CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
 # if architecture is already set (e.g. to "all"), this is not needed
-# add -1~distribution-codename (e.g. -1~trusty or -1~xenial) to end of package version
+# add ~distribution-codename (e.g. ~trusty or ~xenial) to end of package version
 # if lsb_release is available, take it from there or fall back to DISTRO_CODENAME env variable
     set(DISTRO_CODENAME $ENV{DISTRO_CODENAME})
     find_program(LSB_RELEASE_CMD lsb_release)
@@ -31,7 +35,7 @@ if (NOT CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
     endif ()
     if (DISTRO_CODENAME)
-        set(CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}-1~${DISTRO_CODENAME})
+        set(CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}~${DISTRO_CODENAME})
     else ()
         message(STATUS "Could not find lsb_release nor is DISTRO_CODENAME set.")
     endif ()
@@ -47,6 +51,7 @@ if (NOT CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
     endif ()
 endif ()
+message(STATUS "CPACK_PACKAGE_VERSION: " ${CPACK_PACKAGE_VERSION})
 
 # package name is lower case of project name with _ replaced by -
 string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
@@ -83,6 +88,7 @@ if(EXCLUSIVE_CUSTOMER)
 endif()
 
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+message(STATUS "CPACK_PACKAGE_FILE_NAME: " ${CPACK_PACKAGE_FILE_NAME})
 
 #########################################
 ## things you might need to change ??? ##
