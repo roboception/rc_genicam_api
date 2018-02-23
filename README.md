@@ -92,7 +92,7 @@ then read the section 'Transport Layer' below.
   the command line by setting the appropriate GenICam parameters. The following
   command enables intensity images, disables disparity images and stores 10
   images:
-  
+
       gc_stream <ID> ComponentSelector=Intensity ComponentEnable=1 ComponentSelector=Disparity ComponentEnable=0 n=10
 
   NOTE: Many image viewers can display PGM and PPM format. The sv tool of cvkit
@@ -132,9 +132,9 @@ There are three ways of defining an ID to identify a device:
 3. The given ID can also be a user defined name, preceded by an interface ID or
    not as discussed above. The user defined name is set to 'rc_visard' by
    default and can be changed with:
-   
+
        gc_config <ID> -n <user-defined-name>
-   
+
    This way of identifying a device can fail if there is more than one device
    with the same name. No device is returned in this case.
 

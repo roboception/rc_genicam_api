@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>rc_genicam_api</name>
+    <version>1.3.1</version>
+    <description>
+      GenICam Convenience Layer.
+      See LICENSE.md for licensing terms of the different parts.
+    </description>
+
+    <maintainer email="felix.ruess@roboception.de">Felix Ruess</maintainer>
+    <maintainer email="heiki.hirschmueller@roboception.de">Heiko Hirschmueller</maintainer>
+
+    <author email="heiki.hirschmueller@roboception.de">Heiko Hirschmueller</author>
+
+    <license>BSD</license>
+
+    <url type="repository">https://github.com/roboception/rc_genicam_api</url>
+    <url type="bugtracker">https://github.com/roboception/rc_genicam_api/issues</url>
+
+    <buildtool_depend>cmake</buildtool_depend>
+    <run_depend>catkin</run_depend>
+
+    <doc_depend>doxygen</doc_depend>
+
+    <export>
+      <build_type>cmake</build_type>
+    </export>
+</package>

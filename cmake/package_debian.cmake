@@ -64,16 +64,18 @@ if (EXISTS "${PROJECT_SOURCE_DIR}/package.xml")
     if (NOT ROS_PACKAGE_VERSION MATCHES ${PROJECT_VERSION})
         message(WARNING "Version in package.xml (${ROS_PACKAGE_VERSION}) doesn't match project version (${PROJECT_VERSION})")
     endif ()
-    set(ROS_DISTRO $ENV{ROS_DISTRO})
-    if (NOT ROS_DISTRO)
-        message(WARNING "ROS_DISTRO not set! falling back to indigo")
-        set(ROS_DISTRO "indigo")
-    endif ()
-    set(CPACK_PACKAGE_NAME "ros-${ROS_DISTRO}-${CPACK_PACKAGE_NAME}")
 
-    # tell CPack to use CMAKE_INSTALL_PREFIX
-    # cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/indigo" -DCMAKE_PREFIX_PATH="/opt/ros/indigo" -DCMAKE_BUILD_TYPE=Release ..
-    set(CPACK_SET_DESTDIR true)
+    set(ROS_DISTRO $ENV{ROS_DISTRO})
+    if (ROS_DISTRO)
+        set(CPACK_PACKAGE_NAME "ros-${ROS_DISTRO}-${CPACK_PACKAGE_NAME}")
+
+        # tell CPack to use CMAKE_INSTALL_PREFIX
+        # cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/indigo" -DCMAKE_PREFIX_PATH="/opt/ros/indigo" -DCMAKE_BUILD_TYPE=Release ..
+        set(CPACK_SET_DESTDIR true)
+    else ()
+        message(STATUS "ROS_DISTRO not set. Not treating this as a ROS package.")
+    endif ()
+
 endif ()
 
 if(EXCLUSIVE_CUSTOMER)
@@ -136,6 +138,15 @@ if (sharedlibs)
     execute_process(COMMAND chmod 644 "${SHLIBS_FILE}")
     execute_process(COMMAND chmod 755 "${POSTINST_SCRIPT}" "${POSTRM_SCRIPT}")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${SHLIBS_FILE};${POSTINST_SCRIPT};${POSTRM_SCRIPT}")
+endif ()
+
+if (conffiles)
+  set(CONFFILES_FILE "${CMAKE_CURRENT_BINARY_DIR}/conffiles")
+  file(WRITE "${CONFFILES_FILE}" "")
+  foreach (conffile ${conffiles})
+    file(APPEND "${CONFFILES_FILE}" "${conffile}\n")
+  endforeach (conffile)
+  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA};${CONFFILES_FILE}")
 endif ()
 
 include(CPack)

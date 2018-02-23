@@ -3,9 +3,6 @@ build
 *~
 *.swp
 
-.idea
-*.cproject
-*.project
-*.externalToolBuilders
-.settings
-.metadata
+.*
+!.gitignore
+!.gitlab-ci.yml
