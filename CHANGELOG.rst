@@ -1,3 +1,11 @@
+1.3.2 (2018-02-23)
+------------------
+
+- fix installation of exported targets
+- add package.xml for releaseing as ROS third-party package
+- update Baumer GigE vision driver to v2.8.15736
+- fix architecture detection (use compiler info instead of host kernel)
+
 1.3.1 (2017-12-20)
 ------------------
 
