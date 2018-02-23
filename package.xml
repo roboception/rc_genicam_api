@@ -18,7 +18,7 @@
     <url type="bugtracker">https://github.com/roboception/rc_genicam_api/issues</url>
 
     <buildtool_depend>cmake</buildtool_depend>
-    <run_depend>catkin</run_depend>
+    <build_export_depend>catkin</build_export_depend>
 
     <doc_depend>doxygen</doc_depend>
 
