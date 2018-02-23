@@ -1,6 +1,8 @@
 
 if (UNIX)
-  EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+  # try to get architecture from compiler
+  EXECUTE_PROCESS(COMMAND ${CMAKE_CXX_COMPILER} -dumpmachine COMMAND tr -d '\n' OUTPUT_VARIABLE CXX_MACHINE)
+  string(REGEX REPLACE "([a-zA-Z_0-9]+).*" "\\1" ARCHITECTURE ${CXX_MACHINE})
 elseif (WIN32)
   if ("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
     set(ARCHITECTURE WIN32_i86)
@@ -14,7 +16,7 @@ message(STATUS "Detected architecture ${ARCHITECTURE}")
 install(DIRECTORY DESTINATION lib/rc_genicam_api
         DIRECTORY_PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
 
-if ("${ARCHITECTURE}" STREQUAL "armv7l")
+if ("${ARCHITECTURE}" STREQUAL "arm")
   install(FILES Ubuntu-14.04/armv7l/libbgapi2_gige.cti COMPONENT bin DESTINATION lib/rc_genicam_api)
   install(FILES bsysgige.xml COMPONENT bin DESTINATION lib/rc_genicam_api)
 elseif ("${ARCHITECTURE}" STREQUAL "x86_64")

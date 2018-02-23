@@ -1,7 +1,9 @@
 project(genicam CXX)
 
 if (UNIX)
-  EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+  # try to get architecture from compiler
+  EXECUTE_PROCESS(COMMAND ${CMAKE_CXX_COMPILER} -dumpmachine COMMAND tr -d '\n' OUTPUT_VARIABLE CXX_MACHINE)
+  string(REGEX REPLACE "([a-zA-Z_0-9]+).*" "\\1" ARCHITECTURE ${CXX_MACHINE})
 elseif (WIN32)
   if ("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
     set(ARCHITECTURE WIN32_i86)
@@ -12,7 +14,7 @@ endif ()
 
 message(STATUS "Detected architecture ${ARCHITECTURE}")
 
-if ("${ARCHITECTURE}" STREQUAL "armv7l")
+if ("${ARCHITECTURE}" STREQUAL "arm")
   set(GENICAM_LIBRARIES
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux32_ARMhf/libGCBase_gcc46_v3_0.so
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux32_ARMhf/libMathParser_gcc46_v3_0.so
