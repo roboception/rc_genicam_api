@@ -133,12 +133,10 @@ install(FILES package.xml COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})
 # optionally set description and maintainer (if not set will use defaults from package_debian.cmake)
 #set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Roboception package description")
 
-# optionally set package maintainer (otherwise defaults to Roboception <info@roboception.de>)
+# optionally set package maintainer (otherwise defaults to Roboception <support@roboception.de>)
 #set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.name@roboception.de>")
 
 # optionally specify dependencies of the debian package here (comma separated!)
 #set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
-set(CPACK_DEBIAN_PACKAGE_CONFLICTS "genicam, rcgcapi")
-set(CPACK_DEBIAN_PACKAGE_REPLACES "rcgcapi")
 
 include(cmake/package_debian.cmake)

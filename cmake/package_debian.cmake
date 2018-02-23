@@ -1,5 +1,5 @@
 # general cpack variables
-set(CPACK_PACKAGE_CONTACT "Roboception <info@roboception.de>")
+set(CPACK_PACKAGE_CONTACT "Roboception <support@roboception.de>")
 set(CPACK_PACKAGE_VENDOR "Roboception GmbH, Munich, Germany")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Roboception ${PROJECT_NAME} package")
 
