@@ -127,6 +127,7 @@ endif()
 
 # Install catkin package.xml
 install(FILES package.xml COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})
+install(FILES net_perf_check.sh COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})
 
 # - Define information for packaging -
 
