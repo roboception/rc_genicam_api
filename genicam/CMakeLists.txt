@@ -26,13 +26,13 @@ if ("${ARCHITECTURE}" STREQUAL "arm")
   )
 elseif ("${ARCHITECTURE}" STREQUAL "aarch64")
   set(GENICAM_LIBRARIES
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libGCBase_gcc46_v3_0.so
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libMathParser_gcc46_v3_0.so
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libGenApi_gcc46_v3_0.so
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libNodeMapData_gcc46_v3_0.so
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/liblog4cpp_gcc46_v3_0.so
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libXmlParser_gcc46_v3_0.so
-    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libLog_gcc46_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libGCBase_gcc48_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libMathParser_gcc48_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libGenApi_gcc48_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libNodeMapData_gcc48_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/liblog4cpp_gcc48_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libXmlParser_gcc48_v3_0.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux64_ARM/libLog_gcc48_v3_0.so
   )
 elseif ("${ARCHITECTURE}" STREQUAL "i686")
   set(GENICAM_LIBRARIES
