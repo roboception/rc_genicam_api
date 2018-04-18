@@ -108,27 +108,27 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
   if (path.size() == 0)
   {
-	// as fallback if the environment variable is empty, use the absolute
-	// install path to the default transport layer
+    // as fallback if the environment variable is empty, use the absolute
+    // install path to the default transport layer
 
     path=GENTL_INSTALL_PATH;
 
 #ifdef WIN32
-	// under Windows, also use the path to the current executable as
-	// fallback
+    // under Windows, also use the path to the current executable as
+    // fallback
 
-	const size_t n=256;
+    const size_t n=256;
     char procpath[n];
     if (GetModuleFileName(NULL, procpath, n-1) > 0)
-	{
+    {
       procpath[n-1]='\0';
 
-	  char *p=strrchr(procpath, '\\');
-	  if (p != 0) *p='\0';
+      char *p=strrchr(procpath, '\\');
+      if (p != 0) *p='\0';
 
       path+=";";
       path+=procpath;
-	}
+    }
 #endif
   }
 

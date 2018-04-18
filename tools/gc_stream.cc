@@ -308,9 +308,9 @@ int main(int argc, char *argv[])
           {
             // grab next image with timeout of 3 seconds
 
-			int retry=5;
-			while (retry > 0)
-			{
+            int retry=5;
+            while (retry > 0)
+            {
               const rcg::Buffer *buffer=stream[0]->grab(3000);
 
               if (buffer != 0)
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
                 if (name.size() > 0)
                 {
                   std::cout << "Image '" << name << "' stored" << std::endl;
-				  retry=0;
+                  retry=0;
                 }
               }
               else
@@ -329,8 +329,8 @@ int main(int argc, char *argv[])
                 break;
               }
 
-			  retry--;
-			}
+              retry--;
+            }
           }
 
           stream[0]->stopStreaming();

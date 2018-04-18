@@ -62,7 +62,7 @@ void CPort::Read(void *buffer, int64_t addr, int64_t length)
   if (*port != 0)
   {
     if (gentl->GCReadPort(*port, static_cast<uint64_t>(addr), buffer, &size) !=
-	    GenTL::GC_ERR_SUCCESS)
+        GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("CPort::Read()", gentl);
     }
@@ -85,7 +85,7 @@ void CPort::Write(const void *buffer, int64_t addr, int64_t length)
   if (*port != 0)
   {
     if (gentl->GCWritePort(*port, static_cast<uint64_t>(addr), buffer, &size) !=
-	    GenTL::GC_ERR_SUCCESS)
+        GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("CPort::Write()", gentl);
     }

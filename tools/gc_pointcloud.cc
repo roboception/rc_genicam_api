@@ -197,7 +197,7 @@ void storePointCloud(double f, double t, double scale,
 
         uint8_t rgb[3];
         rcg::getColor(rgb, left, static_cast<uint32_t>(ds), static_cast<uint32_t>(i),
-		              static_cast<uint32_t>(k));
+                      static_cast<uint32_t>(k));
 
         // store colored point, optionally with confidence and error
 

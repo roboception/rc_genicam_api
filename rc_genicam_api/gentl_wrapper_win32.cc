@@ -74,24 +74,24 @@ std::vector<std::string> getAvailableGenTLs(const char *paths)
           HANDLE p;
           WIN32_FIND_DATA data;
 
-		  std::string dir=path;
-		  
-		  if (dir.size() > 0 && dir[dir.size()-1] != '\\')
-		  {
-			dir+="\\";
-		  }
-		  
-		  p=FindFirstFileA((dir+"*.cti").c_str(), &data);
-		  
+          std::string dir=path;
+
+          if (dir.size() > 0 && dir[dir.size()-1] != '\\')
+          {
+            dir+="\\";
+          }
+
+          p=FindFirstFileA((dir+"*.cti").c_str(), &data);
+
           if (p != INVALID_HANDLE_VALUE)
           {
-			do
-			{
-			  ret.push_back(dir+data.cFileName);
-			}
-			while (FindNextFileA(p, &data));
-			
-			FindClose(p);
+            do
+            {
+              ret.push_back(dir+data.cFileName);
+            }
+            while (FindNextFileA(p, &data));
+
+            FindClose(p);
           }
         }
       }
@@ -107,19 +107,19 @@ namespace
 inline FARPROC getFunction(HMODULE lib, const char *name)
 {
   FARPROC ret=GetProcAddress(lib, name);
-  
+
   if (ret == 0)
   {
     DWORD err=GetLastError();
 
     FreeLibrary(lib);
-	
-	std::ostringstream out;
-	out << "Cannot resolve GenTL symbol. Error code: " << err;
-	
+
+    std::ostringstream out;
+    out << "Cannot resolve GenTL symbol. Error code: " << err;
+
     throw std::invalid_argument(out.str());
   }
-  
+
   return ret;
 }
 
@@ -130,17 +130,17 @@ GenTLWrapper::GenTLWrapper(const std::string &filename)
   // open library
 
   HMODULE lp=LoadLibrary(filename.c_str());
-  
+
   if (lp == 0)
   {
-	DWORD err=GetLastError();
-	
-	std::ostringstream out;
-	out << "Cannot open GenTL library. Error code: " << err;
-	
+    DWORD err=GetLastError();
+
+    std::ostringstream out;
+    out << "Cannot open GenTL library. Error code: " << err;
+
     throw std::invalid_argument(out.str());
   }
-  
+
   // resolve function calls that will only be used privately
 
   *reinterpret_cast<void**>(&GCInitLib)=getFunction(lp, "GCInitLib");
