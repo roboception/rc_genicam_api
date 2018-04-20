@@ -35,7 +35,7 @@ project(completion CXX)
 
 if (UNIX)
   set(ROS_DISTRO $ENV{ROS_DISTRO})
-  
+
   if (ROS_DISTRO)
     set(COMPLETION_NAME "gc_bash_completion_${ROS_DISTRO}")
   else ()
@@ -43,4 +43,5 @@ if (UNIX)
   endif ()
 
   install(FILES gc_bash_completion COMPONENT bin DESTINATION /etc/bash_completion.d RENAME ${COMPLETION_NAME})
+  set(conffiles /etc/bash_completion.d/${COMPLETION_NAME})
 endif (UNIX)
