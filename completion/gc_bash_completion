@@ -1,0 +1,151 @@
+# This file is part of the rc_genicam_api package.
+#
+# Copyright (c) 2018 Roboception GmbH
+# All rights reserved
+#
+# Author: Raphael Schaller
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+# may be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+function gchosts() {
+  local info=$(gc_config -l | tail -n+2 | tr -s ' ')
+  local names=$(echo -n "${info}" | cut -d ' ' -f2 | tr -d ' ')
+  local ifaces=$(echo -n "${names}" | cut -d ':' -f1)
+  local displaynames=$(echo -n "${info}" | cut -d ' ' -f3 | tr -d '(' | tr -d ',')
+  local displaynameswithiface=$(paste -d ':' <(echo -n "${ifaces}") <(echo -n "${displaynames}"))
+  
+  COMPREPLY=( $(compgen -W "${otheropts} ${names} ${displaynameswithiface}" -- ${cur}) )
+}
+
+function gcparams() {
+  local datatypes="Integer: \|Float: \|String: \|Boolean: \|Enumeration: "
+  local info=$(gc_info "${device}" 2> /dev/null)
+  local params=$(echo -n "${info}" | grep "${datatypes}" | tr -s ' ' | cut -d ' ' -f3 | sed 's/.*/&=/')
+  if [[ "$(echo -n "$cur" | tr -dc '=' | wc -c)" -eq "1" ]]; then
+    local varname=$(echo -n "$cur" | cut -d '=' -f1)
+    local value=$(echo -n "$cur" | cut -d '=' -f2)
+    local values=$(echo -n "${info}" | grep "Enumeration: ${varname} " | grep -o "\[.*\]" | tr -d '[' | tr -d ']')
+    COMPREPLY=( $(compgen -W "${values}" -P "${varname}=" -- ${value}) )
+  else
+    compopt -o nospace
+    COMPREPLY=( $(compgen -W "${otheropts} ${params}" -- ${cur}) )
+  fi
+}
+
+_gc_config()
+{
+  local cur prev opts cword words
+  COMPREPLY=()
+  _get_comp_words_by_ref -n =: cur prev cword words
+
+  if [ "${cword}" == "1" ]; then
+    local otheropts="-l"
+    gchosts
+    __ltrim_colon_completions "${cur}"
+    return 0
+  fi
+  
+  case "${prev}" in
+    -d)
+      ;&
+    -p)
+      ;&
+    -t)
+      opts="0 1"
+      ;;
+    -i)
+      ;&
+    -s)
+      ;&
+    -g)
+      opts=""
+      ;;
+    **)
+      local otheropts="-n -d -p -t -i -s -g"
+      local device=${words[1]}
+      gcparams
+      __ltrim_colon_completions "${cur}"
+      return 0
+      ;;
+  esac
+  
+  COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+  __ltrim_colon_completions "${cur}"
+}
+complete -F _gc_config gc_config
+
+_gc_info()
+{
+  local cur prev
+  COMPREPLY=()
+  _get_comp_words_by_ref -n =: cur prev cword
+
+  if [ "$cword" -eq "1" ]; then
+    local otheropts="-l"
+    gchosts
+    __ltrim_colon_completions "${cur}"
+    return 0
+  fi
+}
+complete -F _gc_info gc_info
+
+_gc_stream()
+{
+  local cur prev cword words
+  COMPREPLY=()
+  _get_comp_words_by_ref -n =: cur prev cword words
+
+  if [ "$cword" -eq "1" ]; then
+    local otheropts="-l"
+    gchosts
+    __ltrim_colon_completions "${cur}"
+    return 0
+  fi
+ 
+  local device=${words[1]}
+ 
+  otheropts="n="
+  gcparams  
+  __ltrim_colon_completions "${cur}"
+}
+complete -F _gc_stream gc_stream
+
+_gc_pointcloud()
+{
+  local cur prev
+  COMPREPLY=()
+  _get_comp_words_by_ref -n =: cur prev cword
+
+  if [ "$cword" -eq "1" ]; then
+    local otheropts=""
+    gchosts
+    __ltrim_colon_completions "${cur}"
+    return 0
+  fi
+}
+complete -F _gc_pointcloud gc_pointcloud
+
