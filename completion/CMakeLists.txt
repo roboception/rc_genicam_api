@@ -43,5 +43,5 @@ if (UNIX)
   endif ()
 
   install(FILES gc_bash_completion COMPONENT bin DESTINATION /etc/bash_completion.d RENAME ${COMPLETION_NAME})
-  set(conffiles /etc/bash_completion.d/${COMPLETION_NAME})
+  set(conffiles /etc/bash_completion.d/${COMPLETION_NAME} PARENT_SCOPE)
 endif (UNIX)
