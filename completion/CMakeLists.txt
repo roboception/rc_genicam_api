@@ -38,7 +38,6 @@ if (UNIX)
 
   if (ROS_DISTRO)
     set(COMPLETION_NAME "20.rc-gc.bash")
-    file(COPY gc_bash_completion DESTINATION ${CMAKE_BINARY_DIR}/devel/etc/catkin/profile.d)
     install(FILES gc_bash_completion COMPONENT bin DESTINATION etc/catkin/profile.d RENAME ${COMPLETION_NAME})
     set(conffiles etc/catkin/profile.d/${COMPLETION_NAME} PARENT_SCOPE)
   else ()
