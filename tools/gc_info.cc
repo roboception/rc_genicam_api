@@ -263,7 +263,12 @@ void printNode(const std::string &prefix, GenApi::INode *node)
               std::cout << list[i];
             }
 
-            std::cout << "]: " << p->GetCurrentEntry()->GetSymbolic();
+            std::cout << "]: ";
+
+            if (p->GetCurrentEntry() != 0)
+            {
+              std::cout << p->GetCurrentEntry()->GetSymbolic();
+            }
           }
 
           std::cout << std::endl;
@@ -297,7 +302,7 @@ int main(int argc, char *argv[])
         // list all systems, interfaces and devices
 
         std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
-		
+
         for (size_t i=0; i<system.size(); i++)
         {
           system[i]->open();
@@ -317,7 +322,7 @@ int main(int argc, char *argv[])
           for (size_t k=0; k<interf.size(); k++)
           {
             interf[k]->open();
-			
+
             std::cout << "    Interface     " << interf[k]->getID() << std::endl;
             std::cout << "    Display name: " << interf[k]->getDisplayName() << std::endl;
             std::cout << "    TL type:      " << interf[k]->getTLType() << std::endl;
@@ -341,7 +346,7 @@ int main(int argc, char *argv[])
 
             interf[k]->close();
           }
-		  
+
           system[i]->close();
         }
       }
