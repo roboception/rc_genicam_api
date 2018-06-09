@@ -31,26 +31,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-project(tools CXX)
+project(completion CXX)
 
-# build programs
+if (UNIX)
+  set(ROS_DISTRO $ENV{ROS_DISTRO})
 
-add_executable(gc_info gc_info.cc)
-target_link_libraries(gc_info rc_genicam_api_static)
+  if (ROS_DISTRO)
+    set(COMPLETION_NAME "20.rc-gc.bash")
+    install(FILES gc_bash_completion COMPONENT bin DESTINATION etc/catkin/profile.d RENAME ${COMPLETION_NAME})
+    set(conffiles etc/catkin/profile.d/${COMPLETION_NAME} PARENT_SCOPE)
+  else ()
+    set(COMPLETION_NAME "gc_bash_completion")
+    install(FILES gc_bash_completion COMPONENT bin DESTINATION /etc/bash_completion.d RENAME ${COMPLETION_NAME})
+    set(conffiles /etc/bash_completion.d/${COMPLETION_NAME} PARENT_SCOPE)
+  endif ()
 
-add_executable(gc_config gc_config.cc)
-target_link_libraries(gc_config rc_genicam_api_static)
-
-add_executable(gc_stream gc_stream.cc)
-target_link_libraries(gc_stream rc_genicam_api_static)
-
-add_executable(gc_pointcloud gc_pointcloud.cc)
-target_link_libraries(gc_pointcloud rc_genicam_api_static)
-
-# install tools
-
-install(TARGETS gc_info COMPONENT bin DESTINATION bin)
-install(TARGETS gc_config COMPONENT bin DESTINATION bin)
-install(TARGETS gc_stream COMPONENT bin DESTINATION bin)
-install(TARGETS gc_pointcloud COMPONENT bin DESTINATION bin)
-
+endif (UNIX)

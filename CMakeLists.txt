@@ -100,6 +100,7 @@ add_subdirectory(genicam)
 add_subdirectory(rc_genicam_api)
 if (BUILD_TOOLS)
   add_subdirectory(tools)
+  add_subdirectory(completion)
 endif ()
 
 # export project targets
