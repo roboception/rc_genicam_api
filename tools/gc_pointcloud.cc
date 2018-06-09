@@ -301,6 +301,36 @@ int main(int argc, char *argv[])
       double t=rcg::getFloat(nodemap, "Baseline", 0, 0, true);
       double scale=rcg::getFloat(nodemap, "Scan3dCoordinateScale", 0, 0, true);
 
+      // check for special exposure alternate mode of rc_visard and
+      // corresponding filter and set tolerance accordingly
+
+      // (The exposure alternate mode is typically used with a random dot
+      // projector connected to Out1. Alternate means that Out1 is high for
+      // every second image. The rc_visard calculates disparities from images
+      // with Out1=High. However, if the alternate filter is set to OnlyLow,
+      // then it is gueranteed that Out1=Low (i.e. projector off) for all
+      // rectified images. Thus, rectified images and disparity images are
+      // always around 40 ms appart, which must be taken into account for
+      // synchronization.)
+
+      uint64_t tol=0;
+
+      try
+      {
+        rcg::setEnum(nodemap, "LineSelector", "Out1", true);
+        std::string linesource=rcg::getEnum(nodemap, "LineSource", true);
+        std::string filter=rcg::getEnum(nodemap, "AcquisitionAlternateFilter", true);
+
+        if (linesource == "ExposureAlternateActive" && filter == "OnlyLow")
+        {
+          tol=50*1000*1000; // set tolerance to 50 ms
+        }
+      }
+      catch (const std::exception &)
+      {
+        // ignore possible errors
+      }
+
       // sanity check of some parameters
 
       rcg::checkFeature(nodemap, "Scan3dOutputMode", "DisparityC");
@@ -366,33 +396,48 @@ int main(int argc, char *argv[])
             {
               // store image in the corresponding list
 
+              uint64_t left_tol=0;
+              uint64_t disp_tol=0;
+
               uint64_t pixelformat=buffer->getPixelFormat();
               if (pixelformat == Mono8 || pixelformat == YCbCr411_8)
               {
                 left_list.add(buffer);
+                disp_tol=tol;
               }
               else if (pixelformat == Coord3D_C16)
               {
                 disp_list.add(buffer);
+                left_tol=tol;
               }
               else if (pixelformat == Confidence8)
               {
                 conf_list.add(buffer);
+                left_tol=tol;
               }
               else if (pixelformat == Error8)
               {
                 error_list.add(buffer);
+                left_tol=tol;
               }
 
-              // check if both lists contain an image with the current time
-              // stamp
+              // get corresponding left and disparity images
 
               uint64_t timestamp=buffer->getTimestampNS();
+              std::shared_ptr<const rcg::Image> left=left_list.find(timestamp, left_tol);
+              std::shared_ptr<const rcg::Image> disp=disp_list.find(timestamp, disp_tol);
 
-              std::shared_ptr<const rcg::Image> left=left_list.find(timestamp);
-              std::shared_ptr<const rcg::Image> disp=disp_list.find(timestamp);
-              std::shared_ptr<const rcg::Image> conf=conf_list.find(timestamp);
-              std::shared_ptr<const rcg::Image> error=error_list.find(timestamp);
+              // get confidence and error images that correspond to the
+              // disparity image
+
+              std::shared_ptr<const rcg::Image> conf;
+              std::shared_ptr<const rcg::Image> error;
+
+              if (disp)
+              {
+                conf=conf_list.find(disp->getTimestampNS());
+                error=error_list.find(disp->getTimestampNS());
+              }
 
               if (left && disp && conf && error)
               {

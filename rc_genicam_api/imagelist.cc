@@ -95,4 +95,25 @@ std::shared_ptr<const Image> ImageList::find(uint64_t timestamp)
   return std::shared_ptr<const Image>();
 }
 
+std::shared_ptr<const Image> ImageList::find(uint64_t timestamp, uint64_t tolerance)
+{
+  if (tolerance > 0)
+  {
+    for (size_t i=0; i<list.size(); i++)
+    {
+      if (list[i]->getTimestampNS() >= timestamp-tolerance &&
+          list[i]->getTimestampNS() <= timestamp+tolerance)
+      {
+        return list[i];
+      }
+    }
+  }
+  else
+  {
+    return find(timestamp);
+  }
+
+  return std::shared_ptr<const Image>();
+}
+
 }
