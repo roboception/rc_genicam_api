@@ -70,6 +70,33 @@ void printHelp(const char *prgname)
 }
 
 /*
+  Get the i-th 16 bit value.
+
+  @param p         Pointer to first byte of array of 16 bit values.
+  @param bigendian True if values are given as big endian. Otherwise, litte
+                   endian is assumed.
+  @param i         Index of 16 bit inside the given array.
+*/
+
+inline uint16_t getUint16(const uint8_t *p, bool bigendian, int i)
+{
+  uint16_t ret;
+
+  if (bigendian)
+  {
+    size_t j=i<<1;
+    ret=((p[j]<<8)|p[j+1]);
+  }
+  else
+  {
+    size_t j=i<<1;
+    ret=((p[j+1]<<8)|p[j]);
+  }
+
+  return ret;
+}
+
+/*
   Computes a point cloud from the given synchronized left and disparity image
   pair and stores it in ply ascii format.
 
@@ -110,7 +137,12 @@ void storePointCloud(std::string name, double f, double t, double scale,
   const uint8_t *dps=disp->getPixels();
   size_t dstep=disp->getWidth()*sizeof(uint16_t)+disp->getXPadding();
 
-  // count number of valid disparities
+  // count number of valid disparities and store vertice index in a temporary
+  // index image
+
+  int vi=0;
+  const uint32_t vinvalid=0xffffffff;
+  std::vector<uint32_t> vindex(width*height);
 
   int n=0;
   for (size_t k=0; k<height; k++)
@@ -118,8 +150,51 @@ void storePointCloud(std::string name, double f, double t, double scale,
     int j=0;
     for (size_t i=0; i<width; i++)
     {
-      if ((dps[j]|dps[j+1]) != 0) n++;
+      vindex[vi]=vinvalid;
+      if ((dps[j]|dps[j+1]) != 0) vindex[vi]=n++;
+
       j+=2;
+      vi++;
+    }
+
+    dps+=dstep;
+  }
+
+  dps=disp->getPixels();
+
+  // count number of triangles
+
+  const uint16_t vstep=static_cast<uint16_t>(std::ceil(2/scale));
+
+  int tn=0;
+  for (size_t k=1; k<height; k++)
+  {
+    for (size_t i=1; i<width; i++)
+    {
+      uint16_t v[4];
+      v[0]=getUint16(dps, bigendian, i-1);
+      v[1]=getUint16(dps, bigendian, i);
+      v[2]=getUint16(dps+dstep, bigendian, i-1);
+      v[3]=getUint16(dps+dstep, bigendian, i);
+
+      uint16_t vmin=65535;
+      uint16_t vmax=0;
+      int valid=0;
+
+      for (int jj=0; jj<4; jj++)
+      {
+        if (v[jj])
+        {
+          vmin=std::min(vmin, v[jj]);
+          vmax=std::max(vmax, v[jj]);
+          valid++;
+        }
+      }
+
+      if (valid >= 3 && vmax-vmin <= vstep)
+      {
+        tn+=valid-2;
+      }
     }
 
     dps+=dstep;
@@ -179,9 +254,11 @@ void storePointCloud(std::string name, double f, double t, double scale,
   out << "property uint8 diffuse_red" << std::endl;
   out << "property uint8 diffuse_green" << std::endl;
   out << "property uint8 diffuse_blue" << std::endl;
+  out << "element face " << tn << std::endl;
+  out << "property list uint8 uint32 vertex_indices" << std::endl;
   out << "end_header" << std::endl;
 
-  // create point cloud
+  // create colored point cloud
 
   for (size_t k=0; k<height; k++)
   {
@@ -189,21 +266,11 @@ void storePointCloud(std::string name, double f, double t, double scale,
     {
       // convert disparity from fixed comma 16 bit integer into float value
 
-      double d;
-      if (bigendian)
-      {
-        size_t j=i<<1;
-        d=scale*((dps[j]<<8)|dps[j+1]);
-      }
-      else
-      {
-        size_t j=i<<1;
-        d=scale*((dps[j+1]<<8)|dps[j]);
-      }
+      double d=scale*getUint16(dps, bigendian, i);
 
       // if disparity is valid and color can be obtained
 
-      if (d > 0)
+      if (d)
       {
         // reconstruct 3D point from disparity value
 
@@ -245,6 +312,73 @@ void storePointCloud(std::string name, double f, double t, double scale,
     dps+=dstep;
     cps+=cstep;
     eps+=estep;
+  }
+
+  dps=disp->getPixels();
+
+  // create triangles
+
+  uint32_t *ips=vindex.data();
+  for (size_t k=1; k<height; k++)
+  {
+    for (size_t i=1; i<width; i++)
+    {
+      uint16_t v[4];
+      v[0]=getUint16(dps, bigendian, i-1);
+      v[1]=getUint16(dps, bigendian, i);
+      v[2]=getUint16(dps+dstep, bigendian, i-1);
+      v[3]=getUint16(dps+dstep, bigendian, i);
+
+      uint16_t vmin=65535;
+      uint16_t vmax=0;
+      int valid=0;
+
+      for (int jj=0; jj<4; jj++)
+      {
+        if (v[jj])
+        {
+          vmin=std::min(vmin, v[jj]);
+          vmax=std::max(vmax, v[jj]);
+          valid++;
+        }
+      }
+
+      if (valid >= 3 && vmax-vmin <= vstep)
+      {
+        int j=0;
+        uint32_t f[4];
+
+        if (ips[i-1] != vinvalid)
+        {
+          f[j++]=ips[i-1];
+        }
+
+        if (ips[width+i-1] != vinvalid)
+        {
+          f[j++]=ips[width+i-1];
+        }
+
+        if (ips[width+i] != vinvalid)
+        {
+          f[j++]=ips[width+i];
+        }
+
+        if (ips[i] != vinvalid)
+        {
+          f[j++]=ips[i];
+        }
+
+        out << "3 " << f[0] << ' ' << f[1] << ' ' << f[2] << std::endl;
+
+        if (j == 4)
+        {
+          out << "3 " << f[2] << ' ' << f[3] << ' ' << f[0] << std::endl;
+        }
+      }
+    }
+
+    ips+=width;
+    dps+=dstep;
   }
 
   out.close();
