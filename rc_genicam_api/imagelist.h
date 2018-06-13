@@ -92,6 +92,14 @@ class ImageList
     void removeOld(uint64_t timestamp);
 
     /**
+      Get oldest timestamp of the list.
+
+      @return Oldest timestamp available or 0 if list is empty.
+    */
+
+    uint64_t getOldestTime();
+
+    /**
       Returns the image that has the given timestamp. If the image cannot be
       found, then a nullptr is returned.
 

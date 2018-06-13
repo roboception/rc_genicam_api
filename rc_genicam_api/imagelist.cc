@@ -82,6 +82,18 @@ void ImageList::removeOld(uint64_t timestamp)
   }
 }
 
+uint64_t ImageList::getOldestTime()
+{
+  uint64_t ret=0;
+
+  if (list.size() > 0)
+  {
+    ret=list[0]->getTimestampNS();
+  }
+
+  return ret;
+}
+
 std::shared_ptr<const Image> ImageList::find(uint64_t timestamp)
 {
   for (size_t i=0; i<list.size(); i++)
