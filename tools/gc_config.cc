@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l|([interface-id>:]<device-id> <options>)" << std::endl;
+      std::cout << argv[0] << " -l|([<interface-id>:]<device-id> <options>)" << std::endl;
       std::cout << std::endl;
       std::cout << "Configuration of a device via GenICam" << std::endl;
       std::cout << std::endl;

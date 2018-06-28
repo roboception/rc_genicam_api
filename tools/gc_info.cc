@@ -37,6 +37,7 @@
 #include <rc_genicam_api/interface.h>
 #include <rc_genicam_api/device.h>
 #include <rc_genicam_api/stream.h>
+#include <rc_genicam_api/config.h>
 
 #include <iostream>
 
@@ -295,7 +296,7 @@ int main(int argc, char *argv[])
 {
   try
   {
-    if (argc == 2 || argc == 3)
+    if (argc >= 2)
     {
       if (std::string(argv[1]) == "-l")
       {
@@ -352,56 +353,101 @@ int main(int argc, char *argv[])
       }
       else
       {
-        // find specific device accross all systems and interfaces and show some
-        // information
+        int k=1;
 
-        std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[1]);
+        // get parameters, if any
 
         const char *xml=0;
-        if (argc == 3)
+        if (k+1 < argc && std::string(argv[k]) == "-o")
         {
-          xml=argv[2];
+          k++;
+          xml=argv[k++];
         }
 
-        if (dev)
+        if (k < argc)
         {
-          dev->open(rcg::Device::READONLY);
+          // find specific device accross all systems and interfaces and show some
+          // information
 
-          std::cout << "Device:        " << dev->getID() << std::endl;
-          std::cout << "Vendor:        " << dev->getVendor() << std::endl;
-          std::cout << "Model:         " << dev->getModel() << std::endl;
-          std::cout << "TL type:       " << dev->getTLType() << std::endl;
-          std::cout << "Display name:  " << dev->getDisplayName() << std::endl;
-          std::cout << "User name:     " << dev->getUserDefinedName() << std::endl;
-          std::cout << "Serial number: " << dev->getSerialNumber() << std::endl;
-          std::cout << "Version:       " << dev->getVersion() << std::endl;
-          std::cout << "TS Frequency:  " << dev->getTimestampFrequency() << std::endl;
-          std::cout << std::endl;
+          std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[k++]);
 
-          std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
-
-          std::cout << "Available streams:" << std::endl;
-          for (size_t i=0; i<stream.size(); i++)
+          if (dev)
           {
-            std::cout << "  Stream ID: " << stream[i]->getID() << std::endl;
+            // open device and optionally change some settings
+
+            if (k < argc)
+            {
+              dev->open(rcg::Device::CONTROL);
+            }
+            else
+            {
+              dev->open(rcg::Device::READONLY);
+            }
+
+            std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap(xml);
+
+            while (k < argc)
+            {
+              std::string p=argv[k++];
+
+              if (p.find('=') != std::string::npos)
+              {
+                // split argument in key and value
+
+                size_t j=p.find('=');
+                std::string value=p.substr(j+1);
+                std::string key=p.substr(0, j);
+
+                // set key=value pair through GenICam
+
+                rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+              }
+              else
+              {
+                std::cerr << "Missing '=': " << p << std::endl;
+                exit(1);
+              }
+            }
+
+            std::cout << "Device:        " << dev->getID() << std::endl;
+            std::cout << "Vendor:        " << dev->getVendor() << std::endl;
+            std::cout << "Model:         " << dev->getModel() << std::endl;
+            std::cout << "TL type:       " << dev->getTLType() << std::endl;
+            std::cout << "Display name:  " << dev->getDisplayName() << std::endl;
+            std::cout << "User name:     " << dev->getUserDefinedName() << std::endl;
+            std::cout << "Serial number: " << dev->getSerialNumber() << std::endl;
+            std::cout << "Version:       " << dev->getVersion() << std::endl;
+            std::cout << "TS Frequency:  " << dev->getTimestampFrequency() << std::endl;
+            std::cout << std::endl;
+
+            std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
+
+            std::cout << "Available streams:" << std::endl;
+            for (size_t i=0; i<stream.size(); i++)
+            {
+              std::cout << "  Stream ID: " << stream[i]->getID() << std::endl;
+            }
+
+            std::cout << std::endl;
+            std::cout << "Available features:" << std::endl;
+            printNode(std::string("  "), nodemap->_GetNode("Root"));
+
+            dev->close();
           }
-
-          std::cout << std::endl;
-          std::cout << "Available features:" << std::endl;
-          std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap(xml);
-          printNode(std::string("  "), nodemap->_GetNode("Root"));
-
-          dev->close();
+          else
+          {
+            std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+          }
         }
         else
         {
-          std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+          std::cerr << "Device name not given!" << std::endl;
         }
       }
     }
     else
     {
-      std::cout << argv[0] << " -l | ([interface-id>:]<device-id> [<name_for_xml_file>])" << std::endl;
+      std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id> [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Lists all reachable devices or all GenICam parameters of the specified device" << std::endl;
     }

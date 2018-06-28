@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
     {
       // show help
 
-      std::cout << argv[0] << " [interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
+      std::cout << argv[0] << " [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
       std::cout << "Stores n images from the specified device after applying the given values." << std::endl;
       std::cout << "Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
