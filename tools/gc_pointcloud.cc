@@ -225,7 +225,7 @@ void storePointCloud(std::string name, double f, double t, double scale,
   {
     std::ostringstream os;
     double timestamp=left->getTimestampNS()/1000000000.0;
-    os << "rc_vizard_" << std::setprecision(16) << timestamp << ".ply";
+    os << "rc_visard_" << std::setprecision(16) << timestamp << ".ply";
     name=os.str();
   }
 
