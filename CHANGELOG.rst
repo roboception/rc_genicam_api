@@ -1,3 +1,10 @@
+1.3.10 (2018-06-28)
+------------------
+
+- Added possibility to set GenICam parameters in gc_info too
+- Only show network summary in gc_config if called without parameters or with network related parameters
+- Corrected spelling of visard in gc_pointcloud output file name
+
 1.3.9 (2018-06-15)
 ------------------
 
