@@ -1,5 +1,11 @@
+1.3.11 (2018-07-02)
+-------------------
+
+- don't install bash completion by default (doesn't work on ROS buildfarm)
+- make sure installed net_perf_check.sh script is executable
+
 1.3.10 (2018-06-28)
-------------------
+-------------------
 
 - Added possibility to set GenICam parameters in gc_info too
 - Only show network summary in gc_config if called without parameters or with network related parameters

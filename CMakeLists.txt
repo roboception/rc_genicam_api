@@ -92,6 +92,7 @@ endif ()
 option(BUILD_TOOLS "Build commandline tools" ON)
 option(BUILD_DOC "Add target for building doxygen docs" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
+option(INSTALL_COMPLETION "Install bash completion" OFF)
 
 # - Build individual parts -
 
@@ -100,6 +101,8 @@ add_subdirectory(genicam)
 add_subdirectory(rc_genicam_api)
 if (BUILD_TOOLS)
   add_subdirectory(tools)
+endif()
+if (INSTALL_COMPLETION)
   add_subdirectory(completion)
 endif ()
 
@@ -128,7 +131,10 @@ endif()
 
 # Install catkin package.xml
 install(FILES package.xml COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})
-install(FILES net_perf_check.sh COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})
+install(FILES net_perf_check.sh COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER}
+        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+                    GROUP_EXECUTE GROUP_READ
+                    WORLD_EXECUTE WORLD_READ)
 
 # - Define information for packaging -
 
