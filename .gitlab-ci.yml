@@ -34,7 +34,7 @@ before_script:
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX="/usr" ..
+    - cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON ..
     - make -j 4
     - CTEST_OUTPUT_ON_FAILURE=1 make test
 
@@ -47,7 +47,7 @@ before_script:
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX="/usr" ..
+    - cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON ..
     - make -j 4
     - make package
     - upload_deb.sh $DISTRO_CODENAME-testing *.deb
@@ -61,7 +61,7 @@ before_script:
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX="/usr" ..
+    - cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON ..
     - make -j 4
     - make package
     - upload_deb.sh $DISTRO_CODENAME-stable *.deb
