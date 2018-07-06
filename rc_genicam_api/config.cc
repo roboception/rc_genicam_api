@@ -40,6 +40,10 @@
 
 #include "Base/GCException.h"
 
+#include <GenApi/ChunkAdapterGEV.h>
+#include <GenApi/ChunkAdapterU3V.h>
+#include <GenApi/ChunkAdapterGeneric.h>
+
 namespace rcg
 {
 
@@ -804,6 +808,30 @@ void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const cha
     out << name << " == " << value << " expected: " << cvalue;
     throw std::invalid_argument(out.str());
   }
+}
+
+std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                                                       const std::string &tltype)
+{
+  std::shared_ptr<GenApi::CChunkAdapter> chunkadapter;
+
+  if (setBoolean(nodemap, "ChunkModeActive", true))
+  {
+    if (tltype == "GEV")
+    {
+      chunkadapter=std::shared_ptr<GenApi::CChunkAdapter>(new GenApi::CChunkAdapterGEV(nodemap->_Ptr));
+    }
+    else if (tltype == "U3V")
+    {
+      chunkadapter=std::shared_ptr<GenApi::CChunkAdapter>(new GenApi::CChunkAdapterU3V(nodemap->_Ptr));
+    }
+    else
+    {
+      chunkadapter=std::shared_ptr<GenApi::CChunkAdapter>(new GenApi::CChunkAdapterGeneric(nodemap->_Ptr));
+    }
+  }
+
+  return chunkadapter;
 }
 
 }

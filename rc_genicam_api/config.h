@@ -37,6 +37,7 @@
 #define RC_GENICAM_API_CONFIG
 
 #include <GenApi/GenApi.h>
+#include <GenApi/ChunkAdapter.h>
 
 #include <memory>
 #include <string>
@@ -241,7 +242,7 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
 std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                       bool exception=false, bool igncache=false);
 
-/*
+/**
   Checks the value of given feature and throws an exception in case of a mismatch.
   The check succeeds if the feature does not exist.
 
@@ -253,6 +254,25 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
 
 void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                   const char *value, bool igncache=false);
+
+/**
+  Sets ChunkModeActive to 1, creates a chunk adapter for the specified
+  transport layer and attaches it to the given nodemap.
+
+  The returned chunk adapter must be attached to a buffer that contains chunk
+  data. Thereafter, the data can be accessed through the Chunk* features of the
+  given nodemap. After accessing all required data, the adapter must be
+  detached from the buffer!
+
+  @param nodemap Feature nodemap.
+  @param tltype  Transport layer type as returned by, e.g. System::getTLType()
+                 or Device::getTLType()
+  @return        Chunk adapter that is already attached to the given nodemap or
+                 null pointer if chunk mode cannot be activated.
+*/
+
+std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                                                       const std::string &tltype);
 
 }
 

@@ -162,14 +162,13 @@ void printNode(const std::string &prefix, GenApi::INode *node)
 
       case GenApi::intfIBoolean:
         {
-          std::cout << prefix << "Boolean: " << node->GetName() << " " << getAccessMode(node)
-                    << ": ";
+          std::cout << prefix << "Boolean: " << node->GetName() << " " << getAccessMode(node);
 
           GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
 
           if (GenApi::IsReadable(p))
           {
-            std::cout << p->GetValue();
+            std::cout << ": " << p->GetValue();
           }
 
           std::cout << std::endl;

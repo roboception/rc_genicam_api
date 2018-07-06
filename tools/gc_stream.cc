@@ -221,6 +221,147 @@ std::string storeBuffer(const rcg::Buffer *buffer)
   return name.str();
 }
 
+/**
+  This method expects in the given buffer an image of format Coord3D_C16 and
+  ChunkScan3d parameters in the nodemap. The chunk adapter is attached to the
+  buffer for reading the parameters. If this succeeds, then a floating point
+  disparity image and a parameter file is stored and the name of the disparity
+  image returned.
+*/
+
+std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                                   const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
+                                   const rcg::Buffer *buffer)
+{
+  std::string dispname;
+
+  if (!buffer->getIsIncomplete() && buffer->getImagePresent() &&
+      buffer->getPixelFormat() == Coord3D_C16 && buffer->getContainsChunkdata() && chunkadapter)
+  {
+    // get necessary information from ChunkScan3d parameters
+
+    chunkadapter->AttachBuffer(reinterpret_cast<std::uint8_t *>(buffer->getBase()), buffer->getSizeFilled());
+
+    int inv=-1;
+
+    if (rcg::getBoolean(nodemap, "ChunkScan3dInvalidDataFlag"))
+    {
+      inv=static_cast<int>(rcg::getFloat(nodemap, "ChunkScan3dInvalidDataValue"));
+    }
+
+    float scale=rcg::getFloat(nodemap, "ChunkScan3dCoordinateScale");
+    float offset=rcg::getFloat(nodemap, "ChunkScan3dCoordinateOffset");
+    float f=rcg::getFloat(nodemap, "ChunkScan3dFocalLength");
+    float t=rcg::getFloat(nodemap, "ChunkScan3dBaseline");
+    float u=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointU");
+    float v=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointV");
+
+    chunkadapter->DetachBuffer();
+
+    // proceed if required information is given
+
+    if (scale > 0 && f > 0 && t > 0)
+    {
+      // prepare file name
+
+      std::ostringstream name;
+
+      double ts=buffer->getTimestampNS()/1000000000.0;
+
+      name << "image_" << std::setprecision(16) << ts;
+
+      // convert values and store disparity image
+
+      size_t px=buffer->getXPadding();
+      size_t width=buffer->getWidth();
+      size_t height=buffer->getHeight();
+      const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset()+
+                             2*(width+px)*(height+1);
+
+      dispname=name.str()+"_disp.pfm";
+      std::ofstream out(dispname, std::ios::binary);
+
+      out << "Pf" << std::endl;
+      out << width << " " << height << std::endl;
+      out << 1 << "\n";
+
+      std::streambuf *sb=out.rdbuf();
+
+      // get 16 bit data, scale and add offset and store as big endian
+
+      bool msbfirst=true;
+
+      {
+        int pp=1;
+        char *cc=reinterpret_cast<char *>(&pp);
+        msbfirst=(cc[0] != 1);
+      }
+
+      for (size_t k=0; k<height && out.good(); k++)
+      {
+        p-=(width+px)<<2;
+        for (size_t i=0; i<width; i++)
+        {
+          int v;
+          if (buffer->isBigEndian())
+          {
+            v=(static_cast<int>(p[0])<<8)|p[1];
+          }
+          else
+          {
+            v=(static_cast<int>(p[1])<<8)|p[0];
+          }
+
+          p+=2;
+
+          float d=std::numeric_limits<float>::infinity();
+          if (v != inv)
+          {
+            d=v*scale+offset;
+          }
+
+          char *c=reinterpret_cast<char *>(&d);
+
+          if (msbfirst)
+          {
+            sb->sputc(c[0]);
+            sb->sputc(c[1]);
+            sb->sputc(c[2]);
+            sb->sputc(c[3]);
+          }
+          else
+          {
+            sb->sputc(c[3]);
+            sb->sputc(c[2]);
+            sb->sputc(c[1]);
+            sb->sputc(c[0]);
+          }
+
+          p+=px;
+        }
+      }
+
+      out.close();
+
+      // store parameters that are necessary for 3D reconstruction in separate
+      // parameter file
+
+      name << "_param.txt";
+
+      out.open(name.str());
+
+      out << "# Created by gc_stream" << std::endl;
+      out << "camera.A=[" << f << " 0 " << u << "; 0 " << f << " " << v << "; 0 0 1]" << std::endl;
+      out << "rho=" << f*t << std::endl;
+      out << "t=" << t << std::endl;
+
+      out.close();
+    }
+  }
+
+  return dispname;
+}
+
 }
 
 int main(int argc, char *argv[])
@@ -237,6 +378,11 @@ int main(int argc, char *argv[])
       {
         dev->open(rcg::Device::CONTROL);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
+
+        // get chunk adapter (this switches chunk mode on if possible and
+        // returns a null pointer if this is not possible)
+
+        std::shared_ptr<GenApi::CChunkAdapter> chunkadapter=rcg::getChunkAdapter(nodemap, dev->getTLType());
 
         // set values as given on the command line
 
@@ -315,7 +461,23 @@ int main(int argc, char *argv[])
 
               if (buffer != 0)
               {
-                std::string name=storeBuffer(buffer);
+                std::string name;
+
+                // if chunk data is available, then try to store as disparity image
+
+                if (chunkadapter)
+                {
+                  name=storeBufferAsDisparity(nodemap, chunkadapter, buffer);
+                }
+
+                // otherwise, store as ordinary image
+
+                if (name.size() == 0)
+                {
+                  name=storeBuffer(buffer);
+                }
+
+                // report success
 
                 if (name.size() > 0)
                 {
