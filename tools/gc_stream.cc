@@ -207,12 +207,12 @@ std::string storeBuffer(const rcg::Buffer *buffer)
         break;
     }
   }
-  else if (!buffer->getImagePresent())
+  else if (buffer->getIsIncomplete())
   {
-    std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
+    std::cerr << "storeBuffer(): Received incomplete buffer" << std::endl;
     return std::string();
   }
-  else if (buffer->getIsIncomplete())
+  else if (!buffer->getImagePresent())
   {
     std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
     return std::string();
