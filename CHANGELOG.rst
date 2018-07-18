@@ -1,3 +1,9 @@
+1.3.12 (2018-07-18)
+-------------------
+
+- Getting chunk data in gc_stream and storing disparity image with all parameters for reconstruction if possible
+- Error handling in gc_stream changed by first checking for incomplete buffer and then for image present
+
 1.3.11 (2018-07-02)
 -------------------
 
