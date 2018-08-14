@@ -58,6 +58,10 @@ The 'bin' directory contains the tools, DLLs and the default transport layer
 including configuration. The 'include' and 'lib' sub-directories contain the
 headers and libraries for using the API in own programs.
 
+NOTE: For using the libraries in own projects, define the symbol
+`GENICAM_NO_AUTO_IMPLIB` in your project file to avoid linker problems with the
+GenICam libraries.
+
 Tools
 -----
 
@@ -115,12 +119,8 @@ Device ID
 
 There are multiple ways of specifying an ID to identify a device.
 
-1. In the most basic version, the device ID is actually defined by the GenTL
-   producer (see Transport Layer section below). The GenTL producer included
-   in rc_genicam_api uses the lower case MAC address with the colons `:`
-   replaced by underscores `_`.
-
-   Example: `00_14_2d_2c_6e_bb`
+1. The serial number of the device serves as ID.
+   Example: `02911931`
 
 2. The given ID can also be a user defined name. The user defined name is set
    to `rc_visard` by default and can be changed with:
@@ -133,8 +133,12 @@ There are multiple ways of specifying an ID to identify a device.
    If the user defined name contains one or more colons, it must be preceded by
    a colon (e.g. `:my:name`) or an interface ID (see below).
 
-3. The serial number of the device can also be used as ID.
-   Example: `02911931`
+3. The device ID of the GenTL producer (see `Transport Layer` section below)
+   may also be used. This ID is unique, but not persistent as it depends on the
+   implementation of the GenTL producer. Thus, it can change after software
+   updates. It often encodes the MAC address of the sensor in some way.
+
+   Example: `00_14_2d_2c_6e_bb`
 
 All three options can be seen in the output of `gc_config -l`.
 
