@@ -360,9 +360,19 @@ std::string System::getTLType() const
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_TLTYPE);
 }
 
+std::string System::getName() const
+{
+  return cTLGetInfo(tl, gentl, GenTL::TL_INFO_NAME);
+}
+
 std::string System::getPathname() const
 {
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_PATHNAME);
+}
+
+std::string System::getDisplayName() const
+{
+  return cTLGetInfo(tl, gentl, GenTL::TL_INFO_DISPLAYNAME);
 }
 
 bool System::isCharEncodingASCII() const

@@ -156,12 +156,28 @@ class System : public std::enable_shared_from_this<System>
     std::string getTLType() const;
 
     /**
-      Returns the path name of the GenTL provider.
+      Returns the file name of the GenTL provider.
 
-      @return Path name.
+      @return File name.
+    */
+
+    std::string getName() const;
+
+    /**
+      Returns the full path name of the GenTL provider.
+
+      @return Full path name.
     */
 
     std::string getPathname() const;
+
+    /**
+      Returns the display name of the GenTL provider.
+
+      @return Display name.
+    */
+
+    std::string getDisplayName() const;
 
     /**
       Returns the character encoding.
