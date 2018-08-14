@@ -52,6 +52,20 @@ namespace rcg
 {
 
 /**
+  Calls the given command.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of command.
+  @param exception True if an error should be signaled via exception instead of
+                   a return value.
+  @return          True if value has been changed. False if feature does not
+                   exist, has a different datatype or is not writable.
+*/
+
+bool callCommand(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                 bool exception=false);
+
+/**
   Set the value of a boolean feature of the given nodemap.
 
   @param nodemap   Initialized nodemap.

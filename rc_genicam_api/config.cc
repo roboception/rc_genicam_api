@@ -47,6 +47,52 @@
 namespace rcg
 {
 
+bool callCommand(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                 bool exception)
+{
+  bool ret=false;
+
+  try
+  {
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
+    {
+      if (GenApi::IsWritable(node))
+      {
+        GenApi::ICommand *val=dynamic_cast<GenApi::ICommand *>(node);
+
+        if (val != 0)
+        {
+          val->Execute();
+          ret=true;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not a command: ")+name);
+        }
+      }
+      else if (exception)
+      {
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      }
+    }
+    else if (exception)
+    {
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
+    }
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+
+  return ret;
+}
+
 bool setBoolean(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                 bool value, bool exception)
 {

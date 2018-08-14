@@ -170,8 +170,8 @@ int main(int argc, char *argv[])
             }
             else
             {
-              std::cerr << "Missing '=': " << p << std::endl;
-              exit(1);
+              // call the command
+              rcg::callCommand(nodemap, p.c_str(), true);
             }
           }
 

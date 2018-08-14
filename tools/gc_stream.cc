@@ -409,7 +409,14 @@ int main(int argc, char *argv[])
           }
           else // set key=value pair through GenICam
           {
-            rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+            if (value.size() > 0)
+            {
+              rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+            }
+            else
+            {
+              rcg::callCommand(nodemap, key.c_str(), true);
+            }
           }
         }
 
