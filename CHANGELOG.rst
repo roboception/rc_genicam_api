@@ -1,3 +1,12 @@
+1.3.13 (2018-08-23)
+-------------------
+
+- Changed output of gc_config -l to emphasize using interface and serial number as unique identifier
+- Added possibility to call a GenICam command from the command line with gc_info, gc_config and gc_stream
+- Additionally printing the internal name and display name of the GenTL producer in the gc_info tool
+- Update GEV GenTL provider from Baumer
+- Revision of readme
+
 1.3.12 (2018-07-18)
 -------------------
 
