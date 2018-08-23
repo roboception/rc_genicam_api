@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
             {
               if (device[j]->getTLType() == "GEV")
               {
-                std::cout << "  " << interf[k]->getID() << ":" << device[j]->getID() << " (";
+                std::cout << "  " << interf[k]->getID() << ":" << device[j]->getSerialNumber() << " (";
 
                 std::string uname=device[j]->getDisplayName();
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
                   std::cout << uname << ", ";
                 }
 
-                std::cout << device[j]->getSerialNumber() << ")" << std::endl;
+                std::cout << device[j]->getID() << ")" << std::endl;
               }
             }
 
