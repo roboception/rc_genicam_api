@@ -48,6 +48,12 @@
 #include <fstream>
 #include <iomanip>
 #include <cmath>
+#include <algorithm>
+
+#ifdef WIN32
+#undef min
+#undef max
+#endif
 
 namespace
 {
