@@ -47,6 +47,8 @@
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include <atomic>
+#include <thread>
 
 #ifdef WIN32
 #undef min
@@ -362,6 +364,21 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
   return dispname;
 }
 
+// simple mechanism to set the boolean flag when the user presses enter in the
+// terminal
+
+std::atomic<bool> user_interrupt(false);
+
+void checkUserInterrupt()
+{
+  char a;
+  std::cin.get(a);
+
+  std::cout << "Stopping ..." << std::endl;
+
+  user_interrupt=true;
+}
+
 }
 
 int main(int argc, char *argv[])
@@ -452,17 +469,25 @@ int main(int argc, char *argv[])
 
         if (stream.size() > 0)
         {
+          // start background thread for checking user input
+
+          std::thread thread_cui(checkUserInterrupt);
+          thread_cui.detach();
+
           // opening first stream
 
           stream[0]->open();
           stream[0]->startStreaming();
 
-          for (int k=0; k<n; k++)
+          std::cout << "Press 'Enter' to interrupt grabbing." << std::endl;
+          std::cout << std::endl;
+
+          for (int k=0; k<n && !user_interrupt; k++)
           {
             // grab next image with timeout of 3 seconds
 
             int retry=5;
-            while (retry > 0)
+            while (retry > 0 && !user_interrupt)
             {
               const rcg::Buffer *buffer=stream[0]->grab(3000);
 
@@ -523,8 +548,9 @@ int main(int argc, char *argv[])
 
       std::cout << argv[0] << " [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
-      std::cout << "Stores n images from the specified device after applying the given values." << std::endl;
-      std::cout << "Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
+      std::cout << "- Stores n images from the specified device after applying the given values." << std::endl;
+      std::cout << "- Streaming can be interrupted by hitting the 'Enter' key." << std::endl;
+      std::cout << "- Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
       std::cout << std::endl;
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
       std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
