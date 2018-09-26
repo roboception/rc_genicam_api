@@ -44,6 +44,10 @@ target_link_libraries(gc_config rc_genicam_api_static)
 add_executable(gc_stream gc_stream.cc)
 target_link_libraries(gc_stream rc_genicam_api_static)
 
+if (UINX)
+  target_link_libraries(gc_stream pthread)
+endif ()
+
 add_executable(gc_pointcloud gc_pointcloud.cc)
 target_link_libraries(gc_pointcloud rc_genicam_api_static)
 
@@ -53,4 +57,3 @@ install(TARGETS gc_info COMPONENT bin DESTINATION bin)
 install(TARGETS gc_config COMPONENT bin DESTINATION bin)
 install(TARGETS gc_stream COMPONENT bin DESTINATION bin)
 install(TARGETS gc_pointcloud COMPONENT bin DESTINATION bin)
-
