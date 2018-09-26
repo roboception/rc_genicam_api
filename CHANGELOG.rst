@@ -1,3 +1,9 @@
+1.3.14 (2018-09-26)
+-------------------
+
+- Added possibility to interrupt streaming with gc_stream by pressing 'Enter' key.
+- Undefined min/max macros in gc_pointcloud.cc on Windows to avoid compile errors
+
 1.3.13 (2018-08-23)
 -------------------
 
