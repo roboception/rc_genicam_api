@@ -99,15 +99,19 @@ int main(int argc, char *argv[])
         if (dev != 0)
         {
           bool showsummary=false;
+          bool iponly=false;
 
-          if (i < argc)
-          {
-            dev->open(rcg::Device::CONTROL);
-          }
-          else
+          // open device with control or read only access, depending on the
+          // given parameters
+
+          if (i == argc || (i+1 == argc && std::string(argv[i]) == "--iponly"))
           {
             dev->open(rcg::Device::READONLY);
             showsummary=true;
+          }
+          else
+          {
+            dev->open(rcg::Device::CONTROL);
           }
 
           // change setting according to given parameters
@@ -118,7 +122,11 @@ int main(int argc, char *argv[])
           {
             std::string p=argv[i++];
 
-            if (p[0] == '-' && i < argc)
+            if (p == "--iponly")
+            {
+              iponly=true;
+            }
+            else if (p[0] == '-' && i < argc)
             {
               showsummary=true;
 
@@ -177,10 +185,15 @@ int main(int argc, char *argv[])
 
           // print network configuration of the device
 
-          if (showsummary)
+          if (iponly)
+          {
+            std::cout << rcg::getString(nodemap, "GevCurrentIPAddress") << std::endl;
+          }
+          else if (showsummary)
           {
             std::cout << "ID:                       " << dev->getParent()->getID() << ":"
-                                                      << dev->getID() << std::endl;
+                                                      << rcg::getString(nodemap, "DeviceID") << std::endl;
+            std::cout << "GenTL ID:                 " << dev->getID() << std::endl;
             std::cout << "Serial number:            " << rcg::getString(nodemap, "DeviceID") << std::endl;
             std::cout << "User defined ID:          " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
             std::cout << "MAC Address:              " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
@@ -217,13 +230,14 @@ int main(int argc, char *argv[])
       std::cout << std::endl;
       std::cout << "Configuration of a device via GenICam" << std::endl;
       std::cout << std::endl;
-      std::cout << "-n <id>: Set user defined id" << std::endl;
-      std::cout << "-d 1|0:  Switch DHCP on or off" << std::endl;
-      std::cout << "-p 1|0:  Switch persistent IP on or off" << std::endl;
-      std::cout << "-t 1|0:  Switch precision time protocol (ptp) on or off" << std::endl;
-      std::cout << "-i <ip>: Set persistent IP address" << std::endl;
-      std::cout << "-s <ip>: Set subnet mask for persistent IP address" << std::endl;
-      std::cout << "-g <ip>: Set default gateway for persistent IP address" << std::endl;
+      std::cout << "-n <id>:  Set user defined id" << std::endl;
+      std::cout << "-d 1|0:   Switch DHCP on or off" << std::endl;
+      std::cout << "-p 1|0:   Switch persistent IP on or off" << std::endl;
+      std::cout << "-t 1|0:   Switch precision time protocol (ptp) on or off" << std::endl;
+      std::cout << "-i <ip>:  Set persistent IP address" << std::endl;
+      std::cout << "-s <ip>:  Set subnet mask for persistent IP address" << std::endl;
+      std::cout << "-g <ip>:  Set default gateway for persistent IP address" << std::endl;
+      std::cout << "--iponly: Show current IP of device instead of full summary" << std::endl;
       std::cout << std::endl;
       std::cout << "<key>=<value>: Set GenICam key to given value." << std::endl;
     }
