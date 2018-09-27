@@ -262,10 +262,14 @@ namespace GENAPI_NAMESPACE
     //! DEPRECATED, use IBase::GetPrincipalInterfaceType() instead
     inline GENICAM_NAMESPACE::gcstring GetInterfaceName(IBase *pBase)
     {
-#pragma warning (push) // icc -W4 complains: controlling expression is constant
-#pragma warning (disable : 279)
+#       ifdef _MSC_VER
+#           pragma warning (push) // icc -W4 complains: controlling expression is constant
+#           pragma warning (disable : 279)
+#       endif
         assert(pBase && "don't call this with a NULL pointer");
-#pragma warning (pop)
+#       ifdef _MSC_VER
+#           pragma warning (pop)
+#       endif
         CNodePtr ptrNode(pBase);
         switch(ptrNode->GetPrincipalInterfaceType())
         {

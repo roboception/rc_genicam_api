@@ -33,8 +33,10 @@
 
 #include <GenApi/IPort.h>
 
-#pragma warning ( push )
-#pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#ifdef _MSC_VER
+#   pragma warning ( push )
+#   pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#endif
 
 namespace GENAPI_NAMESPACE
 {
@@ -142,6 +144,8 @@ namespace GENAPI_NAMESPACE
 
 }
 
-#pragma warning ( pop )
+#ifdef _MSC_VER
+#   pragma warning ( pop )
+#endif
 
 #endif // ifndef GENAPI_IPORTRECORDER_H

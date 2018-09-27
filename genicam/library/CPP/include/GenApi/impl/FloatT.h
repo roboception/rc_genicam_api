@@ -45,7 +45,9 @@
 #include "Exception.h"
 #include "AutovectorImpl.h"
 
-#pragma warning( disable : 4706 ) // assignment within conditional expression
+#ifdef _MSC_VER
+#   pragma warning( disable : 4706 ) // assignment within conditional expression
+#endif
 
 namespace GENAPI_NAMESPACE
 {
@@ -356,6 +358,10 @@ namespace GENAPI_NAMESPACE
             AutoLock l(Base::GetLock());
             typename Base::EntryMethodFinalizer E( this, meGetMin );
 
+            // only allowed for available nodes
+            if (!IsAvailable(this))
+                throw ACCESS_EXCEPTION_NODE("Node is not available.");
+
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetMin..." );
 
             double Minimum = Base::InternalGetMin();
@@ -372,6 +378,10 @@ namespace GENAPI_NAMESPACE
         {
             AutoLock l(Base::GetLock());
             typename Base::EntryMethodFinalizer E( this, meGetMax );
+
+            // only allowed for available nodes
+            if (!IsAvailable(this))
+                throw ACCESS_EXCEPTION_NODE("Node is not available.");
 
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetMax...");
 
@@ -428,6 +438,10 @@ namespace GENAPI_NAMESPACE
 
             if( !Base::InternalHasInc() )
                 throw RUNTIME_EXCEPTION_NODE("node does not have an increment." );
+
+            // only allowed for available nodes
+            if (!IsAvailable(this))
+                throw ACCESS_EXCEPTION_NODE("Node is not available.");
 
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetInc...");
 

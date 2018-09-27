@@ -72,7 +72,7 @@ namespace GENAPI_NAMESPACE
         // IInteger implementation
         //-------------------------------------------------------------
 
-        //! Get feature value usingt m_InputName as hard coded variable name
+        //! Get feature value using m_InputName as hard coded variable name
         /*! This is a helper for the implementation of the converter */
         virtual int64_t GetValueWithInput(int64_t input, bool Verify = false, bool IgnoreCache = false);
 
@@ -144,6 +144,7 @@ namespace GENAPI_NAMESPACE
 
         virtual void SetProperty( CProperty &Property );
         virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
+        virtual void Parse();
         
     protected:
         //-------------------------------------------------------------
@@ -158,11 +159,14 @@ namespace GENAPI_NAMESPACE
         //! the formula evaluated by the swiss knife
         GENICAM_NAMESPACE::gcstring m_Formula;
 
-        //! Mapping of the variable's node names to the SYMBOLIC names in the folmulas
+        //! Mapping of the variable's node names to the SYMBOLIC names in the formulas
         std::map<GENICAM_NAMESPACE::gcstring, GENICAM_NAMESPACE::gcstring> m_Symbolics;
 
         //! Mapping of SYMBOLIC names to the references of the variables
         std::map<GENICAM_NAMESPACE::gcstring, CIntegerPolyRef> m_Variables;
+
+        //! the vairble used by th parser
+        CStrMap m_VariableMap;
 
         //! the parser doing the actual work
         CInt64MathParser m_MathParser;
@@ -176,7 +180,7 @@ namespace GENAPI_NAMESPACE
         //! Indicates if the SwissKnife is part of a Converter and shows which direction is implemented
         GENAPI_NAMESPACE::EInputDirection m_InputDirection;
 
-        //! A hardcoded variable name
+        //! A hard-coded variable name
         /*! This is a helper for the implementation of the converter */
         GENICAM_NAMESPACE::gcstring m_InputName;
 

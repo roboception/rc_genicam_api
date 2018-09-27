@@ -131,7 +131,7 @@ namespace GENICAM_NAMESPACE
     GCBASE_API bool DoesFileExist( const gcstring &FilePath );
 #endif // defined(UNDER_RTSS)
 
-    //! Converts \ to / and replaces all unsave characters by their %xx equivalent
+    //! Converts \ to / and replaces all unsafe characters by their %xx equivalent
     //! \ingroup Base_PublicUtilities
     GCBASE_API gcstring UrlEncode(const GENICAM_NAMESPACE::gcstring& Input);
 
@@ -209,13 +209,13 @@ namespace GENICAM_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////////
 // 
-//    Useful to create pragma message output reconized by VisualStudio
+//    Useful to create pragma message output recognized by VisualStudio
 //
 //    Usage:
 //       #pragma message ( __ERR__ "Invalid DLL ABI" )
 //
 ///////////////////////////////////////////////////////////////////////////////
-// Message formater
+// Message formatter
 #define _TO_STRING( __stN ) #__stN
 #define EXPAND_TO_STRINGISE( __stN ) _TO_STRING( __stN )
 #define __LINE_STR__ EXPAND_TO_STRINGISE(__LINE__)

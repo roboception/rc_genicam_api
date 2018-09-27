@@ -20,10 +20,7 @@
 class CSymTable
 {
 public:
-    CSymTable();
-    ~CSymTable();
-
-    static int FindSymbol(const char *str, int *nchars);
+    static int FindSymbol( const char* str, int* nchars );
 };
 
 #endif // !defined(AFX_SYMTABLE_H__F8B4AD7F_07F9_4AB2_B206_04549837C7ED__INCLUDED_)

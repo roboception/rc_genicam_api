@@ -136,7 +136,7 @@ namespace GENAPI_NAMESPACE
     } EStandardNameSpace;
 
 
-    //! Defines the chices of a Yes/No alternaitve
+    //! Defines the choices of a Yes/No alternatives
     //! \ingroup GenApi_PublicUtilities
     typedef enum _EYesNo
     {
@@ -150,7 +150,7 @@ namespace GENAPI_NAMESPACE
     typedef GENICAM_NAMESPACE::gcstring_vector StringList_t;
 
 
-    //! typedef for fomula type
+    //! typedef for formula type
     //! \ingroup GenApi_PublicImpl
     typedef enum _ESlope
     {
@@ -203,7 +203,7 @@ namespace GENAPI_NAMESPACE
     } EInterfaceType;
 
     //! typedef for link type
-    /*! For details see GenICam wiki : GenApi/SoftwareArchitecture/NodeDependencies
+    /*! For details see GenICam Wiki : GenApi/SoftwareArchitecture/NodeDependencies
     \ingroup GenApi_PublicImpl
     */
     typedef enum _ELinkType
@@ -213,7 +213,8 @@ namespace GENAPI_NAMESPACE
         ctWritingChildren,      //!< All nodes which can write a value further down the node stack
         ctInvalidatingChildren, //!< All directly connected nodes which invalidate this node
         ctDependingNodes,       //!< All directly or indirectly connected nodes which are invalidated by this nodes (i.e. which are dependent on this node)
-        ctTerminalNodes         //!< All indirectly connected terminal nodes
+        ctTerminalNodes,         //!< All indirectly connected terminal nodes
+        ctValueChangingChildren  //!< All child node used to compute the value.
     } ELinkType;
 
     //! typedef for increment mode

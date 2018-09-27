@@ -35,8 +35,10 @@
 #include <GenApi/IPortConstruct.h>
 #include <GenApi/INodeMap.h>
 
-#pragma warning(push)
-#pragma warning(disable: 4251) // GenApi::CChunkPort::m_ptrPort' : class 'GenApi::CPointer<T>' needs to have dll-interface
+#ifdef _MSC_VER
+#   pragma warning(push)
+#   pragma warning(disable: 4251) // GenApi::CChunkPort::m_ptrPort' : class 'GenApi::CPointer<T>' needs to have dll-interface
+#endif
 
 namespace GENAPI_NAMESPACE
 {
@@ -171,6 +173,8 @@ namespace GENAPI_NAMESPACE
 
 }
 
-#pragma warning(pop)
+#ifdef _MSC_VER
+#   pragma warning(pop)
+#endif
 
 #endif // GENAPI_CHUNKPORT_H

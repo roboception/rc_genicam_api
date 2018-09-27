@@ -38,16 +38,15 @@
 #include <GenApi/IPortRecorder.h>
 #include <GenApi/Pointer.h>
 
-#pragma warning( push )
-#pragma warning( disable: 4251 ) // enApi::CPortImpl::m_ptrPort' : class 'GenApi::CPointer<T>' needs to have dll-interface
-#pragma warning ( disable : 4068 ) // unknown pragma; refers to BullsEyeCoverage
+#ifdef _MSC_VER
+#   pragma warning( push )
+#   pragma warning( disable : 4251 )  // enApi::CPortImpl::m_ptrPort' : class 'GenApi::CPointer<T>' needs to have dll-interface
+#   pragma warning( disable : 4275 ) // DLL interface (this is a bug)
+#   pragma warning( disable : 4068 ) // unknown pragma; refers to BullsEyeCoverage
+#endif
 
 namespace GENAPI_NAMESPACE
 {
-#   pragma warning ( push ) 
-#   pragma warning ( disable : 4251 ) // DLL interface (this is a bug)
-#   pragma warning ( disable : 4275 ) // DLL interface (this is a bug)
-
     //*************************************************************
     // CPortImpl class
     //*************************************************************
@@ -136,9 +135,9 @@ namespace GENAPI_NAMESPACE
         CNodePtr m_ptrPort;
 
     };
-
-#   pragma warning ( pop )
 }
 
-#pragma warning(pop)
+#ifdef _MSC_VER
+#   pragma warning(pop)
+#endif
 #endif // ifndef GENAPI_PORTIMPL_H

@@ -53,7 +53,9 @@
 
 // conversion from 'uintptr_t' to 'void *' of greater size
 // This is a portability warning
-#pragma warning( disable : 4312 )
+#ifdef _MSC_VER
+#   pragma warning( disable : 4312 )
+#endif
 
 namespace GENAPI_NAMESPACE
 {

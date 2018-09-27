@@ -213,7 +213,7 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
       }
       else
       {
-        gcstring sxml=buffer.get();
+        GENICAM_NAMESPACE::gcstring sxml=buffer.get();
         nodemap->_LoadXMLFromString(sxml);
       }
     }
@@ -233,12 +233,12 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
 
       if (name.size() > 4 && toLower(name, name.size()-4, 4) == ".zip")
       {
-        gcstring file=name.c_str();
+        GENICAM_NAMESPACE::gcstring file=name.c_str();
         nodemap->_LoadXMLFromZIPFile(file);
       }
       else
       {
-        gcstring file=name.c_str();
+        GENICAM_NAMESPACE::gcstring file=name.c_str();
         nodemap->_LoadXMLFromFile(file);
       }
     }
@@ -257,7 +257,7 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
       throw GenTLException("allocNodeMap()", gentl);
     }
 
-    gcstring portname=tmp;
+    GENICAM_NAMESPACE::gcstring portname=tmp;
     if (!nodemap->_Connect(cport, portname))
     {
       throw GenTLException((std::string("allocNodeMap(): Cannot connect port: ")+tmp).c_str());

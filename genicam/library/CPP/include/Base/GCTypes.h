@@ -272,7 +272,7 @@ namespace GENICAM_NAMESPACE
     };
 }
 
-using GenICam::Version_t;
+using GENICAM_NAMESPACE::Version_t;
 
 // mark a variable as unused. This prevents unused parameter/ unused local variable warnings on warning level 4.
 #if defined(_MSC_VER)

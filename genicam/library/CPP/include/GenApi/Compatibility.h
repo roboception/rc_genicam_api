@@ -59,10 +59,14 @@ typedef struct _GUID {
 
 
 
-#if defined (__x86_64) // GNUC && 64 Bit
-#  define FMT_I64 "l"
-#else // all 32 bit and all Windows
-#  define FMT_I64 "ll"
+#if defined (__APPLE__)
+#   define FMT_I64 "ll"
+#else
+#   if defined (__x86_64) // GNUC && 64 Bit
+#       define FMT_I64 "l"
+#   else // all 32 bit and all Windows
+#       define FMT_I64 "ll"
+#   endif
 #endif
 
 #endif // ifndef GENAPI_COMPATIBILITY_H

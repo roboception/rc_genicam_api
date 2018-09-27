@@ -34,8 +34,10 @@
 #include "Base/GCBase.h"
 #include "INodeMap.h"
 
-#pragma warning ( push )
-#pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#ifdef _MSC_VER
+#   pragma warning ( push )
+#   pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#endif
 
 namespace GENAPI_NAMESPACE
 {
@@ -99,7 +101,7 @@ namespace GENAPI_NAMESPACE
         //! Loads an XML from a ZIP file
         virtual void LoadXMLFromZIPFile(const GENICAM_NAMESPACE::gcstring & ZipFileName) = 0;
 
-		//! Loads an XML from a ZIP data buffer
+        //! Loads an XML from a ZIP data buffer
         virtual void LoadXMLFromZIPData(const void* zipData, size_t zipSize) = 0;
 
         //! Loads a Zipped XML, checks it for correctness, pre-processes it, caches it, and optionally applies a style sheet, and optionally writes it to a file
@@ -114,6 +116,8 @@ namespace GENAPI_NAMESPACE
 
 }
 
-#pragma warning ( pop )
+#ifdef _MSC_VER
+#   pragma warning ( pop )
+#endif
 
 #endif // ifndef GENAPI_INODEMAPDYN_H

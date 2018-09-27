@@ -132,7 +132,7 @@ namespace GENAPI_NAMESPACE
 #else 
             vsnprintf( pBuffer, sizeof pBuffer, pFormat, vap );
 #endif 
-
+            va_end(vap);
             return E( pBuffer, 
                 GENICAM_NAMESPACE::ExceptionReporter<E>::m_SourceFileName.c_str(), GENICAM_NAMESPACE::ExceptionReporter<E>::m_SourceLine,   
                 getEntryPoint(m_pNodePrivate->GetNodeMap()).c_str(),
@@ -151,31 +151,31 @@ namespace GENAPI_NAMESPACE
     };
 
     //! Fires an exception, e.g. throw EXCEPTION("%ld too large", Value);
-#   define GENERIC_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::GenericException>(__FILE__, __LINE__, this, "GenericException" ).Report
+#   define GENERIC_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::GenericException>(__FILE__, __LINE__, this, "GenericException" ).Report
 
     //! Fires an invalid argument exception, e.g. throw INVALID_ARGUMENT("%ld too large", Value);
-#   define INVALID_ARGUMENT_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::InvalidArgumentException>(__FILE__, __LINE__, this, "InvalidArgumentException" ).Report
+#   define INVALID_ARGUMENT_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::InvalidArgumentException>(__FILE__, __LINE__, this, "InvalidArgumentException" ).Report
 
     //! Fires an out of range exception, e.g. throw OUT_OF_RANGE_EXCEPTION("%ld too large", Value);
-#   define OUT_OF_RANGE_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::OutOfRangeException>(__FILE__, __LINE__, this, "OutOfRangeException" ).Report
+#   define OUT_OF_RANGE_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::OutOfRangeException>(__FILE__, __LINE__, this, "OutOfRangeException" ).Report
 
     //! Fires an property exception, e.g. throw PROPERTY_EXCEPTION("%ld too large", Value);
-#   define PROPERTY_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::PropertyException>(__FILE__, __LINE__, this, "PropertyException" ).Report
+#   define PROPERTY_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::PropertyException>(__FILE__, __LINE__, this, "PropertyException" ).Report
 
     //! Fires a runtime exception, e.g. throw RUNTIME_EXCEPTION("buh!")
-#   define RUNTIME_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::RuntimeException>(__FILE__, __LINE__, this, "RuntimeException" ).Report
+#   define RUNTIME_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::RuntimeException>(__FILE__, __LINE__, this, "RuntimeException" ).Report
 
     //! Fires a logical error exception, e.g. throw LOGICAL_ERROR_EXCEPTION("Should never reach this point")
-#   define LOGICAL_ERROR_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::LogicalErrorException>(__FILE__, __LINE__, this, "LogicalErrorException" ).Report
+#   define LOGICAL_ERROR_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::LogicalErrorException>(__FILE__, __LINE__, this, "LogicalErrorException" ).Report
 
     //! Fires a access error exception, e.g. throw ACCESS_ERROR_EXCEPTION("Not everybody")
-#   define ACCESS_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::AccessException>(__FILE__, __LINE__, this, "AccessException" ).Report
+#   define ACCESS_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::AccessException>(__FILE__, __LINE__, this, "AccessException" ).Report
 
     //! Fires a timeout error exception, e.g. throw TIMEOUT_EXCEPTION("Not everybody")
-#   define TIMEOUT_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::TimeoutException>(__FILE__, __LINE__, this, "TimeoutException" ).Report
+#   define TIMEOUT_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::TimeoutException>(__FILE__, __LINE__, this, "TimeoutException" ).Report
 
     //! Fires a dynamic cast exception, e.g. throw DYNAMICCAST_EXCEPTION("Not everybody")
-#   define DYNAMICCAST_EXCEPTION_NODE GenApi::ExceptionReporterNode<GenICam::DynamicCastException>(__FILE__, __LINE__, this, "DynamicCastException" ).Report
+#   define DYNAMICCAST_EXCEPTION_NODE GENAPI_NAMESPACE::ExceptionReporterNode<GENICAM_NAMESPACE::DynamicCastException>(__FILE__, __LINE__, this, "DynamicCastException" ).Report
 
     //! Range check for int64
 #   define CHECK_RANGE_I64_NODE(_Value, _Min, _Max, _Inc) \

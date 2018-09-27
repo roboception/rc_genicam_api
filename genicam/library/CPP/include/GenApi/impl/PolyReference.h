@@ -128,7 +128,7 @@ namespace GENAPI_NAMESPACE
 			  return (m_Type == typeValue) && (m_Type != typeUninitialized);
 		  }
 
-		  //! True if the object is initilaized
+		  //! True if the object is initialized
           inline bool IsInitialized() const
           {
               return (m_Type != typeUninitialized);

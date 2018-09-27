@@ -488,6 +488,9 @@ namespace GENAPI_NAMESPACE
             //! All indirectly connected terminal nodes
             //! For details see GenICam wiki : GenApi/SoftwareArchitecture/NodeDependencies
             NodePrivateVector_t m_AllTerminalNodes;
+
+            //! All node use as variable by this node
+            NodePrivateVector_t m_VariableChildren;
         //@}
 
     protected:

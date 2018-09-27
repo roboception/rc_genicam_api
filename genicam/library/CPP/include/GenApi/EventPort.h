@@ -124,11 +124,15 @@ namespace GENAPI_NAMESPACE
 
         //! Space allocated for the data
         int64_t m_EventDataAlloc;
-#pragma warning( push )
-#pragma warning( disable: 4251 )
+#ifdef _MSC_VER
+#   pragma warning( push )
+#   pragma warning( disable: 4251 )
+#endif
         //! Pointer to the node holding a reference to this implementation
         CNodePtr m_ptrNode;
-#pragma warning( pop )
+#ifdef _MSC_VER
+#   pragma warning( pop )
+#endif
 
         //! Binary version of the EventID
         uint8_t *m_pEventIDBuffer;

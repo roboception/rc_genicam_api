@@ -43,8 +43,10 @@
 namespace GENAPI_NAMESPACE
 {
 
-#   pragma warning ( push )
-#   pragma warning ( disable : 4996 ) // depcretaced function
+#   ifdef _MSC_VER
+#       pragma warning ( push )
+#       pragma warning ( disable : 4996 ) // depcretaced function
+#   endif
     /**
         \brief Implementation of the IRegister interface
     */
@@ -63,7 +65,7 @@ namespace GENAPI_NAMESPACE
                 AutoLock l(Base::GetLock());
                 typename Base::EntryMethodFinalizer E( this, meSet );
 
-                if( GenICam::CLog::IsInfoEnabled( Base::m_pValueLog ) && pBuffer )
+                if( GENICAM_NAMESPACE::CLog::IsInfoEnabled( Base::m_pValueLog ) && pBuffer )
                 {
                     {
                         static const char fmt[] =
@@ -143,7 +145,7 @@ namespace GENAPI_NAMESPACE
             if( Verify )
                 Base::InternalCheckError();
 
-            if( GenICam::CLog::IsInfoEnabled( Base::m_pValueLog ) )
+            if (GENICAM_NAMESPACE::CLog::IsInfoEnabled(Base::m_pValueLog))
             {
                 static const char fmt[] =
                     "...Get( %" FMT_I64 "d ) = 0x";
@@ -190,7 +192,9 @@ namespace GENAPI_NAMESPACE
         }
 
     };
-#   pragma warning ( pop )
+#   ifdef _MSC_VER
+#       pragma warning ( pop )
+#   endif
 
 } // namespace GenApi
 

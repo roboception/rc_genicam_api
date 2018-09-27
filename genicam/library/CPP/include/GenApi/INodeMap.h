@@ -36,9 +36,10 @@
 #include <GenApi/IPort.h>
 #include <GenApi/Synch.h>
 
-
-#pragma warning ( push )
-#pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#ifdef _MSC_VER
+#   pragma warning ( push )
+#   pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#endif
 
 namespace GENAPI_NAMESPACE
 {
@@ -69,7 +70,7 @@ namespace GENAPI_NAMESPACE
         virtual bool Connect( IPort* pPort) const = 0;
 
         //! Get device name
-        /*! The device name identifies a device instance, e.g. for debuggin purposes.
+        /*! The device name identifies a device instance, e.g. for debugging purposes.
         The default ist "Device". */
         virtual GENICAM_NAMESPACE::gcstring GetDeviceName() = 0;
 
@@ -81,9 +82,14 @@ namespace GENAPI_NAMESPACE
 
         //! Get the number of nodes in the map
         virtual uint64_t GetNumNodes() const  = 0;
+
+        //! Parse all Swissknife equations
+        virtual bool ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL ) const = 0;
     };
 }
 
-#pragma warning ( pop )
+#ifdef _MSC_VER
+#   pragma warning ( pop )
+#endif
 
 #endif // ifndef GENAPI_INODEMAP_H

@@ -148,6 +148,7 @@ namespace GENICAM_NAMESPACE
         virtual void              push_back(const gcstring &str);
         virtual void              resize(size_t uiSize, const gcstring &str = gcstring());
         virtual void              reserve(size_t uiSize);
+        virtual bool              contains(const gcstring &str)     const;
 
         // Do not use the methods below - they only exist for
         // backwards compatibility
@@ -170,7 +171,9 @@ namespace GENICAM_NAMESPACE
     private:
         void *                    _pv;
     };
+
 }
+
 
 
 #else

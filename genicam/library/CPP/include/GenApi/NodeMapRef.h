@@ -141,6 +141,8 @@ namespace GENAPI_NAMESPACE
         //! Connects a port to the standard port "Device"
         virtual bool _Connect(IPort* pPort) const;
 
+        //! Parse all Swissknife equations
+        virtual bool _ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL ) const;
         //! Pointer to the NodeMap
         INodeMap *_Ptr;
 
@@ -423,6 +425,17 @@ namespace GENAPI_NAMESPACE
             return _Ptr->InvalidateNodes();
         else
             throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+    }
+
+    template<class TCameraParams>
+    inline bool CNodeMapRefT<TCameraParams>::_ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList ) const
+    {
+        bool ret = false;
+        if (_Ptr)
+            ret = _Ptr->ParseSwissKnifes(pErrorList);
+        else
+            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        return ret;
     }
 
     template<class TCameraParams>

@@ -33,29 +33,29 @@
 */
 class CInt64Lexer
 {
-    char *m_pSS;
-    char       *SS;
+    char* m_pSS;
+    char* SS;
 public:
     // input params
-    int        cssn;    // Comment Start Symbol Number. -1 if none
-    const char    *ComEnd;    // End of comment
-    CSymTable *SymTable;
-    const hqCharType *CharTypeTable;
+    int                 cssn;    // Comment Start Symbol Number. -1 if none
+    const char*         ComEnd;    // End of comment
+    CSymTable*          SymTable;
+    const hqCharType*   CharTypeTable;
 
     // output params
-    char       *Name;
-    size_t        NameLen;
-    int64_t    ExtValue;
-    int64_t    IntValue;
+    char*       Name;
+    size_t      NameLen;
+    int64_t     ExtValue;
+    int64_t     IntValue;
     hqTokenType PrevTokenType;
-    hqCharType    CharType;
-    int        NoIntegers;
-    int SetParseString(const char *str);
-    hqTokenType GetNextToken(void);
-    CInt64Lexer(void);
-    ~CInt64Lexer(void);
-    char * GetCurrentPos(void) const;
-};
+    hqCharType  CharType;
+    int         NoIntegers;
 
+    int SetParseString( const char* str );
+    hqTokenType GetNextToken( void );
+    CInt64Lexer( void );
+    ~CInt64Lexer( void );
+    char* GetCurrentPos( void ) const;
+};
 
 #endif //_INT64LEXER_H_

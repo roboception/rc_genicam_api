@@ -212,6 +212,10 @@ namespace GENAPI_NAMESPACE
             AutoLock l(Base::GetLock());
             typename Base::EntryMethodFinalizer( this, meGetMin );
 
+            // only allowed for available nodes
+            if (!IsAvailable(this))
+                throw ACCESS_EXCEPTION_NODE("Node is not available.");
+
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetMin...");
 
             int64_t Minimum = Base::InternalGetMin();
@@ -228,6 +232,10 @@ namespace GENAPI_NAMESPACE
         {
             AutoLock l(Base::GetLock());
             typename Base::EntryMethodFinalizer( this, meGetMax );
+
+            // only allowed for available nodes
+            if (!IsAvailable(this))
+                throw ACCESS_EXCEPTION_NODE("Node is not available.");
 
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetMax...");
 
@@ -263,6 +271,10 @@ namespace GENAPI_NAMESPACE
         {
             AutoLock l(Base::GetLock());
             typename Base::EntryMethodFinalizer( this, meGetInc );
+
+            // only allowed for available nodes
+            if( !IsAvailable(this))
+                throw ACCESS_EXCEPTION_NODE("Node is not available.");
 
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetInc...");
 

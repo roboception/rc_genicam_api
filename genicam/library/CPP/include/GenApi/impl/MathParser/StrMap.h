@@ -17,7 +17,6 @@
 #ifndef _STRMAP_H_
 #define _STRMAP_H_
 
-
 #include "MathParserDll.h"
 
 /**
@@ -27,18 +26,23 @@
 */
 class MATHPARSERDLL_API CStrMap
 {
-  int   FCount, FCapacity;
-  int   FExtraLen, FRecordLen;
-  int   FDoDuplicate;
-  char *FList;
+    int   FCount, FCapacity;
+    int   FExtraLen, FRecordLen;
+    int   FDoDuplicate;
+    char* FList;
 public:
-  CStrMap(int extrabytes=sizeof(double), int dup=0);
-  ~CStrMap(void);
-  void AddString(const char *str, void *data);
-  void AddStrLen(const char *str, size_t len, const void *data);
-  void TrimClear(int NewCount);
-  void SetCapacity(int NewCapacity);
-  int LenIndexOf(const char *str, size_t len, const void **data);
+    CStrMap( int extrabytes = sizeof( double ), int dup = 0 );
+    ~CStrMap( void );
+    void AddString( const char* str, void* data );
+    void AddStrLen( const char* str, size_t len, const void* data );
+    void TrimClear( int NewCount );
+    void SetCapacity( int NewCapacity );
+    int LenIndexOf( const char* str, size_t len, const void** data );
+    const void* DataAt( int index );
+    bool IsEmpty()
+    {
+        return FCount == 0;
+    }
 };
 
 // these must match StaticFuncMapDouble
@@ -49,20 +53,13 @@ public:
 class MATHPARSERDLL_API CStaticFuncMapDouble
 {
 public:
-    CStaticFuncMapDouble(void);
-    ~CStaticFuncMapDouble(void);
-
-    static int LenIndexOf(const char *str, size_t len, const void **data);
+    static int LenIndexOf( const char* str, size_t len, const void** data );
 };
 
 class MATHPARSERDLL_API CStaticFuncMapInt64
 {
 public:
-    CStaticFuncMapInt64(void);
-    ~CStaticFuncMapInt64(void);
-
-    static int LenIndexOf(const char *str, size_t len, const void **data);
+    static int LenIndexOf( const char* str, size_t len, const void** data );
 };
-
 
 #endif //_STRMAP_H_

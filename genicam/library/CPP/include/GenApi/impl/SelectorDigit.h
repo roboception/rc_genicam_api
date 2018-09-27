@@ -35,7 +35,9 @@
 #include "GenApi/Pointer.h"
 
 #include <list>
-#pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#ifdef _MSC_VER
+#   pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+#endif
 
 namespace GENAPI_NAMESPACE
 {

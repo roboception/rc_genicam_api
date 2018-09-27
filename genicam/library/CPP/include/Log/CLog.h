@@ -31,8 +31,10 @@
 #ifndef LOG_CLOG_H_
 #define LOG_CLOG_H_
 
-#pragma warning (push, 3)
-#pragma warning(disable:4706)  // assignment within conditional expression
+#ifdef _MSC_VER
+#   pragma warning (push, 3)
+#   pragma warning(disable:4706)  // assignment within conditional expression
+#endif
 
 #include <log4cpp/Portability.hh>
 #include <log4cpp/Priority.hh>
@@ -157,12 +159,11 @@ namespace GENICAM_NAMESPACE
 }
 
 // Logging macros (can be replaced by real functions for compilers not supporting it?)
-#define GCLOGINFO( cat, ... ) if(cat != NULL) GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ )
-#define GCLOGINFOPUSH( cat, ... ) if(cat != NULL) GENICAM_NAMESPACE::CLog::LogPush( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ )
-#define GCLOGINFOPOP( cat, ... ) if(cat != NULL) GENICAM_NAMESPACE::CLog::LogPop( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ )
-#define GCLOGWARN( cat, ... ) if(cat != NULL) GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::WARN, ##__VA_ARGS__ )
-#define GCLOGERROR( cat, ... ) if(cat != NULL) GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::ERROR, ##__VA_ARGS__ )
-#define GCLOGDEBUG( cat, ... ) if(cat != NULL) GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::DEBUG,  ##__VA_ARGS__ )
-
+#define GCLOGINFO( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ ); }
+#define GCLOGINFOPUSH( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::LogPush( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ ); }
+#define GCLOGINFOPOP( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::LogPop( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ ); }
+#define GCLOGWARN( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::WARN, ##__VA_ARGS__ ); }
+#define GCLOGERROR( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::ERROR, ##__VA_ARGS__ ); }
+#define GCLOGDEBUG( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::DEBUG,  ##__VA_ARGS__ ); }
 
 #endif // LOG_CLOG_H_

@@ -8,7 +8,9 @@
 #ifndef _LOG4CPP_CONFIGURATOR_HH
 #define _LOG4CPP_CONFIGURATOR_HH
 
-#pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
+#ifdef _MSC_VER
+#   pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
+#endif
 
 #include <log4cpp/Portability.hh>
 #include <log4cpp/Export.hh>

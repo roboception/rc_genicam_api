@@ -39,8 +39,10 @@
 #include "FloatT.h"
 #include <map>
 
-#pragma warning ( push )
-#pragma warning ( disable : 4275 ) // non dll-interface XXX used as base for  dll-interface class YYY
+#ifdef _MSC_VER
+#   pragma warning ( push )
+#   pragma warning ( disable : 4275 ) // non dll-interface XXX used as base for  dll-interface class YYY
+#endif
 
 namespace GENAPI_NAMESPACE
 {
@@ -180,6 +182,8 @@ namespace GENAPI_NAMESPACE
     };
 }
 
-#pragma warning ( pop )
+#ifdef _MSC_VER
+#   pragma warning ( pop )
+#endif
 
 #endif // GENAPI_FLOAT_H

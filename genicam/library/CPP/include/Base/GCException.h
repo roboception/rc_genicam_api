@@ -91,33 +91,33 @@ namespace GENICAM_NAMESPACE
         void AssembleMessage();
 
         //! The full error message
-        gcstring m_What;
+        GENICAM_NAMESPACE::gcstring m_What;
 
         //! The full error message
-        gcstring m_ExceptionType;
+        GENICAM_NAMESPACE::gcstring m_ExceptionType;
 
         //! Line number at which the error occurred
         unsigned int m_SourceLine;
 
         //! Filename in which the error occurred
-        gcstring m_SourceFileName;
+        GENICAM_NAMESPACE::gcstring m_SourceFileName;
 
         //! Error description
-        gcstring m_Description;
+        GENICAM_NAMESPACE::gcstring m_Description;
 
         /* the following members are GenApi specific */
 
         //! Node and method where the call stack entered the node map (may be empty)
-        gcstring m_EntryPoint;
+        GENICAM_NAMESPACE::gcstring m_EntryPoint;
 
         //! Node where the error occurred (may be empty)
-        gcstring m_ErrorNodeName;
+        GENICAM_NAMESPACE::gcstring m_ErrorNodeName;
     };
 
     //! Creates an exception with the same functionality as the GenericException but being of different type
     //! \ingroup Base_PublicUtilities
 #define DECLARE_EXCEPTION( name ) \
-        class GCBASE_RTTI_CLASS_API name : public GenICam::GenericException \
+        class GCBASE_RTTI_CLASS_API name : public GENICAM_NAMESPACE::GenericException \
             { \
         public: \
             name( const char* pDescription, const char *pSourceFileName, int SourceLine ); \
@@ -193,6 +193,7 @@ namespace GENICAM_NAMESPACE
             vsnprintf( pBuffer, sizeof pBuffer, pFormat, vap );
 #               endif 
 
+            va_end(vap);
 
             return E(pBuffer, m_SourceFileName.c_str(), m_SourceLine, m_ExceptionType.c_str());
         };
@@ -214,47 +215,47 @@ namespace GENICAM_NAMESPACE
 
     protected:
         //! the path to the source file where the exception is thrown
-        gcstring m_SourceFileName;
+        GENICAM_NAMESPACE::gcstring m_SourceFileName;
 
         //! The line within the source file where the exception is thrown
         int m_SourceLine;
 
         //! the type of the exception in string
-        gcstring m_ExceptionType;
+        GENICAM_NAMESPACE::gcstring m_ExceptionType;
     };
 
     //! \addtogroup Base_PublicImpl
     //! \{
 
     //! Fires a generic exception, e.g. throw GENERIC_EXCEPTION("%ld too large", Value);
-    #define GENERIC_EXCEPTION GenICam::ExceptionReporter<GenICam::GenericException>(__FILE__, __LINE__).Report
+    #define GENERIC_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::GenericException>(__FILE__, __LINE__).Report
 
     //! Fires a bad alloc exception, e.g. throw BAD_ALLOC_EXCEPTION();
-    #define BAD_ALLOC_EXCEPTION GenICam::ExceptionReporter<GenICam::BadAllocException>(__FILE__, __LINE__, "BadAllocException" ).Report
+    #define BAD_ALLOC_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::BadAllocException>(__FILE__, __LINE__, "BadAllocException" ).Report
 
     //! Fires an invalid argument exception, e.g. throw INVALID_ARGUMENT_EXCEPTION("%ld too large", Value);
-    #define INVALID_ARGUMENT_EXCEPTION GenICam::ExceptionReporter<GenICam::InvalidArgumentException>(__FILE__, __LINE__, "InvalidArgumentException" ).Report
+    #define INVALID_ARGUMENT_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::InvalidArgumentException>(__FILE__, __LINE__, "InvalidArgumentException" ).Report
 
     //! Fires an out of range exception, e.g. throw OUT_OF_RANGE_EXCEPTION("%ld too large", Value);
-    #define OUT_OF_RANGE_EXCEPTION GenICam::ExceptionReporter<GenICam::OutOfRangeException>(__FILE__, __LINE__, "OutOfRangeException" ).Report
+    #define OUT_OF_RANGE_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::OutOfRangeException>(__FILE__, __LINE__, "OutOfRangeException" ).Report
 
     //! Fires an property exception, e.g. throw PROPERTY_EXCEPTION("%ld too large", Value);
-    #define PROPERTY_EXCEPTION GenICam::ExceptionReporter<GenICam::PropertyException>(__FILE__, __LINE__, "PropertyException" ).Report
+    #define PROPERTY_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::PropertyException>(__FILE__, __LINE__, "PropertyException" ).Report
 
     //! Fires a runtime exception, e.g. throw RUNTIME_EXCEPTION("buh!")
-    #define RUNTIME_EXCEPTION GenICam::ExceptionReporter<GenICam::RuntimeException>(__FILE__, __LINE__, "RuntimeException" ).Report
+    #define RUNTIME_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::RuntimeException>(__FILE__, __LINE__, "RuntimeException" ).Report
 
     //! Fires a logical error exception, e.g. throw LOGICAL_ERROR_EXCEPTION("Should never reach this point")
-    #define LOGICAL_ERROR_EXCEPTION GenICam::ExceptionReporter<GenICam::LogicalErrorException>(__FILE__,  __LINE__, "LogicalErrorException" ).Report
+    #define LOGICAL_ERROR_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::LogicalErrorException>(__FILE__,  __LINE__, "LogicalErrorException" ).Report
 
     //! Fires a access exception, e.g. throw ACCESS_EXCEPTION("Not everybody")
-    #define ACCESS_EXCEPTION GenICam::ExceptionReporter<GenICam::AccessException>(__FILE__, __LINE__, "AccessException" ).Report
+    #define ACCESS_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::AccessException>(__FILE__, __LINE__, "AccessException" ).Report
 
     //! Fires a timeout error exception, e.g. throw TIMEOUT_EXCEPTION("Not everybody")
-    #define TIMEOUT_EXCEPTION GenICam::ExceptionReporter<GenICam::TimeoutException>(__FILE__, __LINE__,"TimeoutException" ).Report
+    #define TIMEOUT_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::TimeoutException>(__FILE__, __LINE__,"TimeoutException" ).Report
 
     //! Fires a dynamic cast exception, e.g. throw DYNAMICCAST_EXCEPTION("Not everybody")
-    #define DYNAMICCAST_EXCEPTION GenICam::ExceptionReporter<GenICam::DynamicCastException>(__FILE__, __LINE__, "DynamicCastException" ).Report
+    #define DYNAMICCAST_EXCEPTION GENICAM_NAMESPACE::ExceptionReporter<GENICAM_NAMESPACE::DynamicCastException>(__FILE__, __LINE__, "DynamicCastException" ).Report
 
     //! Range check for int64
     #define CHECK_RANGE_I64(_Value, _Min, _Max, _Inc) \

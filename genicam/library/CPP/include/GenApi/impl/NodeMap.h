@@ -81,6 +81,7 @@ namespace GENAPI_NAMESPACE
             virtual void Poll(int64_t ElapsedTime);
             virtual CLock& GetLock() const;
             virtual uint64_t GetNumNodes() const;
+            virtual bool ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL ) const;
         //@}
 
         //-------------------------------------------------------------

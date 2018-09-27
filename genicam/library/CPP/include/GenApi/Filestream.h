@@ -35,6 +35,7 @@
 // #include <streambuf>
 #include <iomanip>
 #include <iosfwd>
+#include <cstring> // memcpy
 //#include <cstdlib>
 //#include <memory>
 
