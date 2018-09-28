@@ -532,72 +532,81 @@ int main(int argc, char *argv[])
           {
             // check for a complete image in the buffer
 
-            if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+            if (!buffer->getIsIncomplete())
             {
-              // store image in the corresponding list
+              // go through all parts in case of multi-part buffer
 
-              uint64_t left_tol=0;
-              uint64_t disp_tol=0;
-
-              uint64_t pixelformat=buffer->getPixelFormat();
-              if (pixelformat == Mono8 || pixelformat == YCbCr411_8)
+              size_t partn=buffer->getNumberOfParts();
+              for (size_t part=0; part<partn; part++)
               {
-                left_list.add(buffer);
-                disp_tol=tol;
-              }
-              else if (pixelformat == Coord3D_C16)
-              {
-                disp_list.add(buffer);
-                left_tol=tol;
-              }
-              else if (pixelformat == Confidence8)
-              {
-                conf_list.add(buffer);
-                left_tol=tol;
-              }
-              else if (pixelformat == Error8)
-              {
-                error_list.add(buffer);
-                left_tol=tol;
-              }
+                if (buffer->getImagePresent(part))
+                {
+                  // store image in the corresponding list
 
-              // get corresponding left and disparity images
+                  uint64_t left_tol=0;
+                  uint64_t disp_tol=0;
 
-              uint64_t timestamp=buffer->getTimestampNS();
-              std::shared_ptr<const rcg::Image> left=left_list.find(timestamp, left_tol);
-              std::shared_ptr<const rcg::Image> disp=disp_list.find(timestamp, disp_tol);
+                  uint64_t pixelformat=buffer->getPixelFormat(part);
+                  if (pixelformat == Mono8 || pixelformat == YCbCr411_8)
+                  {
+                    left_list.add(buffer, part);
+                    disp_tol=tol;
+                  }
+                  else if (pixelformat == Coord3D_C16)
+                  {
+                    disp_list.add(buffer, part);
+                    left_tol=tol;
+                  }
+                  else if (pixelformat == Confidence8)
+                  {
+                    conf_list.add(buffer, part);
+                    left_tol=tol;
+                  }
+                  else if (pixelformat == Error8)
+                  {
+                    error_list.add(buffer, part);
+                    left_tol=tol;
+                  }
 
-              // get confidence and error images that correspond to the
-              // disparity image
+                  // get corresponding left and disparity images
 
-              std::shared_ptr<const rcg::Image> conf;
-              std::shared_ptr<const rcg::Image> error;
+                  uint64_t timestamp=buffer->getTimestampNS();
+                  std::shared_ptr<const rcg::Image> left=left_list.find(timestamp, left_tol);
+                  std::shared_ptr<const rcg::Image> disp=disp_list.find(timestamp, disp_tol);
 
-              if (disp)
-              {
-                conf=conf_list.find(disp->getTimestampNS());
-                error=error_list.find(disp->getTimestampNS());
-              }
+                  // get confidence and error images that correspond to the
+                  // disparity image
 
-              if (left && disp && conf && error)
-              {
-                // compute and store point cloud from synchronized image pair
+                  std::shared_ptr<const rcg::Image> conf;
+                  std::shared_ptr<const rcg::Image> error;
 
-                storePointCloud(name, f, t, scale, left, disp, conf, error);
+                  if (disp)
+                  {
+                    conf=conf_list.find(disp->getTimestampNS());
+                    error=error_list.find(disp->getTimestampNS());
+                  }
 
-                // remove all images from the buffer with the current or an
-                // older time stamp
+                  if (left && disp && conf && error)
+                  {
+                    // compute and store point cloud from synchronized image pair
 
-                async=0;
-                left_list.removeOld(timestamp);
-                disp_list.removeOld(timestamp);
-                conf_list.removeOld(timestamp);
-                error_list.removeOld(timestamp);
+                    storePointCloud(name, f, t, scale, left, disp, conf, error);
 
-                // in this example, we exit the grabbing loop after receiving
-                // the first synchronized image pair
+                    // remove all images from the buffer with the current or an
+                    // older time stamp
 
-                run=false;
+                    async=0;
+                    left_list.removeOld(timestamp);
+                    disp_list.removeOld(timestamp);
+                    conf_list.removeOld(timestamp);
+                    error_list.removeOld(timestamp);
+
+                    // in this example, we exit the grabbing loop after receiving
+                    // the first synchronized image pair
+
+                    run=false;
+                  }
+                }
               }
             }
           }
