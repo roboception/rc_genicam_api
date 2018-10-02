@@ -246,6 +246,8 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
     int inv=-1;
 
+    rcg::setString(nodemap, "ChunkComponentSelector", "Disparity");
+
     if (rcg::getBoolean(nodemap, "ChunkScan3dInvalidDataFlag"))
     {
       inv=static_cast<int>(rcg::getFloat(nodemap, "ChunkScan3dInvalidDataValue"));
