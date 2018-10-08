@@ -82,7 +82,7 @@ void ImageList::removeOld(uint64_t timestamp)
   }
 }
 
-uint64_t ImageList::getOldestTime()
+uint64_t ImageList::getOldestTime() const
 {
   uint64_t ret=0;
 
@@ -94,7 +94,7 @@ uint64_t ImageList::getOldestTime()
   return ret;
 }
 
-std::shared_ptr<const Image> ImageList::find(uint64_t timestamp)
+std::shared_ptr<const Image> ImageList::find(uint64_t timestamp) const
 {
   for (size_t i=0; i<list.size(); i++)
   {
@@ -107,7 +107,7 @@ std::shared_ptr<const Image> ImageList::find(uint64_t timestamp)
   return std::shared_ptr<const Image>();
 }
 
-std::shared_ptr<const Image> ImageList::find(uint64_t timestamp, uint64_t tolerance)
+std::shared_ptr<const Image> ImageList::find(uint64_t timestamp, uint64_t tolerance) const
 {
   if (tolerance > 0)
   {
