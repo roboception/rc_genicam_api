@@ -97,7 +97,7 @@ class ImageList
       @return Oldest timestamp available or 0 if list is empty.
     */
 
-    uint64_t getOldestTime();
+    uint64_t getOldestTime() const;
 
     /**
       Returns the image that has the given timestamp. If the image cannot be
@@ -107,7 +107,7 @@ class ImageList
       @return Pointer to image or 0.
     */
 
-    std::shared_ptr<const Image> find(uint64_t timestamp);
+    std::shared_ptr<const Image> find(uint64_t timestamp) const;
 
     /**
       Returns the oldest image that has a timestamp within the tolerance of the
@@ -120,7 +120,8 @@ class ImageList
       @return Pointer to image or 0.
     */
 
-    std::shared_ptr<const Image> find(uint64_t timestamp, uint64_t tolerance);
+    std::shared_ptr<const Image> find(uint64_t timestamp,
+                                      uint64_t tolerance) const;
 
   private:
 
