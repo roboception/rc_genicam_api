@@ -435,6 +435,11 @@ int main(int argc, char *argv[])
       dev->open(rcg::Device::CONTROL);
       std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
+      // get chunk adapter (this switches chunk mode on if possible and
+      // returns a null pointer if this is not possible)
+
+      std::shared_ptr<GenApi::CChunkAdapter> chunkadapter=rcg::getChunkAdapter(nodemap, dev->getTLType());
+
       // get focal length, baseline and disparity scale factor
 
       double f=rcg::getFloat(nodemap, "FocalLengthFactor", 0, 0, false);
@@ -482,7 +487,8 @@ int main(int argc, char *argv[])
 
       rcg::setEnum(nodemap, "PixelFormat", "YCbCr411_8", false);
 
-      // enable left image and disparity image and disable all other streams
+      // enable left image, disparity, confidence and error image and disable
+      // all others
 
       {
         std::vector<std::string> component;
@@ -498,6 +504,11 @@ int main(int argc, char *argv[])
           rcg::setBoolean(nodemap, "ComponentEnable", enable, true);
         }
       }
+
+      // try getting synchronized data (which only has an effect if the device
+      // and GenTL producer support multipart)
+
+      rcg::setString(nodemap, "AcquisitionMultiPartMode", "SynchronizedComponents");
 
       // open image stream
 
@@ -525,15 +536,24 @@ int main(int argc, char *argv[])
         {
           async++;
 
-          // grab next image with timeout of 0.5 seconds
+          // grab next image with timeout
 
-          const rcg::Buffer *buffer=stream[0]->grab(500);
+          const rcg::Buffer *buffer=stream[0]->grab(5000);
           if (buffer != 0)
           {
             // check for a complete image in the buffer
 
             if (!buffer->getIsIncomplete())
             {
+              // attach buffer to nodemap for accessing chunk data if possible
+
+              if (chunkadapter)
+              {
+                chunkadapter->AttachBuffer(
+                  reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
+                                                   buffer->getSizeFilled());
+              }
+
               // go through all parts in case of multi-part buffer
 
               size_t partn=buffer->getNumberOfParts();
@@ -546,23 +566,24 @@ int main(int argc, char *argv[])
                   uint64_t left_tol=0;
                   uint64_t disp_tol=0;
 
-                  uint64_t pixelformat=buffer->getPixelFormat(part);
-                  if (pixelformat == Mono8 || pixelformat == YCbCr411_8)
+                  std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
+
+                  if (component == "Intensity")
                   {
                     left_list.add(buffer, part);
                     disp_tol=tol;
                   }
-                  else if (pixelformat == Coord3D_C16)
+                  else if (component == "Disparity")
                   {
                     disp_list.add(buffer, part);
                     left_tol=tol;
                   }
-                  else if (pixelformat == Confidence8)
+                  else if (component == "Confidence")
                   {
                     conf_list.add(buffer, part);
                     left_tol=tol;
                   }
-                  else if (pixelformat == Error8)
+                  else if (component == "Error")
                   {
                     error_list.add(buffer, part);
                     left_tol=tol;
@@ -608,6 +629,10 @@ int main(int argc, char *argv[])
                   }
                 }
               }
+
+              // detach buffer from nodemap
+
+              if (chunkadapter) chunkadapter->DetachBuffer();
             }
           }
           else
