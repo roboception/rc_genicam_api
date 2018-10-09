@@ -1,3 +1,15 @@
+2.0.0 (2018-10-08)
+------------------
+
+NOTE: Including multipart support required minor changes of the existing API. See readme for more
+information. Attention: The provided GenTL layer does not yet support multipart!
+
+- Extended Buffer and Image classes as well as the examples for handling multi-part buffers as well
+  (NOTE: The provided GenTL producer does not yet support multipart!)
+- Upgrading GenICam reference implementation to v3.1
+- Add libs of GenICam reference implementation to external dependencies of shared genicam_api
+  library
+
 1.3.15 (2018-09-27)
 -------------------
 
