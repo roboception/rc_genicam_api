@@ -59,10 +59,59 @@ namespace
 {
 
 /**
+  This method checks if the given file name already exists and produces a new
+  file name if this happens.
+*/
+
+std::string ensureNewName(std::string name)
+{
+  // check if given name is already used
+
+  std::ifstream file(name);
+
+  if (file.is_open())
+  {
+    file.close();
+
+    // split name in prefix and suffix
+
+    std::string suffix;
+
+    size_t i=name.rfind('.');
+    if (i != name.npos && name.size()-i <= 4)
+    {
+      suffix=name.substr(i);
+      name=name.substr(0, i);
+    }
+
+    // add number for finding name that is nor used
+
+    int n=1;
+    while (n < 100)
+    {
+      std::ostringstream s;
+      s << name << "_" << n << suffix;
+
+      file.open(s.str());
+      if (!file.is_open())
+      {
+        name=s.str();
+        break;
+      }
+
+      file.close();
+      n++;
+    }
+  }
+
+  return name;
+}
+
+/**
   Store image given in buffer in PGM or PPM format.
 */
 
-std::string storeBuffer(const rcg::Buffer *buffer)
+std::string storeBuffer(const std::string &component, const rcg::Buffer *buffer, size_t part)
 {
   // prepare file name
 
@@ -72,37 +121,30 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
   name << "image_" << std::setprecision(16) << t;
 
+  if (component.size() > 0)
+  {
+    name << '_' << component;
+  }
+
   // store image (see e.g. the sv tool of cvkit for show images)
 
-  if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+  if (!buffer->getIsIncomplete() && buffer->getImagePresent(part))
   {
-    size_t width=buffer->getWidth();
-    size_t height=buffer->getHeight();
-    const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+    size_t width=buffer->getWidth(part);
+    size_t height=buffer->getHeight(part);
+    const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(part));
 
-    size_t px=buffer->getXPadding();
+    size_t px=buffer->getXPadding(part);
 
-    uint64_t format=buffer->getPixelFormat();
+    uint64_t format=buffer->getPixelFormat(part);
     switch (format)
     {
       case Mono8: // store 8 bit monochrome image
       case Confidence8:
       case Error8:
         {
-          if (format == Mono8)
-          {
-            name << "_mono.pgm";
-          }
-          else if (format == Confidence8)
-          {
-            name << "_conf.pgm";
-          }
-          else if (format == Error8)
-          {
-            name << "_err.pgm";
-          }
-
-          std::ofstream out(name.str(), std::ios::binary);
+          name << ".pgm";
+          std::ofstream out(ensureNewName(name.str()), std::ios::binary);
 
           out << "P5" << std::endl;
           out << width << " " << height << std::endl;
@@ -126,8 +168,8 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
       case Coord3D_C16: // store 16 bit monochrome image
         {
-          name << "_disp.pgm";
-          std::ofstream out(name.str(), std::ios::binary);
+          name << ".pgm";
+          std::ofstream out(ensureNewName(name.str()), std::ios::binary);
 
           out << "P5" << std::endl;
           out << width << " " << height << std::endl;
@@ -171,8 +213,8 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
       case YCbCr411_8: // convert and store as color image
         {
-          name << "_color.ppm";
-          std::ofstream out(name.str(), std::ios::binary);
+          name << ".ppm";
+          std::ofstream out(ensureNewName(name.str()), std::ios::binary);
 
           out << "P6" << std::endl;
           out << width << " " << height << std::endl;
@@ -203,7 +245,7 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
       default:
         std::cerr << "storeBuffer(): Unknown pixel format: "
-                  << GetPixelFormatName(static_cast<PfncFormat>(buffer->getPixelFormat()))
+                  << GetPixelFormatName(static_cast<PfncFormat>(buffer->getPixelFormat(part)))
                   << std::endl;
         return std::string();
         break;
@@ -214,7 +256,7 @@ std::string storeBuffer(const rcg::Buffer *buffer)
     std::cerr << "storeBuffer(): Received incomplete buffer" << std::endl;
     return std::string();
   }
-  else if (!buffer->getImagePresent())
+  else if (!buffer->getImagePresent(part))
   {
     std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
     return std::string();
@@ -225,26 +267,26 @@ std::string storeBuffer(const rcg::Buffer *buffer)
 
 /**
   This method expects in the given buffer an image of format Coord3D_C16 and
-  ChunkScan3d parameters in the nodemap. The chunk adapter is attached to the
-  buffer for reading the parameters. If this succeeds, then a floating point
-  disparity image and a parameter file is stored and the name of the disparity
-  image returned.
+  ChunkScan3d parameters in the nodemap. The chunk adapter must have already
+  been attached to the nodemap. If this function succeeds, then a floating
+  point disparity image and a parameter file is stored and the name of the
+  disparity image returned.
 */
 
 std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                                    const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
-                                   const rcg::Buffer *buffer)
+                                   const rcg::Buffer *buffer, size_t part)
 {
   std::string dispname;
 
-  if (!buffer->getIsIncomplete() && buffer->getImagePresent() &&
-      buffer->getPixelFormat() == Coord3D_C16 && buffer->getContainsChunkdata() && chunkadapter)
+  if (!buffer->getIsIncomplete() && buffer->getImagePresent(part) &&
+      buffer->getPixelFormat(part) == Coord3D_C16 && chunkadapter)
   {
     // get necessary information from ChunkScan3d parameters
 
-    chunkadapter->AttachBuffer(reinterpret_cast<std::uint8_t *>(buffer->getBase()), buffer->getSizeFilled());
-
     int inv=-1;
+
+    rcg::setString(nodemap, "ChunkComponentSelector", "Disparity");
 
     if (rcg::getBoolean(nodemap, "ChunkScan3dInvalidDataFlag"))
     {
@@ -257,8 +299,6 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
     float t=rcg::getFloat(nodemap, "ChunkScan3dBaseline");
     float u=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointU");
     float v=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointV");
-
-    chunkadapter->DetachBuffer();
 
     // proceed if required information is given
 
@@ -274,14 +314,14 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
       // convert values and store disparity image
 
-      size_t px=buffer->getXPadding();
-      size_t width=buffer->getWidth();
-      size_t height=buffer->getHeight();
-      const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset()+
+      size_t px=buffer->getXPadding(part);
+      size_t width=buffer->getWidth(part);
+      size_t height=buffer->getHeight(part);
+      const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(part))+
                              2*(width+px)*(height+1);
 
-      dispname=name.str()+"_disp.pfm";
-      std::ofstream out(dispname, std::ios::binary);
+      dispname=name.str()+"_Disparity.pfm";
+      std::ofstream out(ensureNewName(dispname), std::ios::binary);
 
       out << "Pf" << std::endl;
       out << width << " " << height << std::endl;
@@ -350,7 +390,7 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
       name << "_param.txt";
 
-      out.open(name.str());
+      out.open(ensureNewName(name.str()));
 
       out << "# Created by gc_stream" << std::endl;
       out << "camera.A=[" << f << " 0 " << u << "; 0 " << f << " " << v << "; 0 0 1]" << std::endl;
@@ -493,29 +533,55 @@ int main(int argc, char *argv[])
 
               if (buffer != 0)
               {
-                std::string name;
-
-                // if chunk data is available, then try to store as disparity image
+                // attach buffer to nodemap for accessing chunk data if possible
 
                 if (chunkadapter)
                 {
-                  name=storeBufferAsDisparity(nodemap, chunkadapter, buffer);
+                  chunkadapter->AttachBuffer(
+                    reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
+                                                     buffer->getSizeFilled());
                 }
 
-                // otherwise, store as ordinary image
+                // store images in all parts
 
-                if (name.size() == 0)
+                size_t n=buffer->getNumberOfParts();
+                for (size_t part=0; part<n; part++)
                 {
-                  name=storeBuffer(buffer);
+                  if (buffer->getImagePresent(part))
+                  {
+                    std::string name;
+
+                    // get component name
+
+                    std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
+
+                    // try storing disparity as float image with meta information
+
+                    if (component == "Disparity")
+                    {
+                      name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
+                    }
+
+                    // otherwise, store as ordinary image
+
+                    if (name.size() == 0)
+                    {
+                      name=storeBuffer(component, buffer, part);
+                    }
+
+                    // report success
+
+                    if (name.size() > 0)
+                    {
+                      std::cout << "Image '" << name << "' stored" << std::endl;
+                      retry=0;
+                    }
+                  }
                 }
 
-                // report success
+                // detach buffer from nodemap
 
-                if (name.size() > 0)
-                {
-                  std::cout << "Image '" << name << "' stored" << std::endl;
-                  retry=0;
-                }
+                if (chunkadapter) chunkadapter->DetachBuffer();
               }
               else
               {

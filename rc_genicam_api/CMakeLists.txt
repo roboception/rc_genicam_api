@@ -85,10 +85,10 @@ endif ()
 
 if (BUILD_SHARED_LIBS)
   add_library(rc_genicam_api SHARED ${src})
-  target_link_libraries(rc_genicam_api LINK_PRIVATE ${GENICAM_LIBRARIES})
+  target_link_libraries(rc_genicam_api ${GENICAM_LIBRARIES})
 
   if (UNIX)
-    target_link_libraries(rc_genicam_api LINK_PRIVATE dl)
+    target_link_libraries(rc_genicam_api dl)
   endif ()
 
   set_target_properties(rc_genicam_api PROPERTIES SOVERSION ${abiversion})

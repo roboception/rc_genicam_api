@@ -43,28 +43,27 @@
 namespace rcg
 {
 
-Image::Image(const Buffer *buffer)
+Image::Image(const Buffer *buffer, std::uint32_t part)
 {
-  if (buffer->getImagePresent())
+  if (buffer->getImagePresent(part))
   {
     timestamp=buffer->getTimestampNS();
 
-    width=buffer->getWidth();
-    height=buffer->getHeight();
-    xoffset=buffer->getXOffset();
-    yoffset=buffer->getYOffset();
-    xpadding=buffer->getXPadding();
+    width=buffer->getWidth(part);
+    height=buffer->getHeight(part);
+    xoffset=buffer->getXOffset(part);
+    yoffset=buffer->getYOffset(part);
+    xpadding=buffer->getXPadding(part);
     ypadding=buffer->getYPadding();
     frameid=buffer->getFrameID();
-    pixelformat=buffer->getPixelFormat();
+    pixelformat=buffer->getPixelFormat(part);
     bigendian=buffer->isBigEndian();
 
-    const size_t size=buffer->getSizeFilled();
-    const size_t offset=buffer->getImageOffset();
+    const size_t size=buffer->getSize(part);
 
-    pixel.reset(new uint8_t [size-offset]);
+    pixel.reset(new uint8_t [size]);
 
-    memcpy(pixel.get(), reinterpret_cast<uint8_t *>(buffer->getBase())+offset, size-offset);
+    memcpy(pixel.get(), reinterpret_cast<uint8_t *>(buffer->getBase(part)), size);
   }
   else
   {

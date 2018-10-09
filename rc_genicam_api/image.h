@@ -45,8 +45,9 @@ namespace rcg
 
 /**
   The image class encapsulates image information. It can be created from a
-  buffer and provides a part of its information. It can be used to temporarily
-  store the image so that the buffer can be freed.
+  buffer or a buffer part in case of a mult part buffer and provides a part of
+  its information. It can be used to temporarily store the image so that the
+  buffer can be freed.
 
   NOTE: A GenTLException is thrown in case of a severe error.
 */
@@ -57,9 +58,12 @@ class Image
 
     /**
       Copies the image information of the buffer.
+
+      @param buffer Buffer object to copy the data from.
+      @param part   Part number from which the image should be created.
     */
 
-    Image(const Buffer *buffer);
+    Image(const Buffer *buffer, std::uint32_t part);
 
     /**
       Pointer to pixel information of the image.

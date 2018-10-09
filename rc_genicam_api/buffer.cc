@@ -42,18 +42,6 @@
 namespace rcg
 {
 
-Buffer::Buffer(const std::shared_ptr<const GenTLWrapper> &_gentl, Stream *_parent)
-{
-  parent=_parent;
-  gentl=_gentl;
-  buffer=0;
-}
-
-void Buffer::setHandle(void *handle)
-{
-  buffer=handle;
-}
-
 namespace
 {
 
@@ -112,16 +100,117 @@ inline std::string getBufferString(const std::shared_ptr<const GenTLWrapper> &ge
   return ret;
 }
 
+template<class T> inline T getBufferPartValue(const std::shared_ptr<const GenTLWrapper> &gentl,
+                                              void *stream, void *buffer, std::uint32_t part,
+                                              GenTL::BUFFER_PART_INFO_CMD cmd)
+{
+  T ret=0;
+
+  GenTL::INFO_DATATYPE type;
+  size_t size=sizeof(T);
+
+  if (stream != 0 && buffer != 0)
+  {
+    gentl->DSGetBufferPartInfo(stream, buffer, part, cmd, &type, &ret, &size);
+  }
+
+  return ret;
 }
 
-void *Buffer::getBase() const
+}
+
+Buffer::Buffer(const std::shared_ptr<const GenTLWrapper> &_gentl, Stream *_parent)
+{
+  parent=_parent;
+  gentl=_gentl;
+  buffer=0;
+  multipart=false;
+}
+
+void Buffer::setHandle(void *handle)
+{
+  buffer=handle;
+
+  multipart=false;
+  if (buffer != 0)
+  {
+    multipart=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                     GenTL::BUFFER_INFO_PAYLOADTYPE) == PAYLOAD_TYPE_MULTI_PART;
+  }
+}
+
+uint32_t Buffer::getNumberOfParts() const
+{
+  uint32_t ret=0;
+
+  if (multipart)
+  {
+    gentl->DSGetNumBufferParts(parent->getHandle(), buffer, &ret);
+  }
+  else
+  {
+    size_t type=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                       GenTL::BUFFER_INFO_PAYLOADTYPE);
+
+    if (type != PAYLOAD_TYPE_CHUNK_DATA && type != PAYLOAD_TYPE_CHUNK_ONLY)
+    {
+      ret=1;
+    }
+  }
+
+  return ret;
+}
+
+void *Buffer::getGlobalBase() const
 {
   return getBufferValue<void *>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_BASE);
 }
 
-size_t Buffer::getSize() const
+size_t Buffer::getGlobalSize() const
 {
   return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_SIZE);
+}
+
+void *Buffer::getBase(std::uint32_t part) const
+{
+  if (multipart)
+  {
+    return getBufferPartValue<void *>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_BASE);
+  }
+  else
+  {
+    void *ret=getBufferValue<void *>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_BASE);
+
+    size_t offset=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                         GenTL::BUFFER_INFO_IMAGEOFFSET);
+
+    if (offset > 0)
+    {
+      ret=reinterpret_cast<char *>(ret)+offset;
+    }
+
+    return ret;
+  }
+}
+
+size_t Buffer::getSize(std::uint32_t part) const
+{
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_DATA_SIZE);
+  }
+  else
+  {
+    size_t size=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                       GenTL::BUFFER_INFO_SIZE);
+
+    size_t offset=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                         GenTL::BUFFER_INFO_IMAGEOFFSET);
+
+    return size-offset;
+  }
 }
 
 void *Buffer::getUserPtr() const
@@ -166,29 +255,82 @@ size_t Buffer::getSizeFilled() const
                                 GenTL::BUFFER_INFO_SIZE_FILLED);
 }
 
-size_t Buffer::getWidth() const
+size_t Buffer::getPartDataType(uint32_t part) const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_WIDTH);
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_DATA_TYPE);
+  }
+  else
+  {
+    return 0;
+  }
 }
 
-size_t Buffer::getHeight() const
+size_t Buffer::getWidth(std::uint32_t part) const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_HEIGHT);
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_WIDTH);
+  }
+  else
+  {
+    return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_WIDTH);
+  }
 }
 
-size_t Buffer::getXOffset() const
+size_t Buffer::getHeight(std::uint32_t part) const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_XOFFSET);
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_HEIGHT);
+  }
+  else
+  {
+    return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_HEIGHT);
+  }
 }
 
-size_t Buffer::getYOffset() const
+size_t Buffer::getXOffset(std::uint32_t part) const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_YOFFSET);
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_XOFFSET);
+  }
+  else
+  {
+    return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_XOFFSET);
+  }
 }
 
-size_t Buffer::getXPadding() const
+size_t Buffer::getYOffset(std::uint32_t part) const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_XPADDING);
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_YOFFSET);
+  }
+  else
+  {
+    return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_YOFFSET);
+  }
+}
+
+size_t Buffer::getXPadding(std::uint32_t part) const
+{
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_XPADDING);
+  }
+  else
+  {
+    return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_XPADDING);
+  }
 }
 
 size_t Buffer::getYPadding() const
@@ -201,15 +343,40 @@ uint64_t Buffer::getFrameID() const
   return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_FRAMEID);
 }
 
-bool Buffer::getImagePresent() const
+bool Buffer::getImagePresent(uint32_t part) const
 {
-  return getBufferBool(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_IMAGEPRESENT);
-}
+  if (multipart)
+  {
+    size_t type=getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                           GenTL::BUFFER_PART_INFO_DATA_TYPE);
 
-size_t Buffer::getImageOffset() const
-{
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
-                                GenTL::BUFFER_INFO_IMAGEOFFSET);
+    bool ret;
+
+    switch (type)
+    {
+      case PART_DATATYPE_2D_IMAGE:
+      case PART_DATATYPE_2D_PLANE_BIPLANAR:
+      case PART_DATATYPE_2D_PLANE_TRIPLANAR:
+      case PART_DATATYPE_2D_PLANE_QUADPLANAR:
+      case PART_DATATYPE_3D_IMAGE:
+      case PART_DATATYPE_3D_PLANE_BIPLANAR:
+      case PART_DATATYPE_3D_PLANE_TRIPLANAR:
+      case PART_DATATYPE_3D_PLANE_QUADPLANAR:
+      case PART_DATATYPE_CONFIDENCE_MAP:
+        ret=true;
+        break;
+
+      default:
+        ret=false;
+        break;
+    }
+
+    return ret;
+  }
+  else
+  {
+    return getBufferBool(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_IMAGEPRESENT);
+  }
 }
 
 size_t Buffer::getPayloadType() const
@@ -218,22 +385,59 @@ size_t Buffer::getPayloadType() const
                                 GenTL::BUFFER_INFO_PAYLOADTYPE);
 }
 
-uint64_t Buffer::getPixelFormat() const
+uint64_t Buffer::getPixelFormat(uint32_t part) const
 {
-  return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
-                                  GenTL::BUFFER_INFO_PIXELFORMAT);
+  if (multipart)
+  {
+    return getBufferPartValue<uint64_t>(gentl, parent->getHandle(), buffer, part,
+                                        GenTL::BUFFER_PART_INFO_DATA_FORMAT);
+  }
+  else
+  {
+    return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
+                                    GenTL::BUFFER_INFO_PIXELFORMAT);
+  }
 }
 
-uint64_t Buffer::getPixelFormatNamespace() const
+uint64_t Buffer::getPixelFormatNamespace(uint32_t part) const
 {
-  return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
-                                  GenTL::BUFFER_INFO_PIXELFORMAT_NAMESPACE);
+  if (multipart)
+  {
+    return getBufferPartValue<uint64_t>(gentl, parent->getHandle(), buffer, part,
+                                        GenTL::BUFFER_PART_INFO_DATA_FORMAT_NAMESPACE);
+  }
+  else
+  {
+    return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
+                                    GenTL::BUFFER_INFO_PIXELFORMAT_NAMESPACE);
+  }
 }
 
-size_t Buffer::getDeliveredImageHeight() const
+uint64_t Buffer::getPartSourceID(std::uint32_t part) const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
-                                GenTL::BUFFER_INFO_DELIVERED_IMAGEHEIGHT);
+  if (multipart)
+  {
+    return getBufferPartValue<uint64_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_SOURCE_ID);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+size_t Buffer::getDeliveredImageHeight(uint32_t part) const
+{
+  if (multipart)
+  {
+    return getBufferPartValue<size_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_DELIVERED_IMAGEHEIGHT);
+  }
+  else
+  {
+    return getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                  GenTL::BUFFER_INFO_DELIVERED_IMAGEHEIGHT);
+  }
 }
 
 size_t Buffer::getDeliveredChunkPayloadSize() const
