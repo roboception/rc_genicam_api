@@ -98,6 +98,9 @@ option(INSTALL_COMPLETION "Install bash completion" OFF)
 
 add_subdirectory(baumer)
 add_subdirectory(genicam)
+
+link_directories(${GENICAM_LIBRARIES_DIR})
+
 add_subdirectory(rc_genicam_api)
 if (BUILD_TOOLS)
   add_subdirectory(tools)
