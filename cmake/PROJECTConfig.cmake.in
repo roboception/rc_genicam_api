@@ -3,12 +3,14 @@
 # It defines the following variables:
 #
 # @PROJECT_NAME_UPPER@_INCLUDE_DIRS     - include directory
+# @PROJECT_NAME_UPPER@_LIBRARY_DIRS     - library directory
 # @PROJECT_NAME_UPPER@_LIBRARIES        - all dynamic libraries
 # @PROJECT_NAME_UPPER@_STATIC_LIBRARIES - all static libraries
 
 get_filename_component(PROJECT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 set(@PROJECT_NAME_UPPER@_INCLUDE_DIRS "${PROJECT_CMAKE_DIR}/../../include")
+set(@PROJECT_NAME_UPPER@_LIBRARY_DIRS "${PROJECT_CMAKE_DIR}/..")
 
 include("${PROJECT_CMAKE_DIR}/@PROJECT_NAME_UPPER@Targets.cmake")
 
