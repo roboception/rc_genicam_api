@@ -44,6 +44,8 @@
 
 #include <rc_genicam_api/pixel_formats.h>
 
+#include <Base/GCException.h>
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -671,6 +673,14 @@ int main(int argc, char *argv[])
   catch (const std::exception &ex)
   {
     std::cerr << ex.what() << std::endl;
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    std::cerr << "Exception: " << ex.what() << std::endl;
+  }
+  catch (...)
+  {
+    std::cerr << "Unknown exception!" << std::endl;
   }
 
   rcg::System::clearSystems();
