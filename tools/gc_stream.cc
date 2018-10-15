@@ -535,55 +535,62 @@ int main(int argc, char *argv[])
 
               if (buffer != 0)
               {
-                // attach buffer to nodemap for accessing chunk data if possible
-
-                if (chunkadapter)
+                if (!buffer->getIsIncomplete())
                 {
-                  chunkadapter->AttachBuffer(
-                    reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
-                      static_cast<int64_t>(buffer->getSizeFilled()));
-                }
+                  // attach buffer to nodemap for accessing chunk data if possible
 
-                // store images in all parts
-
-                uint32_t npart=buffer->getNumberOfParts();
-                for (uint32_t part=0; part<npart; part++)
-                {
-                  if (buffer->getImagePresent(part))
+                  if (chunkadapter)
                   {
-                    std::string name;
+                    chunkadapter->AttachBuffer(
+                      reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
+                        static_cast<int64_t>(buffer->getSizeFilled()));
+                  }
 
-                    // get component name
+                  // store images in all parts
 
-                    std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
-
-                    // try storing disparity as float image with meta information
-
-                    if (component == "Disparity")
+                  uint32_t npart=buffer->getNumberOfParts();
+                  for (uint32_t part=0; part<npart; part++)
+                  {
+                    if (buffer->getImagePresent(part))
                     {
-                      name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
-                    }
+                      std::string name;
 
-                    // otherwise, store as ordinary image
+                      // get component name
 
-                    if (name.size() == 0)
-                    {
-                      name=storeBuffer(component, buffer, part);
-                    }
+                      std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
 
-                    // report success
+                      // try storing disparity as float image with meta information
 
-                    if (name.size() > 0)
-                    {
-                      std::cout << "Image '" << name << "' stored" << std::endl;
-                      retry=0;
+                      if (component == "Disparity")
+                      {
+                        name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
+                      }
+
+                      // otherwise, store as ordinary image
+
+                      if (name.size() == 0)
+                      {
+                        name=storeBuffer(component, buffer, part);
+                      }
+
+                      // report success
+
+                      if (name.size() > 0)
+                      {
+                        std::cout << "Image '" << name << "' stored" << std::endl;
+                        retry=0;
+                      }
                     }
                   }
+
+                  // detach buffer from nodemap
+
+                  if (chunkadapter) chunkadapter->DetachBuffer();
                 }
-
-                // detach buffer from nodemap
-
-                if (chunkadapter) chunkadapter->DetachBuffer();
+                else
+                {
+                  std::cerr << "Incomplete buffer received" << std::endl;
+                }
               }
               else
               {
