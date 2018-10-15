@@ -84,19 +84,19 @@ void printHelp(const char *prgname)
   @param i         Index of 16 bit inside the given array.
 */
 
-inline uint16_t getUint16(const uint8_t *p, bool bigendian, int i)
+inline uint16_t getUint16(const uint8_t *p, bool bigendian, size_t i)
 {
   uint16_t ret;
 
   if (bigendian)
   {
     size_t j=i<<1;
-    ret=((p[j]<<8)|p[j+1]);
+    ret=static_cast<uint16_t>(((p[j]<<8)|p[j+1]));
   }
   else
   {
     size_t j=i<<1;
-    ret=((p[j+1]<<8)|p[j]);
+    ret=static_cast<uint16_t>(((p[j+1]<<8)|p[j]));
   }
 
   return ret;
@@ -146,11 +146,11 @@ void storePointCloud(std::string name, double f, double t, double scale,
   // count number of valid disparities and store vertice index in a temporary
   // index image
 
-  int vi=0;
+  size_t vi=0;
   const uint32_t vinvalid=0xffffffff;
   std::vector<uint32_t> vindex(width*height);
 
-  int n=0;
+  uint32_t n=0;
   for (size_t k=0; k<height; k++)
   {
     int j=0;
@@ -352,33 +352,33 @@ void storePointCloud(std::string name, double f, double t, double scale,
       if (valid >= 3 && vmax-vmin <= vstep)
       {
         int j=0;
-        uint32_t f[4];
+        uint32_t fc[4];
 
         if (ips[i-1] != vinvalid)
         {
-          f[j++]=ips[i-1];
+          fc[j++]=ips[i-1];
         }
 
         if (ips[width+i-1] != vinvalid)
         {
-          f[j++]=ips[width+i-1];
+          fc[j++]=ips[width+i-1];
         }
 
         if (ips[width+i] != vinvalid)
         {
-          f[j++]=ips[width+i];
+          fc[j++]=ips[width+i];
         }
 
         if (ips[i] != vinvalid)
         {
-          f[j++]=ips[i];
+          fc[j++]=ips[i];
         }
 
-        out << "3 " << f[0] << ' ' << f[1] << ' ' << f[2] << std::endl;
+        out << "3 " << fc[0] << ' ' << fc[1] << ' ' << fc[2] << std::endl;
 
         if (j == 4)
         {
-          out << "3 " << f[2] << ' ' << f[3] << ' ' << f[0] << std::endl;
+          out << "3 " << fc[2] << ' ' << fc[3] << ' ' << fc[0] << std::endl;
         }
       }
     }
@@ -495,12 +495,12 @@ int main(int argc, char *argv[])
 
         rcg::getEnum(nodemap, "ComponentSelector", component, true);
 
-        for (size_t i=0; i<component.size(); i++)
+        for (size_t k=0; k<component.size(); k++)
         {
-          rcg::setEnum(nodemap, "ComponentSelector", component[i].c_str(), true);
+          rcg::setEnum(nodemap, "ComponentSelector", component[k].c_str(), true);
 
-          bool enable=(component[i] == "Intensity" || component[i] == "Disparity" ||
-                       component[i] == "Confidence" || component[i] == "Error");
+          bool enable=(component[k] == "Intensity" || component[k] == "Disparity" ||
+                       component[k] == "Confidence" || component[k] == "Error");
           rcg::setBoolean(nodemap, "ComponentEnable", enable, true);
         }
       }
@@ -551,13 +551,13 @@ int main(int argc, char *argv[])
               {
                 chunkadapter->AttachBuffer(
                   reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
-                                                   buffer->getSizeFilled());
+                                                   static_cast<int64_t>(buffer->getSizeFilled()));
               }
 
               // go through all parts in case of multi-part buffer
 
               size_t partn=buffer->getNumberOfParts();
-              for (size_t part=0; part<partn; part++)
+              for (uint32_t part=0; part<partn; part++)
               {
                 if (buffer->getImagePresent(part))
                 {

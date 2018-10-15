@@ -55,7 +55,7 @@ void ImageList::add(const std::shared_ptr<const Image> &image)
   }
 }
 
-void ImageList::add(const Buffer *buffer, size_t part)
+void ImageList::add(const Buffer *buffer, uint32_t part)
 {
   list.push_back(std::shared_ptr<const Image>(new Image(buffer, part)));
 

@@ -309,7 +309,7 @@ std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<Gen
 class Buffer;
 
 std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                              const Buffer *buffer, int part);
+                              const Buffer *buffer, uint32_t part);
 
 }
 

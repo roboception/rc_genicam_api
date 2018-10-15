@@ -111,7 +111,7 @@ std::string ensureNewName(std::string name)
   Store image given in buffer in PGM or PPM format.
 */
 
-std::string storeBuffer(const std::string &component, const rcg::Buffer *buffer, size_t part)
+std::string storeBuffer(const std::string &component, const rcg::Buffer *buffer, uint32_t part)
 {
   // prepare file name
 
@@ -275,7 +275,7 @@ std::string storeBuffer(const std::string &component, const rcg::Buffer *buffer,
 
 std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                                    const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
-                                   const rcg::Buffer *buffer, size_t part)
+                                   const rcg::Buffer *buffer, uint32_t part)
 {
   std::string dispname;
 
@@ -293,12 +293,12 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
       inv=static_cast<int>(rcg::getFloat(nodemap, "ChunkScan3dInvalidDataValue"));
     }
 
-    float scale=rcg::getFloat(nodemap, "ChunkScan3dCoordinateScale");
-    float offset=rcg::getFloat(nodemap, "ChunkScan3dCoordinateOffset");
-    float f=rcg::getFloat(nodemap, "ChunkScan3dFocalLength");
-    float t=rcg::getFloat(nodemap, "ChunkScan3dBaseline");
-    float u=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointU");
-    float v=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointV");
+    double scale=rcg::getFloat(nodemap, "ChunkScan3dCoordinateScale");
+    double offset=rcg::getFloat(nodemap, "ChunkScan3dCoordinateOffset");
+    double f=rcg::getFloat(nodemap, "ChunkScan3dFocalLength");
+    double t=rcg::getFloat(nodemap, "ChunkScan3dBaseline");
+    double u=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointU");
+    double v=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointV");
 
     // proceed if required information is given
 
@@ -344,22 +344,22 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
         p-=(width+px)<<2;
         for (size_t i=0; i<width; i++)
         {
-          int v;
+          int val;
           if (buffer->isBigEndian())
           {
-            v=(static_cast<int>(p[0])<<8)|p[1];
+            val=(static_cast<int>(p[0])<<8)|p[1];
           }
           else
           {
-            v=(static_cast<int>(p[1])<<8)|p[0];
+            val=(static_cast<int>(p[1])<<8)|p[0];
           }
 
           p+=2;
 
           float d=std::numeric_limits<float>::infinity();
-          if (v != inv)
+          if (val != inv)
           {
-            d=v*scale+offset;
+            d=static_cast<float>(val*scale+offset);
           }
 
           char *c=reinterpret_cast<char *>(&d);
@@ -539,13 +539,13 @@ int main(int argc, char *argv[])
                 {
                   chunkadapter->AttachBuffer(
                     reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
-                                                     buffer->getSizeFilled());
+                      static_cast<int64_t>(buffer->getSizeFilled()));
                 }
 
                 // store images in all parts
 
-                size_t n=buffer->getNumberOfParts();
-                for (size_t part=0; part<n; part++)
+                uint32_t npart=buffer->getNumberOfParts();
+                for (uint32_t part=0; part<npart; part++)
                 {
                   if (buffer->getImagePresent(part))
                   {

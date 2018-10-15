@@ -81,7 +81,7 @@ class ImageList
       @param part   Part number from which the image should be created.
     */
 
-    void add(const Buffer *buffer, size_t part);
+    void add(const Buffer *buffer, uint32_t part);
 
     /**
       Removes all images that have a timestamp that is older or equal than the

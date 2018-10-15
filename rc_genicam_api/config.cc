@@ -884,7 +884,7 @@ std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<Gen
 }
 
 std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                              const rcg::Buffer *buffer, int ipart)
+                              const rcg::Buffer *buffer, uint32_t ipart)
 {
   std::string component;
 
@@ -924,7 +924,7 @@ std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodema
   }
   catch (const std::exception &)
   { /* ignore errors */ }
-  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  catch (const GENICAM_NAMESPACE::GenericException &)
   { /* ignore errors */ }
 
   // try guessing component name from pixel format
