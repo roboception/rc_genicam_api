@@ -6,6 +6,12 @@ information. Attention: The provided GenTL layer does not yet support multipart!
 
 - Extended Buffer and Image classes as well as the examples for handling multi-part buffers as well
   (NOTE: The provided GenTL producer does not yet support multipart!)
+- gc_stream: Using component name for storing individual images and ensuring that files are not
+  overwritten
+- gc_pointcloud: Using component name for identifying images and try enabling synchronization on
+  device
+- Add libs of GenICam reference implementation to external cmake dependencies of shared
+  genicam_api library
 - Upgrading GenICam reference implementation to v3.1
 - Add libs of GenICam reference implementation to external dependencies of shared genicam_api
   library
