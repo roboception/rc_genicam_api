@@ -50,7 +50,7 @@ before_script:
   stage: deploy
   script:
     - mkdir build && cd build
-    - cmake ..
+    - cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON ..
     - make -j 4
     - make package
     - if [ -z "$APT_REPO" ]; then export APT_REPO=testing; fi
