@@ -53,9 +53,12 @@ if (NOT CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
 endif ()
 message(STATUS "CPACK_PACKAGE_VERSION: " ${CPACK_PACKAGE_VERSION})
 
-# package name is lower case of project name with _ replaced by -
-string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
-string(REPLACE "_" "-" CPACK_PACKAGE_NAME "${PROJECT_NAME_LOWER}")
+# package name defaults to lower case of project name with _ replaced by -
+if (NOT CPACK_PACKAGE_NAME)
+    string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
+    string(REPLACE "_" "-" CPACK_PACKAGE_NAME "${PROJECT_NAME_LOWER}")
+endif ()
+message(STATUS "CPACK_PACKAGE_NAME: " ${CPACK_PACKAGE_NAME})
 
 # check if it is a ROS/catkin package
 if (EXISTS "${PROJECT_SOURCE_DIR}/package.xml")
@@ -112,14 +115,10 @@ endif ()
 # generate debian shlibs file and call ldconf in postinst and postrm scripts
 if (sharedlibs)
     set(SHLIBS_FILE "${CMAKE_CURRENT_BINARY_DIR}/shlibs")
-    set(POSTINST_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/postinst")
-    set(POSTRM_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/postrm")
+    set(TRIGGERS_FILE "${CMAKE_CURRENT_BINARY_DIR}/triggers")
 
-    # Generate postinst, prerm and postrm hooks
-    file(WRITE "${POSTINST_SCRIPT}" "#!/bin/sh\n\nset -e\n")
-    file(WRITE "${POSTRM_SCRIPT}" "#!/bin/sh\n\nset -e\n")
-    file(APPEND "${POSTINST_SCRIPT}" "if [ \"$1\" = \"configure\" ]; then\n        ldconfig\nfi\n")
-    file(APPEND "${POSTRM_SCRIPT}" "if [ \"$1\" = \"remove\" ]; then\n        ldconfig\nfi\n")
+    # Generate triggers file
+    file(WRITE "${TRIGGERS_FILE}" "activate-noawait ldconfig\n")
 
     # Generate shlibs file
     # also the lib needs to set SOVERSION via set_target_properties:
@@ -135,9 +134,8 @@ if (sharedlibs)
         file(APPEND "${SHLIBS_FILE}" "lib${libname} ${so_abiversion} ${CPACK_PACKAGE_NAME}\n")
     endforeach (libname)
 
-    execute_process(COMMAND chmod 644 "${SHLIBS_FILE}")
-    execute_process(COMMAND chmod 755 "${POSTINST_SCRIPT}" "${POSTRM_SCRIPT}")
-    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${SHLIBS_FILE};${POSTINST_SCRIPT};${POSTRM_SCRIPT}")
+    execute_process(COMMAND chmod 644 "${SHLIBS_FILE}" "${TRIGGERS_FILE}")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${SHLIBS_FILE};${TRIGGERS_FILE}")
 endif ()
 
 if (conffiles)
