@@ -85,6 +85,12 @@ if (MSVC)
   add_definitions("/wd4061")
   add_definitions("/wd4800")
   add_definitions("/wd4711")
+  add_definitions("/wd4774")
+  add_definitions("/wd4625")
+  add_definitions("/wd4626")
+  add_definitions("/wd5026")
+  add_definitions("/wd5027")
+  add_definitions("/wd5039")
 endif ()
 
 # - Options -
