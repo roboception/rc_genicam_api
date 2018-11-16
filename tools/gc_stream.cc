@@ -511,18 +511,21 @@ int main(int argc, char *argv[])
 
         if (stream.size() > 0)
         {
+#ifdef WIN32
           // start background thread for checking user input
-
           std::thread thread_cui(checkUserInterrupt);
           thread_cui.detach();
+#endif
 
           // opening first stream
 
           stream[0]->open();
           stream[0]->startStreaming();
 
-          std::cout << "Press 'Enter' to interrupt grabbing." << std::endl;
+#ifdef WIN32
+          std::cout << "Press 'Enter' to abort grabbing." << std::endl;
           std::cout << std::endl;
+#endif
 
           for (int k=0; k<n && !user_interrupt; k++)
           {
@@ -624,7 +627,9 @@ int main(int argc, char *argv[])
       std::cout << argv[0] << " [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
       std::cout << "- Stores n images from the specified device after applying the given values." << std::endl;
-      std::cout << "- Streaming can be interrupted by hitting the 'Enter' key." << std::endl;
+#ifdef WIN32
+      std::cout << "- Streaming can be aborted by hitting the 'Enter' key." << std::endl;
+#endif
       std::cout << "- Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
       std::cout << std::endl;
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
