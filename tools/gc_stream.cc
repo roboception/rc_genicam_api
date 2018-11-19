@@ -45,6 +45,8 @@
 
 #include <Base/GCException.h>
 
+#include <signal.h>
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -411,6 +413,15 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
 std::atomic<bool> user_interrupt(false);
 
+void interruptHandler(int)
+{
+  std::cout << "Stopping ..." << std::endl;
+
+  user_interrupt=true;
+}
+
+#ifdef WIN32
+
 void checkUserInterrupt()
 {
   char a;
@@ -421,10 +432,14 @@ void checkUserInterrupt()
   user_interrupt=true;
 }
 
+#endif
+
 }
 
 int main(int argc, char *argv[])
 {
+  signal(SIGINT, interruptHandler);
+
   try
   {
     if (argc >= 2)
