@@ -442,11 +442,23 @@ int main(int argc, char *argv[])
 
   try
   {
-    if (argc >= 2)
+    bool store=true;
+    int i=1;
+
+    if (i < argc)
+    {
+      if (std::string(argv[i]) == "-t")
+      {
+        store=false;
+        i++;
+      }
+    }
+
+    if (i < argc)
     {
       // find specific device accross all systems and interfaces and open it
 
-      std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[1]);
+      std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i++]);
 
       if (dev)
       {
@@ -461,8 +473,6 @@ int main(int argc, char *argv[])
         // set values as given on the command line
 
         int n=1;
-
-        int i=2;
         while (i < argc)
         {
           // split argument in key and value
@@ -537,10 +547,15 @@ int main(int argc, char *argv[])
           stream[0]->open();
           stream[0]->startStreaming();
 
+          std::cout << "Package size: " << rcg::getString(nodemap, "GevSCPSPacketSize") << std::endl;
+
 #ifdef WIN32
           std::cout << "Press 'Enter' to abort grabbing." << std::endl;
-          std::cout << std::endl;
 #endif
+          std::cout << std::endl;
+
+          int buffers_received=0;
+          int buffers_incomplete=0;
 
           for (int k=0; k<n && !user_interrupt; k++)
           {
@@ -553,6 +568,8 @@ int main(int argc, char *argv[])
 
               if (buffer != 0)
               {
+                buffers_received++;
+
                 if (!buffer->getIsIncomplete())
                 {
                   // attach buffer to nodemap for accessing chunk data if possible
@@ -566,39 +583,48 @@ int main(int argc, char *argv[])
 
                   // store images in all parts
 
-                  uint32_t npart=buffer->getNumberOfParts();
-                  for (uint32_t part=0; part<npart; part++)
+                  if (store)
                   {
-                    if (buffer->getImagePresent(part))
+                    uint32_t npart=buffer->getNumberOfParts();
+                    for (uint32_t part=0; part<npart; part++)
                     {
-                      std::string name;
-
-                      // get component name
-
-                      std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
-
-                      // try storing disparity as float image with meta information
-
-                      if (component == "Disparity")
+                      if (buffer->getImagePresent(part))
                       {
-                        name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
-                      }
+                        std::string name;
 
-                      // otherwise, store as ordinary image
+                        // get component name
 
-                      if (name.size() == 0)
-                      {
-                        name=storeBuffer(component, buffer, part);
-                      }
+                        std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
 
-                      // report success
+                        // try storing disparity as float image with meta information
 
-                      if (name.size() > 0)
-                      {
-                        std::cout << "Image '" << name << "' stored" << std::endl;
-                        retry=0;
+                        if (component == "Disparity")
+                        {
+                          name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
+                        }
+
+                        // otherwise, store as ordinary image
+
+                        if (name.size() == 0)
+                        {
+                          name=storeBuffer(component, buffer, part);
+                        }
+
+                        // report success
+
+                        if (name.size() > 0)
+                        {
+                          std::cout << "Image '" << name << "' stored" << std::endl;
+                          retry=0;
+                        }
                       }
                     }
+                  }
+                  else
+                  {
+                    std::cout << "Received buffer with timestamp: " << std::setprecision(16)
+                              << buffer->getTimestampNS()/1.9e9 << std::endl;
+                    retry=0;
                   }
 
                   // detach buffer from nodemap
@@ -608,6 +634,7 @@ int main(int argc, char *argv[])
                 else
                 {
                   std::cerr << "Incomplete buffer received" << std::endl;
+                  buffers_incomplete++;
                 }
               }
               else
@@ -622,6 +649,10 @@ int main(int argc, char *argv[])
 
           stream[0]->stopStreaming();
           stream[0]->close();
+
+          std::cout << std::endl;
+          std::cout << "Received buffers:   " << buffers_received << std::endl;
+          std::cout << "Incomplete buffers: " << buffers_incomplete << std::endl;
         }
         else
         {
@@ -639,13 +670,15 @@ int main(int argc, char *argv[])
     {
       // show help
 
-      std::cout << argv[0] << " [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
+      std::cout << argv[0] << " [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
       std::cout << "- Stores n images from the specified device after applying the given values." << std::endl;
 #ifdef WIN32
       std::cout << "- Streaming can be aborted by hitting the 'Enter' key." << std::endl;
 #endif
       std::cout << "- Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
+      std::cout << std::endl;
+      std::cout << "Parameter '-t' switches to test mode, which prevents storing images." << std::endl;
       std::cout << std::endl;
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
       std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
