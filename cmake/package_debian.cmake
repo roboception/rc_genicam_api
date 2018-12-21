@@ -7,8 +7,14 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Roboception ${PROJECT_NAME} package")
 if (PACKAGE_VERSION)
     set(CPACK_PACKAGE_VERSION ${PACKAGE_VERSION})
 else ()
-    message(WARNING "PACKAGE_VERSION not set! Did you include project_version.cmake? Falling back to (${PROJECT_VERSION})")
-    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    message(WARNING "PACKAGE_VERSION not set! Did you include project_version.cmake?")
+    if (RC_PROJECT_VERSION)
+        message(WARNING "CPACK_PACKAGE_VERSION: Falling back to RC_PROJECT_VERSION (${RC_PROJECT_VERSION})")
+        set(CPACK_PACKAGE_VERSION ${RC_PROJECT_VERSION})
+    elseif (PROJECT_VERSION)
+        message(WARNING "CPACK_PACKAGE_VERSION: Falling back to PROJECT_VERSION (${PROJECT_VERSION})")
+        set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    endif ()
 endif ()
 
 # add date stamp to CPACK_PACKAGE_VERSION
@@ -62,23 +68,15 @@ message(STATUS "CPACK_PACKAGE_NAME: " ${CPACK_PACKAGE_NAME})
 
 # check if it is a ROS/catkin package
 if (EXISTS "${PROJECT_SOURCE_DIR}/package.xml")
-    file(STRINGS "${PROJECT_SOURCE_DIR}/package.xml" PACKAGE_XML_VERSION REGEX <version>[0-9.]*</version>)
-    string(REGEX REPLACE .*<version>\([0-9.]*\)</version>.* \\1 ROS_PACKAGE_VERSION "${PACKAGE_XML_VERSION}")
-    if (NOT ROS_PACKAGE_VERSION MATCHES ${PROJECT_VERSION})
-        message(WARNING "Version in package.xml (${ROS_PACKAGE_VERSION}) doesn't match project version (${PROJECT_VERSION})")
-    endif ()
-
     set(ROS_DISTRO $ENV{ROS_DISTRO})
     if (ROS_DISTRO)
         set(CPACK_PACKAGE_NAME "ros-${ROS_DISTRO}-${CPACK_PACKAGE_NAME}")
-
         # tell CPack to use CMAKE_INSTALL_PREFIX
-        # cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/indigo" -DCMAKE_PREFIX_PATH="/opt/ros/indigo" -DCMAKE_BUILD_TYPE=Release ..
+        # cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/$ROS_DISTRO" -DCMAKE_PREFIX_PATH="/opt/ros/$ROS_DISTRO" ..
         set(CPACK_SET_DESTDIR true)
     else ()
         message(STATUS "ROS_DISTRO not set. Not treating this as a ROS package.")
     endif ()
-
 endif ()
 
 if(EXCLUSIVE_CUSTOMER)
@@ -112,7 +110,7 @@ if (PROJECT_LIBRARIES)
 endif ()
 
 # if there are shared libs exported by this package:
-# generate debian shlibs file and call ldconf in postinst and postrm scripts
+# generate debian shlibs file and trigger ldconfig
 if (sharedlibs)
     set(SHLIBS_FILE "${CMAKE_CURRENT_BINARY_DIR}/shlibs")
     set(TRIGGERS_FILE "${CMAKE_CURRENT_BINARY_DIR}/triggers")

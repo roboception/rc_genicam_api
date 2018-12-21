@@ -1,5 +1,5 @@
 
-set(PACKAGE_VERSION "@PROJECT_VERSION@")
+set(PACKAGE_VERSION "@RC_PROJECT_VERSION@")
 
 # Check whether the requested PACKAGE_FIND_VERSION is compatible
 
