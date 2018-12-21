@@ -1,3 +1,12 @@
+2.0.1 (2018-12-21)
+------------------
+
+- Added test mode to gc_stream tool (i.e. disables saving for only testing the connection)
+- Added printing of package size to gc_stream tool
+- Added statistic to gc_stream tool
+- Removed aborting gc_stream with 'Enter' from Linux version as it causes unwanted stops in some situations
+- Minor fixes in build files.
+
 2.0.0 (2018-10-08)
 ------------------
 
