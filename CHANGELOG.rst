@@ -1,3 +1,9 @@
+2.0.2 (2019-01-01)
+------------------
+
+- Fixed bug in rcg::getEnum() function that may lead to a seg fault
+- Minor changes in cmake build files
+
 2.0.1 (2018-12-21)
 ------------------
 
