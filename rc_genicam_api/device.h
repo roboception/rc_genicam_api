@@ -98,7 +98,8 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the currently available streams of this device.
 
-      NOTE: open() must be called before calling this method.
+      NOTE: The device must have been opened with the open() call before
+      calling this method.
 
       @return List of streams.
     */
@@ -108,8 +109,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the vendor of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Vendor.
     */
@@ -119,8 +121,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the model of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Model.
     */
@@ -130,8 +133,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the transport layer type of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Transport layer type.
     */
@@ -141,8 +145,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the display name of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Display name.
     */
@@ -152,8 +157,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the access status of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Access status.
     */
@@ -163,8 +169,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the user defined name of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return User defined name.
     */
@@ -174,8 +181,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the serial number of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Serial number.
     */
@@ -185,8 +193,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the version of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Version.
     */
@@ -196,8 +205,9 @@ class Device : public std::enable_shared_from_this<Device>
     /**
       Returns the timestamp frequency of the device.
 
-      NOTE: At least the parent object must have been opened before calling
-      this method.
+      NOTE: This method only returns a non empty string if the parent interface
+      has NOT been closed after Interface::getDevice() or Interface::getDevices()
+      call, or if this device itself has been opened with the open() call.
 
       @return Tick-frequency of the time stamp clock.
     */
@@ -229,7 +239,7 @@ class Device : public std::enable_shared_from_this<Device>
     std::shared_ptr<GenApi::CNodeMapRef> getRemoteNodeMap(const char *xml=0);
 
     /**
-      Get internal interace handle.
+      Get internal interface handle.
 
       @return Internal handle.
     */
