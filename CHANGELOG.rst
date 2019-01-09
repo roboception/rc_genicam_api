@@ -1,3 +1,9 @@
+2.0.3 (2019-01-09)
+------------------
+
+- Improved description of some device methods
+- Under Windows, do not check install path but only current directory as default location of GenTL producer
+
 2.0.2 (2019-01-01)
 ------------------
 
