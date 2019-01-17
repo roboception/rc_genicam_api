@@ -152,7 +152,7 @@ uint32_t Buffer::getNumberOfParts() const
     size_t type=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
                                        GenTL::BUFFER_INFO_PAYLOADTYPE);
 
-    if (type != PAYLOAD_TYPE_CHUNK_DATA && type != PAYLOAD_TYPE_CHUNK_ONLY)
+    if (type != PAYLOAD_TYPE_CHUNK_ONLY)
     {
       ret=1;
     }
