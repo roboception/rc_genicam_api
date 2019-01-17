@@ -88,25 +88,41 @@ void Device::open(ACCESS access)
   {
     parent->open();
 
-    GenTL::DEVICE_ACCESS_FLAGS mode;
+    // convert access mode to GenTL flags
 
+    GenTL::DEVICE_ACCESS_FLAGS mode[]={GenTL::DEVICE_ACCESS_READONLY,
+      GenTL::DEVICE_ACCESS_CONTROL, GenTL::DEVICE_ACCESS_EXCLUSIVE};
+
+    int i=0;
     switch (access)
     {
       case READONLY:
-        mode=GenTL::DEVICE_ACCESS_READONLY;
+        i=0;
         break;
 
       case CONTROL:
-        mode=GenTL::DEVICE_ACCESS_CONTROL;
+        i=1;
         break;
 
       default:
       case EXCLUSIVE:
-        mode=GenTL::DEVICE_ACCESS_EXCLUSIVE;
+        i=2;
         break;
     }
 
-    if (gentl->IFOpenDevice(parent->getHandle(), id.c_str(), mode, &dev) != GenTL::GC_ERR_SUCCESS)
+    // open device (if readonly fails, try control; if control fails try
+    // exclusive)
+
+    GenTL::GC_ERROR err = GenTL::GC_ERR_NOT_IMPLEMENTED;
+    while (err == GenTL::GC_ERR_NOT_IMPLEMENTED && i < 3)
+    {
+      err=gentl->IFOpenDevice(parent->getHandle(), id.c_str(), mode[i], &dev);
+      i++;
+    }
+
+    // check if open was successful
+
+    if (err != GenTL::GC_ERR_SUCCESS)
     {
       parent->close();
       throw GenTLException("Device::open() failed", gentl);
