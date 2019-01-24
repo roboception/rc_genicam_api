@@ -1,3 +1,9 @@
+2.0.4 (2019-01-24)
+------------------
+
+- A buffer that is labelled to contain chunk data may also contain an image
+- Implemented fallback of open device access from readonly to control to exclusive
+
 2.0.3 (2019-01-09)
 ------------------
 
