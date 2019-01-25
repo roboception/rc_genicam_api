@@ -65,6 +65,7 @@ System::~System()
 namespace
 {
 
+std::mutex system_mtx;
 std::vector<std::shared_ptr<System> > slist;
 
 int find(const std::vector<std::shared_ptr<System> > &list, const std::string &filename)
@@ -84,6 +85,7 @@ int find(const std::vector<std::shared_ptr<System> > &list, const std::string &f
 
 std::vector<std::shared_ptr<System> > System::getSystems()
 {
+  std::lock_guard<std::mutex> lock(system_mtx);
   std::vector<std::shared_ptr<System> > ret;
 
   // get list of all available transport layer libraries
@@ -173,6 +175,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
 void System::clearSystems()
 {
+  std::lock_guard<std::mutex> lock(system_mtx);
   slist.clear();
 }
 
@@ -183,6 +186,8 @@ const std::string &System::getFilename() const
 
 void System::open()
 {
+  std::lock_guard<std::mutex> lock(mtx);
+
   if (n_open == 0)
   {
     if (gentl->TLOpen(&tl) != GenTL::GC_ERR_SUCCESS)
@@ -196,6 +201,8 @@ void System::open()
 
 void System::close()
 {
+  std::lock_guard<std::mutex> lock(mtx);
+
   if (n_open > 0)
   {
     n_open--;
@@ -231,6 +238,7 @@ int find(const std::vector<std::shared_ptr<Interface> > &list, const std::string
 
 std::vector<std::shared_ptr<Interface> > System::getInterfaces()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   std::vector<std::shared_ptr<Interface> > ret;
 
   if (tl != 0)
@@ -333,48 +341,57 @@ std::string cTLGetInfo(GenTL::TL_HANDLE tl, const std::shared_ptr<const GenTLWra
 
 }
 
-std::string System::getID() const
+std::string System::getID()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_ID);
 }
 
-std::string System::getVendor() const
+std::string System::getVendor()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_VENDOR);
 }
 
-std::string System::getModel() const
+std::string System::getModel()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_MODEL);
 }
 
-std::string System::getVersion() const
+std::string System::getVersion()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_VERSION);
 }
 
-std::string System::getTLType() const
+std::string System::getTLType()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_TLTYPE);
 }
 
-std::string System::getName() const
+std::string System::getName()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_NAME);
 }
 
-std::string System::getPathname() const
+std::string System::getPathname()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_PATHNAME);
 }
 
-std::string System::getDisplayName() const
+std::string System::getDisplayName()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_DISPLAYNAME);
 }
 
-bool System::isCharEncodingASCII() const
+bool System::isCharEncodingASCII()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   bool ret=true;
 
   GenTL::INFO_DATATYPE type;
@@ -400,8 +417,9 @@ bool System::isCharEncodingASCII() const
   return ret;
 }
 
-int System::getMajorVersion() const
+int System::getMajorVersion()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   uint32_t ret=0;
 
   GenTL::INFO_DATATYPE type;
@@ -419,8 +437,9 @@ int System::getMajorVersion() const
   return static_cast<int>(ret);
 }
 
-int System::getMinorVersion() const
+int System::getMinorVersion()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   uint32_t ret=0;
 
   GenTL::INFO_DATATYPE type;
@@ -440,6 +459,7 @@ int System::getMinorVersion() const
 
 std::shared_ptr<GenApi::CNodeMapRef> System::getNodeMap()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   if (tl != 0 && !nodemap)
   {
     cport=std::shared_ptr<CPort>(new CPort(gentl, &tl));

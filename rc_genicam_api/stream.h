@@ -39,6 +39,8 @@
 #include "device.h"
 #include "buffer.h"
 
+#include <mutex>
+
 namespace rcg
 {
 
@@ -128,7 +130,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Number of delivered buffers since last acquisition start.
     */
 
-    uint64_t getNumDelivered() const;
+    uint64_t getNumDelivered();
 
     /**
       Returns some information about the stream.
@@ -138,7 +140,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Number of lost buffers due to queue underrun.
     */
 
-    uint64_t getNumUnderrun() const;
+    uint64_t getNumUnderrun();
 
     /**
       Returns some information about the stream.
@@ -148,7 +150,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Number of announced buffers.
     */
 
-    size_t getNumAnnounced() const;
+    size_t getNumAnnounced();
 
     /**
       Returns some information about the stream.
@@ -158,7 +160,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Number of buffers in the input pool.
     */
 
-    size_t getNumQueued() const;
+    size_t getNumQueued();
 
     /**
       Returns some information about the stream.
@@ -168,7 +170,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Number of buffers in the output queue.
     */
 
-    size_t getNumAwaitDelivery() const;
+    size_t getNumAwaitDelivery();
 
     /**
       Returns some information about the stream.
@@ -178,7 +180,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Number of buffers started in the acquisition engine.
     */
 
-    uint64_t getNumStarted() const;
+    uint64_t getNumStarted();
 
     /**
       Returns some information about the stream.
@@ -188,7 +190,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Size of the expected data in bytes.
     */
 
-    size_t getPayloadSize() const;
+    size_t getPayloadSize();
 
     /**
       Returns some information about the stream.
@@ -198,7 +200,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Flag indicating whether the acquisition engine is started or not.
     */
 
-    bool getIsGrabbing() const;
+    bool getIsGrabbing();
 
     /**
       Returns some information about the stream.
@@ -209,7 +211,7 @@ class Stream : public std::enable_shared_from_this<Stream>
               independent from the remote device.
     */
 
-    bool getDefinesPayloadsize() const;
+    bool getDefinesPayloadsize();
 
     /**
       Returns some information about the stream.
@@ -219,7 +221,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Transport layer technology that is supported.
     */
 
-    std::string getTLType() const;
+    std::string getTLType();
 
     /**
       Returns some information about the stream.
@@ -229,7 +231,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Max number of chunks in a buffer, if known.
     */
 
-    size_t getNumChunksMax() const;
+    size_t getNumChunksMax();
 
     /**
       Returns some information about the stream.
@@ -239,7 +241,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Min number of buffers to announce before acq can start, if known.
     */
 
-    size_t getBufAnnounceMin() const;
+    size_t getBufAnnounceMin();
 
     /**
       Returns some information about the stream.
@@ -249,7 +251,7 @@ class Stream : public std::enable_shared_from_this<Stream>
       @return Buffer alignment in bytes.
     */
 
-    size_t getBufAlignment() const;
+    size_t getBufAlignment();
 
     /**
       Returns the node map of this object.
@@ -280,6 +282,8 @@ class Stream : public std::enable_shared_from_this<Stream>
     std::shared_ptr<Device> parent;
     std::shared_ptr<const GenTLWrapper> gentl;
     std::string id;
+
+    std::recursive_mutex mtx;
 
     int n_open;
     void *stream;

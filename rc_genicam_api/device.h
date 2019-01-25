@@ -38,6 +38,8 @@
 
 #include "interface.h"
 
+#include <mutex>
+
 namespace rcg
 {
 
@@ -116,7 +118,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Vendor.
     */
 
-    std::string getVendor() const;
+    std::string getVendor();
 
     /**
       Returns the model of the device.
@@ -128,7 +130,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Model.
     */
 
-    std::string getModel() const;
+    std::string getModel();
 
     /**
       Returns the transport layer type of the device.
@@ -140,7 +142,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Transport layer type.
     */
 
-    std::string getTLType() const;
+    std::string getTLType();
 
     /**
       Returns the display name of the device.
@@ -152,7 +154,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Display name.
     */
 
-    std::string getDisplayName() const;
+    std::string getDisplayName();
 
     /**
       Returns the access status of the device.
@@ -164,7 +166,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Access status.
     */
 
-    std::string getAccessStatus() const;
+    std::string getAccessStatus();
 
     /**
       Returns the user defined name of the device.
@@ -176,7 +178,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return User defined name.
     */
 
-    std::string getUserDefinedName() const;
+    std::string getUserDefinedName();
 
     /**
       Returns the serial number of the device.
@@ -188,7 +190,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Serial number.
     */
 
-    std::string getSerialNumber() const;
+    std::string getSerialNumber();
 
     /**
       Returns the version of the device.
@@ -200,7 +202,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Version.
     */
 
-    std::string getVersion() const;
+    std::string getVersion();
 
     /**
       Returns the timestamp frequency of the device.
@@ -212,7 +214,7 @@ class Device : public std::enable_shared_from_this<Device>
       @return Tick-frequency of the time stamp clock.
     */
 
-    uint64_t getTimestampFrequency() const;
+    uint64_t getTimestampFrequency();
 
     /**
       Returns the node map of this object.
@@ -254,6 +256,8 @@ class Device : public std::enable_shared_from_this<Device>
     std::shared_ptr<Interface> parent;
     std::shared_ptr<const GenTLWrapper> gentl;
     std::string id;
+
+    std::mutex mtx;
 
     int n_open;
     void *dev;

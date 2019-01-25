@@ -40,6 +40,7 @@
 
 #include <memory>
 #include <vector>
+#include <mutex>
 
 namespace rcg
 {
@@ -121,7 +122,7 @@ class System : public std::enable_shared_from_this<System>
       @return ID.
     */
 
-    std::string getID() const;
+    std::string getID();
 
     /**
       Returns the vendor name of the GenTL provider.
@@ -129,7 +130,7 @@ class System : public std::enable_shared_from_this<System>
       @return Vendor name.
     */
 
-    std::string getVendor() const;
+    std::string getVendor();
 
     /**
       Returns the model of the GenTL provider.
@@ -137,7 +138,7 @@ class System : public std::enable_shared_from_this<System>
       @return Model.
     */
 
-    std::string getModel() const;
+    std::string getModel();
 
     /**
       Returns the version of the GenTL provider.
@@ -145,7 +146,7 @@ class System : public std::enable_shared_from_this<System>
       @return Version.
     */
 
-    std::string getVersion() const;
+    std::string getVersion();
 
     /**
       Returns the transport layer type of the GenTL provider.
@@ -153,7 +154,7 @@ class System : public std::enable_shared_from_this<System>
       @return Transport layer type.
     */
 
-    std::string getTLType() const;
+    std::string getTLType();
 
     /**
       Returns the file name of the GenTL provider.
@@ -161,7 +162,7 @@ class System : public std::enable_shared_from_this<System>
       @return File name.
     */
 
-    std::string getName() const;
+    std::string getName();
 
     /**
       Returns the full path name of the GenTL provider.
@@ -169,7 +170,7 @@ class System : public std::enable_shared_from_this<System>
       @return Full path name.
     */
 
-    std::string getPathname() const;
+    std::string getPathname();
 
     /**
       Returns the display name of the GenTL provider.
@@ -177,7 +178,7 @@ class System : public std::enable_shared_from_this<System>
       @return Display name.
     */
 
-    std::string getDisplayName() const;
+    std::string getDisplayName();
 
     /**
       Returns the character encoding.
@@ -185,7 +186,7 @@ class System : public std::enable_shared_from_this<System>
       @return True for ASCII, false for UTF8.
     */
 
-    bool isCharEncodingASCII() const;
+    bool isCharEncodingASCII();
 
     /**
       Returns the major version number.
@@ -193,7 +194,7 @@ class System : public std::enable_shared_from_this<System>
       @return Major version number.
     */
 
-    int getMajorVersion() const;
+    int getMajorVersion();
 
     /**
       Returns the minor version number.
@@ -201,7 +202,7 @@ class System : public std::enable_shared_from_this<System>
       @return Minor version number.
     */
 
-    int getMinorVersion() const;
+    int getMinorVersion();
 
     /**
       Returns the node map of this object.
@@ -230,6 +231,8 @@ class System : public std::enable_shared_from_this<System>
 
     std::string filename;
     std::shared_ptr<const GenTLWrapper> gentl;
+
+    std::mutex mtx;
 
     int n_open;
     void *tl;

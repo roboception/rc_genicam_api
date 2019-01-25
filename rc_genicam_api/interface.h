@@ -38,6 +38,8 @@
 
 #include "system.h"
 
+#include <mutex>
+
 namespace rcg
 {
 
@@ -122,7 +124,7 @@ class Interface : public std::enable_shared_from_this<Interface>
       @return Display name.
     */
 
-    std::string getDisplayName() const;
+    std::string getDisplayName();
 
     /**
       Returns the transport layer type of the interface.
@@ -133,7 +135,7 @@ class Interface : public std::enable_shared_from_this<Interface>
       @return Transport layer type.
     */
 
-    std::string getTLType() const;
+    std::string getTLType();
 
     /**
       Returns the node map of this object.
@@ -162,6 +164,8 @@ class Interface : public std::enable_shared_from_this<Interface>
     std::shared_ptr<System> parent;
     std::shared_ptr<const GenTLWrapper> gentl;
     std::string id;
+
+    std::mutex mtx;
 
     int n_open;
     void *ifh;

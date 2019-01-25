@@ -91,6 +91,8 @@ const std::string &Stream::getID() const
 
 void Stream::open()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
+
   if (n_open == 0)
   {
     if (parent->getHandle() != 0)
@@ -112,6 +114,8 @@ void Stream::open()
 
 void Stream::close()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
+
   if (n_open > 0)
   {
     n_open--;
@@ -130,6 +134,8 @@ void Stream::close()
 
 void Stream::startStreaming(int na)
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
+
   buffer.setHandle(0);
 
   if (stream == 0)
@@ -232,6 +238,8 @@ void Stream::startStreaming(int na)
 
 void Stream::stopStreaming()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
+
   if (bn > 0)
   {
     buffer.setHandle(0);
@@ -260,6 +268,8 @@ void Stream::stopStreaming()
 
 const Buffer *Stream::grab(int64_t _timeout)
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
+
   uint64_t timeout=GENTL_INFINITE;
   if (_timeout >= 0)
   {
@@ -350,53 +360,63 @@ inline bool getStreamBool(const std::shared_ptr<const GenTLWrapper> &gentl,
 
 }
 
-uint64_t Stream::getNumDelivered() const
+uint64_t Stream::getNumDelivered()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<uint64_t>(gentl, stream, GenTL::STREAM_INFO_NUM_DELIVERED);
 }
 
-uint64_t Stream::getNumUnderrun() const
+uint64_t Stream::getNumUnderrun()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<uint64_t>(gentl, stream, GenTL::STREAM_INFO_NUM_UNDERRUN);
 }
 
-size_t Stream::getNumAnnounced() const
+size_t Stream::getNumAnnounced()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_NUM_ANNOUNCED);
 }
 
-size_t Stream::getNumQueued() const
+size_t Stream::getNumQueued()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_NUM_QUEUED);
 }
 
-size_t Stream::getNumAwaitDelivery() const
+size_t Stream::getNumAwaitDelivery()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_NUM_AWAIT_DELIVERY);
 }
 
-uint64_t Stream::getNumStarted() const
+uint64_t Stream::getNumStarted()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<uint64_t>(gentl, stream, GenTL::STREAM_INFO_NUM_STARTED);
 }
 
-size_t Stream::getPayloadSize() const
+size_t Stream::getPayloadSize()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_PAYLOAD_SIZE);
 }
 
-bool Stream::getIsGrabbing() const
+bool Stream::getIsGrabbing()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamBool(gentl, stream, GenTL::STREAM_INFO_IS_GRABBING);
 }
 
-bool Stream::getDefinesPayloadsize() const
+bool Stream::getDefinesPayloadsize()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamBool(gentl, stream, GenTL::STREAM_INFO_DEFINES_PAYLOADSIZE);
 }
 
-std::string Stream::getTLType() const
+std::string Stream::getTLType()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   std::string ret;
 
   GenTL::INFO_DATATYPE type;
@@ -418,23 +438,27 @@ std::string Stream::getTLType() const
   return ret;
 }
 
-size_t Stream::getNumChunksMax() const
+size_t Stream::getNumChunksMax()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_NUM_CHUNKS_MAX);
 }
 
-size_t Stream::getBufAnnounceMin() const
+size_t Stream::getBufAnnounceMin()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_BUF_ANNOUNCE_MIN);
 }
 
-size_t Stream::getBufAlignment() const
+size_t Stream::getBufAlignment()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return getStreamValue<size_t>(gentl, stream, GenTL::STREAM_INFO_BUF_ALIGNMENT);
 }
 
 std::shared_ptr<GenApi::CNodeMapRef> Stream::getNodeMap()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   if (stream != 0 && !nodemap)
   {
     cport=std::shared_ptr<CPort>(new CPort(gentl, &stream));

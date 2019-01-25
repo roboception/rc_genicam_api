@@ -77,6 +77,8 @@ const std::string &Interface::getID() const
 
 void Interface::open()
 {
+  std::lock_guard<std::mutex> lock(mtx);
+
   if (n_open == 0)
   {
     parent->open();
@@ -97,6 +99,8 @@ void Interface::open()
 
 void Interface::close()
 {
+  std::lock_guard<std::mutex> lock(mtx);
+
   if (n_open > 0)
   {
     n_open--;
@@ -134,6 +138,8 @@ int find(const std::vector<std::shared_ptr<Device> > &list, const std::string &i
 
 std::vector<std::shared_ptr<Device> > Interface::getDevices()
 {
+  std::lock_guard<std::mutex> lock(mtx);
+
   std::vector<std::shared_ptr<Device> > ret;
 
   if (ifh != 0)
@@ -270,18 +276,21 @@ std::string cIFGetInfo(const Interface *obj,
 
 }
 
-std::string Interface::getDisplayName() const
+std::string Interface::getDisplayName()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cIFGetInfo(this, gentl, GenTL::INTERFACE_INFO_DISPLAYNAME);
 }
 
-std::string Interface::getTLType() const
+std::string Interface::getTLType()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   return cIFGetInfo(this, gentl, GenTL::INTERFACE_INFO_TLTYPE);
 }
 
 std::shared_ptr<GenApi::CNodeMapRef> Interface::getNodeMap()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   if (ifh != 0 && !nodemap)
   {
     cport=std::shared_ptr<CPort>(new CPort(gentl, &ifh));
