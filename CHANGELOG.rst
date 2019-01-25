@@ -1,3 +1,8 @@
+2.1.0 (2019-01-25)
+------------------
+
+- Made System, Interface, Device and Stream objects thread safe
+
 2.0.4 (2019-01-24)
 ------------------
 
