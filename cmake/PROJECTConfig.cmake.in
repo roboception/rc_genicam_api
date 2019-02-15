@@ -8,10 +8,67 @@
 # @PROJECT_NAME_UPPER@_STATIC_LIBRARIES - all static libraries
 
 get_filename_component(PROJECT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(Genicam_IMPORT_PREFIX "${PROJECT_CMAKE_DIR}/../.." ABSOLUTE)
 
-set(@PROJECT_NAME_UPPER@_INCLUDE_DIRS "${PROJECT_CMAKE_DIR}/../../include")
-set(@PROJECT_NAME_UPPER@_LIBRARY_DIRS "${PROJECT_CMAKE_DIR}/..")
+### Resolve Genicam first 
+if (UNIX)
+  # try to get architecture from compiler
+  EXECUTE_PROCESS(COMMAND ${CMAKE_CXX_COMPILER} -dumpmachine COMMAND tr -d '\n' OUTPUT_VARIABLE CXX_MACHINE)
+  string(REGEX REPLACE "([a-zA-Z_0-9]+).*" "\\1" ARCHITECTURE ${CXX_MACHINE})
+elseif (WIN32)
+  if ("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
+    set(ARCHITECTURE WIN32_i86)
+  else ()
+    set(ARCHITECTURE WIN64_x64)
+  endif ()
+endif ()
 
+message(STATUS "Detected architecture ${ARCHITECTURE}")
+
+set(GENICAM_LIB_SUFFIX)
+if ("${ARCHITECTURE}" STREQUAL "arm")
+  set(GENICAM_LIB_SUFFIX ".so")
+elseif ("${ARCHITECTURE}" STREQUAL "aarch64")
+  set(GENICAM_LIB_SUFFIX ".so")
+elseif ("${ARCHITECTURE}" STREQUAL "i686")
+  set(GENICAM_LIB_SUFFIX ".so")
+elseif ("${ARCHITECTURE}" STREQUAL "x86_64")
+  set(GENICAM_LIB_SUFFIX ".so")
+elseif ("${ARCHITECTURE}" STREQUAL "WIN32_i86")
+  set(GENICAM_LIB_SUFFIX ".lib")
+elseif ("${ARCHITECTURE}" STREQUAL "WIN64_x64")
+  set(GENICAM_LIB_SUFFIX ".lib")
+else ()
+  message(FATAL_ERROR "Unknown architecture")
+endif ()
+
+foreach(GENICAM_LIB @Genicam_LIBRARIES@)
+  add_library(${GENICAM_LIB} SHARED IMPORTED)
+  set_property(TARGET ${GENICAM_LIB} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+  set_property(TARGET ${GENICAM_LIB} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+  
+  string(REPLACE "Genicam::" "" GENICAM_LIB_NAME ${GENICAM_LIB})
+  set(GENICAM_LIB_FILE "${Genicam_IMPORT_PREFIX}/lib/${GENICAM_LIB_NAME}${GENICAM_LIB_SUFFIX}")
+  if (UNIX)
+	  set_target_properties(${GENICAM_LIB}
+	      PROPERTIES
+			  INTERFACE_INCLUDE_DIRECTORIES "${Genicam_IMPORT_PREFIX}/include/rc_genicam_api/genicam"
+		      IMPORTED_LOCATION_DEBUG "${GENICAM_LIB_FILE}"
+		      IMPORTED_LOCATION_RELEASE "${GENICAM_LIB_FILE}"
+		      IMPORTED_LOCATION "${GENICAM_LIB_FILE}"
+	  )
+  elseif (WIN32)
+	  set_target_properties(${GENICAM_LIB}
+	      PROPERTIES
+			  INTERFACE_INCLUDE_DIRECTORIES "${Genicam_IMPORT_PREFIX}/include/rc_genicam_api/genicam"
+		      IMPORTED_IMPLIB_DEBUG  "${GENICAM_LIB_FILE}"
+		      IMPORTED_IMPLIB_RELEASE "${GENICAM_LIB_FILE}"
+		      IMPORTED_IMPLIB "${GENICAM_LIB_FILE}"
+	  )
+  endif ()
+endforeach()
+
+## Targets
 include("${PROJECT_CMAKE_DIR}/@PROJECT_NAME_UPPER@Targets.cmake")
 
 set(@PROJECT_NAME_UPPER@_STATIC_LIBRARIES @PROJECT_STATIC_LIBRARIES@)

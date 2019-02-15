@@ -39,7 +39,6 @@ include(cmake/project_version.cmake)
 enable_testing()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/genicam/library/CPP/include)
 
 # - Configuration for code optimization -
 
@@ -48,48 +47,48 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 # - Standard definitions -
-
-add_definitions(-Wall)
+set(rc_genicam_api_COMPILE_CXX_OPTIONS)
+list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS -Wall)
 if (CMAKE_MAJOR_VERSION VERSION_LESS "3.1.0")
-  add_definitions(-std=c++11)
+list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS -std=c++11)
 else ()
   set(CMAKE_CXX_STANDARD 11)
 endif ()
 
 if (CMAKE_COMPILER_IS_GNUCC)
-  add_definitions(-Wno-unknown-pragmas)
+  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS -Wno-unknown-pragmas)
 endif ()
 
 # In case of Visual Studio, enable exporting all symbols and disable some
 # warnings
 
 if (WIN32)
-  add_definitions(/DGENICAM_NO_AUTO_IMPLIB)
+  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS /DGENICAM_NO_AUTO_IMPLIB)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif ()
 
 if (MSVC)
-  add_definitions("/wd4003")
-  add_definitions("/wd4514")
-  add_definitions("/wd4710")
-  add_definitions("/wd4820")
-  add_definitions("/wd4435")
-  add_definitions("/wd4668")
-  add_definitions("/wd4127")
-  add_definitions("/wd4265")
-  add_definitions("/wd4996")
-  add_definitions("/wd4437")
-  add_definitions("/wd4571")
-  add_definitions("/wd4355")
-  add_definitions("/wd4061")
-  add_definitions("/wd4800")
-  add_definitions("/wd4711")
-  add_definitions("/wd4774")
-  add_definitions("/wd4625")
-  add_definitions("/wd4626")
-  add_definitions("/wd5026")
-  add_definitions("/wd5027")
-  add_definitions("/wd5039")
+  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS "/wd4003" 
+  "/wd4514" 
+  "/wd4710"
+  "/wd4820"
+  "/wd4435"
+  "/wd4668"
+  "/wd4127"
+  "/wd4265"
+  "/wd4996"
+  "/wd4437"
+  "/wd4571"
+  "/wd4355"
+  "/wd4061"
+  "/wd4800"
+  "/wd4711"
+  "/wd4774"
+  "/wd4625"
+  "/wd4626"
+  "/wd5026"
+  "/wd5027"
+  "/wd5039")
 endif ()
 
 # - Options -
@@ -100,11 +99,9 @@ option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(INSTALL_COMPLETION "Install bash completion" OFF)
 
 # - Build individual parts -
-
+find_package(Genicam REQUIRED NO_CMAKE_PATH PATHS ${CMAKE_CURRENT_SOURCE_DIR}/genicam CONFIG NO_DEFAULT_PATH)
 add_subdirectory(baumer)
 add_subdirectory(genicam)
-
-link_directories(${GENICAM_LIBRARIES_DIR})
 
 add_subdirectory(rc_genicam_api)
 if (BUILD_TOOLS)

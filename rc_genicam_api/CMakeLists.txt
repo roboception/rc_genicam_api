@@ -76,7 +76,8 @@ elseif (WIN32)
 endif ()
 
 add_library(rc_genicam_api_static STATIC ${src})
-target_link_libraries(rc_genicam_api_static ${GENICAM_LIBRARIES})
+target_link_libraries(rc_genicam_api_static ${Genicam_LIBRARIES})
+target_compile_options(rc_genicam_api_static PUBLIC ${rc_genicam_api_COMPILE_CXX_OPTIONS})
 if (UNIX)
   target_link_libraries(rc_genicam_api_static dl)
 endif ()
@@ -85,8 +86,8 @@ endif ()
 
 if (BUILD_SHARED_LIBS)
   add_library(rc_genicam_api SHARED ${src})
-  target_link_libraries(rc_genicam_api ${GENICAM_LIBRARIES})
-
+  target_link_libraries(rc_genicam_api ${Genicam_LIBRARIES})
+  target_compile_options(rc_genicam_api PUBLIC ${rc_genicam_api_COMPILE_CXX_OPTIONS})
   if (UNIX)
     target_link_libraries(rc_genicam_api dl)
   endif ()
@@ -96,7 +97,8 @@ if (BUILD_SHARED_LIBS)
   install(TARGETS rc_genicam_api EXPORT PROJECTTargets COMPONENT bin
           RUNTIME DESTINATION bin
 		  LIBRARY DESTINATION lib
-		  ARCHIVE DESTINATION lib)
+		  ARCHIVE DESTINATION lib
+		  INCLUDES DESTINATION include)
 endif ()
 
 # only install headers if we build and install the shared lib
