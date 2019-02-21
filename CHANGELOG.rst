@@ -1,3 +1,9 @@
+2.1.1 (2019-02-21)
+------------------
+
+- Command line tools now exit with != 0 in case of an error
+- Improved cmake project files
+
 2.1.0 (2019-01-25)
 ------------------
 
