@@ -438,6 +438,8 @@ void checkUserInterrupt()
 
 int main(int argc, char *argv[])
 {
+  int ret=0;
+
   signal(SIGINT, interruptHandler);
 
   try
@@ -657,6 +659,7 @@ int main(int argc, char *argv[])
         else
         {
           std::cerr << "No streams available" << std::endl;
+          ret=1;
         }
 
         dev->close();
@@ -664,6 +667,7 @@ int main(int argc, char *argv[])
       else
       {
         std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+        ret=1;
       }
     }
     else
@@ -683,22 +687,27 @@ int main(int argc, char *argv[])
       std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
       std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
       std::cout << "<key>=<value> Values set via GenICam before streaming images" << std::endl;
+
+      ret=1;
     }
   }
   catch (const std::exception &ex)
   {
     std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
   }
   catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
     std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
   }
   catch (...)
   {
     std::cerr << "Unknown exception!" << std::endl;
+    ret=2;
   }
 
   rcg::System::clearSystems();
 
-  return 0;
+  return ret;
 }

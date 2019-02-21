@@ -42,6 +42,8 @@
 
 int main(int argc, char *argv[])
 {
+  int ret=0;
+
   try
   {
     if (argc > 1)
@@ -221,6 +223,7 @@ int main(int argc, char *argv[])
         else
         {
           std::cerr << "Cannot find device: " << argv[1] << std::endl;
+          ret=1;
         }
       }
     }
@@ -240,14 +243,16 @@ int main(int argc, char *argv[])
       std::cout << "--iponly: Show current IP of device instead of full summary" << std::endl;
       std::cout << std::endl;
       std::cout << "<key>=<value>: Set GenICam key to given value." << std::endl;
+      ret=1;
     }
   }
   catch (const std::exception &ex)
   {
     std::cerr << ex.what() << std::endl;
+    ret=2;
   }
 
   rcg::System::clearSystems();
 
-  return 0;
+  return ret;
 }

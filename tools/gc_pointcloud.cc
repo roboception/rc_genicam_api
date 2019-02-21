@@ -396,6 +396,8 @@ void storePointCloud(std::string name, double f, double t, double scale,
 
 int main(int argc, char *argv[])
 {
+  int ret=0;
+
   try
   {
     // optional parameters
@@ -649,6 +651,7 @@ int main(int argc, char *argv[])
         if (async >= maxasync && run)
         {
           std::cerr << "Cannot grab synchronized left and disparity image" << std::endl;
+          ret=1;
         }
 
         // stopping and closing image stream
@@ -659,6 +662,7 @@ int main(int argc, char *argv[])
       else
       {
         std::cerr << "No streams available" << std::endl;
+        ret=1;
       }
 
       // closing the communication to the device
@@ -668,22 +672,26 @@ int main(int argc, char *argv[])
     else
     {
       std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+      ret=1;
     }
   }
   catch (const std::exception &ex)
   {
     std::cerr << ex.what() << std::endl;
+    ret=2;
   }
   catch (const GENICAM_NAMESPACE::GenericException &ex)
   {
     std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
   }
   catch (...)
   {
     std::cerr << "Unknown exception!" << std::endl;
+    ret=2;
   }
 
   rcg::System::clearSystems();
 
-  return 0;
+  return ret;
 }

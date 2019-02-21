@@ -293,6 +293,8 @@ void printNode(const std::string &prefix, GenApi::INode *node)
 
 int main(int argc, char *argv[])
 {
+  int ret=0;
+
   try
   {
     if (argc >= 2)
@@ -438,11 +440,13 @@ int main(int argc, char *argv[])
           else
           {
             std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+            ret=1;
           }
         }
         else
         {
           std::cerr << "Device name not given!" << std::endl;
+          ret=1;
         }
       }
     }
@@ -451,14 +455,16 @@ int main(int argc, char *argv[])
       std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id> [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Lists all reachable devices or all GenICam parameters of the specified device" << std::endl;
+      ret=1;
     }
   }
   catch (const std::exception &ex)
   {
     std::cerr << ex.what() << std::endl;
+    ret=2;
   }
 
   rcg::System::clearSystems();
 
-  return 0;
+  return ret;
 }
