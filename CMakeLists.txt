@@ -38,8 +38,6 @@ include(cmake/project_version.cmake)
 
 enable_testing()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 # - Configuration for code optimization -
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -68,8 +66,8 @@ if (WIN32)
 endif ()
 
 if (MSVC)
-  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS "/wd4003" 
-  "/wd4514" 
+  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS "/wd4003"
+  "/wd4514"
   "/wd4710"
   "/wd4820"
   "/wd4435"
