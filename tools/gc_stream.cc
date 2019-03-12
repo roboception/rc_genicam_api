@@ -123,9 +123,10 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
   std::ostringstream name;
 
-  double t=buffer->getTimestampNS()/1000000000.0;
+  uint64_t t_sec = buffer->getTimestampNS()/1000000000;
+  uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
 
-  name << "image_" << std::setprecision(16) << t;
+  name << "image_" << t_sec << "." << std::setfill('0') << std::setw(9) << t_nsec;
 
   if (component.size() > 0)
   {
@@ -323,9 +324,10 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
       std::ostringstream name;
 
-      double ts=buffer->getTimestampNS()/1000000000.0;
+      uint64_t t_sec = buffer->getTimestampNS()/1000000000;
+      uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
 
-      name << "image_" << std::setprecision(16) << ts;
+      name << "image_" << t_sec << "." << std::setfill('0') << std::setw(9) << t_nsec;
 
       // convert values and store disparity image
 
