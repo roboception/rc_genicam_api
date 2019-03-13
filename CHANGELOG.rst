@@ -1,3 +1,10 @@
+2.1.2 (2019-03-13)
+------------------
+
+- Remove global include_directories in cmake build files
+- Use full precision timestamp in name of images saved by gc_stream
+- Append out1 and out2 state to name of images saved by gc_stream
+
 2.1.1 (2019-02-21)
 ------------------
 
