@@ -115,19 +115,31 @@ std::string ensureNewName(std::string name)
   Store image given in buffer in PGM or PPM format.
 */
 
-std::string storeBuffer(const std::string &component, const rcg::Buffer *buffer, uint32_t part)
+std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                        const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
+                        const std::string &component, const rcg::Buffer *buffer, uint32_t part)
 {
   // prepare file name
 
   std::ostringstream name;
 
-  double t=buffer->getTimestampNS()/1000000000.0;
+  uint64_t t_sec = buffer->getTimestampNS()/1000000000;
+  uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
 
-  name << "image_" << std::setprecision(16) << t;
+  name << "image_" << t_sec << "." << std::setfill('0') << std::setw(9) << t_nsec;
 
   if (component.size() > 0)
   {
     name << '_' << component;
+  }
+
+  if (chunkadapter)
+  {
+    // Append out1 and out2 status to file name: _<out1>_<out2>
+    int line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
+    bool out1 = line_status & 0x01;
+    bool out2 = line_status & 0x02;
+    name << "_" << std::noboolalpha << out1 << "_" << out2;
   }
 
   // store image (see e.g. the sv tool of cvkit for show images)
@@ -312,9 +324,10 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
       std::ostringstream name;
 
-      double ts=buffer->getTimestampNS()/1000000000.0;
+      uint64_t t_sec = buffer->getTimestampNS()/1000000000;
+      uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
 
-      name << "image_" << std::setprecision(16) << ts;
+      name << "image_" << t_sec << "." << std::setfill('0') << std::setw(9) << t_nsec;
 
       // convert values and store disparity image
 
@@ -324,7 +337,16 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
       const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(part))+
                              2*(width+px)*(height+1);
 
-      dispname=name.str()+"_Disparity.pfm";
+      name << "_Disparity";
+
+      // Append out1 and out2 status to file name: _<out1>_<out2>
+      int line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
+      bool out1 = line_status & 0x01;
+      bool out2 = line_status & 0x02;
+      name << "_" << std::noboolalpha << out1 << "_" << out2;
+
+      dispname=name.str()+".pfm";
+
       std::ofstream out(ensureNewName(dispname), std::ios::binary);
 
       out << "Pf" << std::endl;
@@ -609,7 +631,7 @@ int main(int argc, char *argv[])
 
                         if (name.size() == 0)
                         {
-                          name=storeBuffer(component, buffer, part);
+                          name=storeBuffer(nodemap, chunkadapter, component, buffer, part);
                         }
 
                         // report success
