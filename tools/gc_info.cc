@@ -122,11 +122,13 @@ std::string formatValue(GenApi::IInteger *node, int64_t value)
 /**
   Recursive printing of nodes to standard out.
 
-  @param prefix Prefix that will be prepended to every line.
-  @param node   Node to be printed.
+  @param prefix    Prefix that will be prepended to every line.
+  @param node      Node to be printed.
+  @param recursive If true, then printNode() is called recursively for each
+                   category node.
 */
 
-void printNode(const std::string &prefix, GenApi::INode *node)
+void printNode(const std::string &prefix, GenApi::INode *node, bool recursive)
 {
   if (node != 0 && node->GetAccessMode() != GenApi::NI)
   {
@@ -224,16 +226,19 @@ void printNode(const std::string &prefix, GenApi::INode *node)
           std::cout << prefix << "Category: " << node->GetName() << " "
                     << getAccessMode(node) << std::endl;
 
-          GenApi::ICategory *root=dynamic_cast<GenApi::ICategory *>(node);
-
-          if (root != 0)
+          if (recursive)
           {
-            GenApi::FeatureList_t feature;
-            root->GetFeatures(feature);
+            GenApi::ICategory *root=dynamic_cast<GenApi::ICategory *>(node);
 
-            for (size_t i=0; i<feature.size(); i++)
+            if (root != 0)
             {
-              printNode(prefix+"  ", feature[i]->GetNode());
+              GenApi::FeatureList_t feature;
+              root->GetFeatures(feature);
+
+              for (size_t i=0; i<feature.size(); i++)
+              {
+                printNode(prefix+"  ", feature[i]->GetNode(), recursive);
+              }
             }
           }
         }
@@ -369,10 +374,27 @@ int main(int argc, char *argv[])
 
         if (k < argc)
         {
+          // separate optional node name from device id
+
+          std::string devid=argv[k++];
+          std::string node="Root";
+          bool recursive=true;
+
+          {
+            size_t j=devid.find('?');
+
+            if (j != std::string::npos)
+            {
+              node=devid.substr(j+1);
+              devid=devid.substr(0, j);
+              recursive=false;
+            }
+          }
+
           // find specific device accross all systems and interfaces and show some
           // information
 
-          std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[k++]);
+          std::shared_ptr<rcg::Device> dev=rcg::getDevice(devid.c_str());
 
           if (dev)
           {
@@ -433,13 +455,13 @@ int main(int argc, char *argv[])
 
             std::cout << std::endl;
             std::cout << "Available features:" << std::endl;
-            printNode(std::string("  "), nodemap->_GetNode("Root"));
+            printNode(std::string("  "), nodemap->_GetNode(node.c_str()), recursive);
 
             dev->close();
           }
           else
           {
-            std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+            std::cerr << "Device '" << devid << "' not found!" << std::endl;
             ret=1;
           }
         }
@@ -452,7 +474,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id> [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Lists all reachable devices or all GenICam parameters of the specified device" << std::endl;
       ret=1;
