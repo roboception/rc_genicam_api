@@ -128,7 +128,7 @@ std::string formatValue(GenApi::IInteger *node, int64_t value)
 
 void printNode(const std::string &prefix, GenApi::INode *node)
 {
-  if (node != 0)
+  if (node != 0 && node->GetAccessMode() != GenApi::NI)
   {
     switch (node->GetPrincipalInterfaceType())
     {
