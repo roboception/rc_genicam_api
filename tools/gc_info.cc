@@ -477,6 +477,10 @@ int main(int argc, char *argv[])
       std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Lists all reachable devices or all GenICam parameters of the specified device" << std::endl;
+      std::cout << std::endl;
+      std::cout << "The output can be restricted to a no by specifying it with '?' after the device id." << std::endl;
+      std::cout << std::endl;
+      std::cout << "The remaining parameters on the command line are expected to be GenICam parameters that are set before reporting." << std::endl;
       ret=1;
     }
   }
