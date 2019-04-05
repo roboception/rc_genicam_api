@@ -420,7 +420,10 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
       out.open(ensureNewName(name.str()));
 
       out << "# Created by gc_stream" << std::endl;
+      out << std::fixed << std::setprecision(5);
       out << "camera.A=[" << f << " 0 " << u << "; 0 " << f << " " << v << "; 0 0 1]" << std::endl;
+      out << "camera.height=" << height << std::endl;
+      out << "camera.width=" << width << std::endl;
       out << "rho=" << f*t << std::endl;
       out << "t=" << t << std::endl;
 
