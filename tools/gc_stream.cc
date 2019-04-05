@@ -53,6 +53,7 @@
 #include <algorithm>
 #include <atomic>
 #include <thread>
+#include <chrono>
 
 #ifdef WIN32
 #undef min
@@ -580,6 +581,8 @@ int main(int argc, char *argv[])
 
           int buffers_received=0;
           int buffers_incomplete=0;
+          auto time_start=std::chrono::steady_clock::now();
+          double latency_ns=0;
 
           for (int k=0; k<n && !user_interrupt; k++)
           {
@@ -646,9 +649,21 @@ int main(int argc, char *argv[])
                   }
                   else
                   {
-                    std::cout << "Received buffer with timestamp: " << std::setprecision(16)
-                              << buffer->getTimestampNS()/1.9e9 << std::endl;
+                    // just print timestamp of received buffer
+
+                    uint64_t t_sec = buffer->getTimestampNS()/1000000000;
+                    uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
+
+                    std::cout << "Received buffer with timestamp: " << t_sec << "."
+                              << std::setfill('0') << std::setw(9) << t_nsec << std::endl;
                     retry=0;
+
+                    // accumulate mean latency
+
+                    auto current=std::chrono::system_clock::now();
+                    latency_ns+=
+                      static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(current.time_since_epoch()).count())-
+                      static_cast<double>(buffer->getTimestampNS());
                   }
 
                   // detach buffer from nodemap
@@ -677,6 +692,22 @@ int main(int argc, char *argv[])
           std::cout << std::endl;
           std::cout << "Received buffers:   " << buffers_received << std::endl;
           std::cout << "Incomplete buffers: " << buffers_incomplete << std::endl;
+
+          auto time_stop=std::chrono::steady_clock::now();
+          std::cout << "Buffers per second: " << std::setprecision(3)
+                    << 1000.0*buffers_received/std::chrono::duration_cast<std::chrono::milliseconds>(time_stop-time_start).count()
+                    << std::endl;
+
+          if (!store)
+          {
+            if (buffers_received-buffers_incomplete > 0)
+            {
+              latency_ns/=buffers_received-buffers_incomplete;
+            }
+
+            std::cout << "Mean latency:       " << std::setprecision(5) << latency_ns/1.0e6
+                      << " ms (only meaningful if camera is synchronized e.g. via PTP!)" << std::endl;
+          }
         }
         else
         {
