@@ -122,13 +122,14 @@ std::string formatValue(GenApi::IInteger *node, int64_t value)
 /**
   Recursive printing of nodes to standard out.
 
-  @param prefix    Prefix that will be prepended to every line.
-  @param node      Node to be printed.
-  @param recursive If true, then printNode() is called recursively for each
-                   category node.
+  @param prefix Prefix that will be prepended to every line.
+  @param node   Node to be printed.
+  @param depth  This value is reduced when calling printNode() recursively on
+                category nodes. If the value is <= 0, then no recursion is
+                done.
 */
 
-void printNode(const std::string &prefix, GenApi::INode *node, bool recursive)
+void printNode(const std::string &prefix, GenApi::INode *node, int depth)
 {
   if (node != 0 && node->GetAccessMode() != GenApi::NI)
   {
@@ -226,7 +227,7 @@ void printNode(const std::string &prefix, GenApi::INode *node, bool recursive)
           std::cout << prefix << "Category: " << node->GetName() << " "
                     << getAccessMode(node) << std::endl;
 
-          if (recursive)
+          if (depth > 0)
           {
             GenApi::ICategory *root=dynamic_cast<GenApi::ICategory *>(node);
 
@@ -237,7 +238,7 @@ void printNode(const std::string &prefix, GenApi::INode *node, bool recursive)
 
               for (size_t i=0; i<feature.size(); i++)
               {
-                printNode(prefix+"  ", feature[i]->GetNode(), recursive);
+                printNode(prefix+"  ", feature[i]->GetNode(), depth-1);
               }
             }
           }
@@ -378,7 +379,7 @@ int main(int argc, char *argv[])
 
           std::string devid=argv[k++];
           std::string node="Root";
-          bool recursive=true;
+          int depth=1000;
 
           {
             size_t j=devid.find('?');
@@ -387,7 +388,7 @@ int main(int argc, char *argv[])
             {
               node=devid.substr(j+1);
               devid=devid.substr(0, j);
-              recursive=false;
+              depth=1;
             }
           }
 
@@ -434,28 +435,32 @@ int main(int argc, char *argv[])
               }
             }
 
-            std::cout << "Device:        " << dev->getID() << std::endl;
-            std::cout << "Vendor:        " << dev->getVendor() << std::endl;
-            std::cout << "Model:         " << dev->getModel() << std::endl;
-            std::cout << "TL type:       " << dev->getTLType() << std::endl;
-            std::cout << "Display name:  " << dev->getDisplayName() << std::endl;
-            std::cout << "User name:     " << dev->getUserDefinedName() << std::endl;
-            std::cout << "Serial number: " << dev->getSerialNumber() << std::endl;
-            std::cout << "Version:       " << dev->getVersion() << std::endl;
-            std::cout << "TS Frequency:  " << dev->getTimestampFrequency() << std::endl;
-            std::cout << std::endl;
-
-            std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
-
-            std::cout << "Available streams:" << std::endl;
-            for (size_t i=0; i<stream.size(); i++)
+            if (depth > 1)
             {
-              std::cout << "  Stream ID: " << stream[i]->getID() << std::endl;
+              std::cout << "Device:        " << dev->getID() << std::endl;
+              std::cout << "Vendor:        " << dev->getVendor() << std::endl;
+              std::cout << "Model:         " << dev->getModel() << std::endl;
+              std::cout << "TL type:       " << dev->getTLType() << std::endl;
+              std::cout << "Display name:  " << dev->getDisplayName() << std::endl;
+              std::cout << "User name:     " << dev->getUserDefinedName() << std::endl;
+              std::cout << "Serial number: " << dev->getSerialNumber() << std::endl;
+              std::cout << "Version:       " << dev->getVersion() << std::endl;
+              std::cout << "TS Frequency:  " << dev->getTimestampFrequency() << std::endl;
+              std::cout << std::endl;
+
+              std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
+
+              std::cout << "Available streams:" << std::endl;
+              for (size_t i=0; i<stream.size(); i++)
+              {
+                std::cout << "  Stream ID: " << stream[i]->getID() << std::endl;
+              }
+
+              std::cout << std::endl;
             }
 
-            std::cout << std::endl;
             std::cout << "Available features:" << std::endl;
-            printNode(std::string("  "), nodemap->_GetNode(node.c_str()), recursive);
+            printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth);
 
             dev->close();
           }
@@ -476,11 +481,9 @@ int main(int argc, char *argv[])
     {
       std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
-      std::cout << "Lists all reachable devices or all GenICam parameters of the specified device" << std::endl;
-      std::cout << std::endl;
-      std::cout << "The output can be restricted to a no by specifying it with '?' after the device id." << std::endl;
-      std::cout << std::endl;
-      std::cout << "The remaining parameters on the command line are expected to be GenICam parameters that are set before reporting." << std::endl;
+      std::cout << "- Lists all reachable devices or all GenICam parameters of the specified device." << std::endl;
+      std::cout << "- The output can be restricted to a node by specifying it with '?' after the device id." << std::endl;
+      std::cout << "- The remaining parameters on the command line are expected to be GenICam parameters that are set before reporting." << std::endl;
       ret=1;
     }
   }
