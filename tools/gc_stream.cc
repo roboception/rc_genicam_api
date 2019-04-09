@@ -692,6 +692,8 @@ int main(int argc, char *argv[])
           stream[0]->stopStreaming();
           stream[0]->close();
 
+          // report received and incomplete buffers
+
           std::cout << std::endl;
           std::cout << "Received buffers:   " << buffers_received << std::endl;
           std::cout << "Incomplete buffers: " << buffers_incomplete << std::endl;
@@ -710,6 +712,13 @@ int main(int argc, char *argv[])
 
             std::cout << "Mean latency:       " << std::setprecision(5) << latency_ns/1.0e6
                       << " ms (only meaningful if camera is synchronized e.g. via PTP!)" << std::endl;
+          }
+
+          // return error code if no images could be received
+
+          if (buffers_incomplete == buffers_received)
+          {
+            ret=1;
           }
         }
         else
