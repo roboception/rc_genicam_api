@@ -389,6 +389,11 @@ int main(int argc, char *argv[])
               node=devid.substr(j+1);
               devid=devid.substr(0, j);
               depth=1;
+
+              if (node.size() == 0)
+              {
+                node="Root";
+              }
             }
           }
 
@@ -437,6 +442,8 @@ int main(int argc, char *argv[])
 
             if (depth > 1)
             {
+              // report all features
+
               std::cout << "Device:        " << dev->getID() << std::endl;
               std::cout << "Vendor:        " << dev->getVendor() << std::endl;
               std::cout << "Model:         " << dev->getModel() << std::endl;
@@ -457,10 +464,26 @@ int main(int argc, char *argv[])
               }
 
               std::cout << std::endl;
-            }
 
-            std::cout << "Available features:" << std::endl;
-            printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth);
+              std::cout << "Available features:" << std::endl;
+              printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth);
+            }
+            else
+            {
+              // report requested node only
+
+              GenApi::INode *p=nodemap->_GetNode(node.c_str());
+
+              if (p)
+              {
+                printNode(std::string(), p, depth);
+              }
+              else
+              {
+                std::cerr << "Unknown node: " << node << std::endl;
+                ret=1;
+              }
+            }
 
             dev->close();
           }
