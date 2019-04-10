@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    if (argc > 1)
+    if (argc > 1 && std::string(argv[1]) != "-h")
     {
       // list all available GigE Vision devices
 
@@ -229,20 +229,27 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l|([<interface-id>:]<device-id> <options>)" << std::endl;
+      std::cout << argv[0] << " -h | -l | ([<interface-id>:]<device-id> <options> ...)" << std::endl;
       std::cout << std::endl;
-      std::cout << "Configuration of a device via GenICam" << std::endl;
+      std::cout << "Configuration of a GigE Vision device via GenICam." << std::endl;
       std::cout << std::endl;
-      std::cout << "-n <id>:  Set user defined id" << std::endl;
-      std::cout << "-d 1|0:   Switch DHCP on or off" << std::endl;
-      std::cout << "-p 1|0:   Switch persistent IP on or off" << std::endl;
-      std::cout << "-t 1|0:   Switch precision time protocol (ptp) on or off" << std::endl;
-      std::cout << "-i <ip>:  Set persistent IP address" << std::endl;
-      std::cout << "-s <ip>:  Set subnet mask for persistent IP address" << std::endl;
-      std::cout << "-g <ip>:  Set default gateway for persistent IP address" << std::endl;
-      std::cout << "--iponly: Show current IP of device instead of full summary" << std::endl;
+      std::cout << "-h             Prints help information and exits" << std::endl;
+      std::cout << "-l             Lists all available GigE Vision devices" << std::endl;
       std::cout << std::endl;
-      std::cout << "<key>=<value>: Set GenICam key to given value." << std::endl;
+      std::cout << "Parameters:" << std::endl;
+      std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
+      std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
+      std::cout << std::endl;
+      std::cout << "Options:" << std::endl;
+      std::cout << "-n <id>        Set user defined id" << std::endl;
+      std::cout << "-d 1|0         Switch DHCP on or off" << std::endl;
+      std::cout << "-p 1|0         Switch persistent IP on or off" << std::endl;
+      std::cout << "-t 1|0         Switch precision time protocol (ptp) on or off" << std::endl;
+      std::cout << "-i <ip>        Set persistent IP address" << std::endl;
+      std::cout << "-s <ip>        Set subnet mask for persistent IP address" << std::endl;
+      std::cout << "-g <ip>        Set default gateway for persistent IP address" << std::endl;
+      std::cout << "--iponly       Show current IP of device instead of full summary" << std::endl;
+      std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
       ret=1;
     }
   }

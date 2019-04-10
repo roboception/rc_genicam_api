@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    if (argc >= 2)
+    if (argc >= 2 && std::string(argv[1]) != "-h")
     {
       if (std::string(argv[1]) == "-l")
       {
@@ -502,11 +502,20 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -h | -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
-      std::cout << "- Lists all reachable devices or all GenICam parameters of the specified device." << std::endl;
-      std::cout << "- The output can be restricted to a node by specifying it with '?' after the device id." << std::endl;
-      std::cout << "- The remaining parameters on the command line are expected to be GenICam parameters that are set before reporting." << std::endl;
+      std::cout << "Provides information about GenICam transport layers, interfaces and devices." << std::endl;
+      std::cout << std::endl;
+      std::cout << "Options: " << std::endl;
+      std::cout << "-h   Prints help information and exits" << std::endl;
+      std::cout << "-l   List all all available devices on all interfaces" << std::endl;
+      std::cout << "-o   Filename to store XML description from specified device" << std::endl;
+      std::cout << std::endl;
+      std::cout << "Parameters:" << std::endl;
+      std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
+      std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
+      std::cout << "<node>         Optional name of category or parameter to be reported" << std::endl;
+      std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order before reporting" << std::endl;
       ret=1;
     }
   }

@@ -68,13 +68,17 @@ void printHelp(const char *prgname)
 {
   // show help
 
-  std::cout << prgname << " [-o <output-filename>] [<interface-id>:]<device-id>" << std::endl;
+  std::cout << prgname << " -h | [-o <output-filename>] [<interface-id>:]<device-id>" << std::endl;
   std::cout << std::endl;
-  std::cout << "Gets the first synchronized image set consisting of left, disparity, confidence" << std::endl;
-  std::cout << "and error image, creates a point cloud and stores it in ply ascii format" << std::endl;
-  std::cout << "in the current directory." << std::endl;
+  std::cout << "Gets the first synchronized image set of the Roboception rc_visard, consisting of left, disparity, confidence and error image, creates a point cloud and stores it in ply ascii format." << std::endl;
   std::cout << std::endl;
-  std::cout << "<device-id> Device from which images will taken" << std::endl;
+  std::cout << "Options:" << std::endl;
+  std::cout << "-h        Prints help information and exits" << std::endl;
+  std::cout << "-o <file> Set name of output file (default is 'rc_visard_<timestamp>.ply')" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Parameters:" << std::endl;
+  std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
+  std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
 }
 
 /*
@@ -424,7 +428,7 @@ int main(int argc, char *argv[])
       }
     }
 
-    if (i >= argc)
+    if (i >= argc || std::string(argv[i]) == "-h")
     {
       printHelp(argv[0]);
       return 1;

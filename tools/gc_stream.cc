@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
       }
     }
 
-    if (i < argc)
+    if (i < argc && std::string(argv[i]) != "-h")
     {
       // find specific device accross all systems and interfaces and open it
 
@@ -739,20 +739,23 @@ int main(int argc, char *argv[])
     {
       // show help
 
-      std::cout << argv[0] << " [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
+      std::cout << argv[0] << " -h | [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
       std::cout << std::endl;
-      std::cout << "- Stores n images from the specified device after applying the given values." << std::endl;
+      std::cout << "Stores images from the specified device after applying the given optional GenICam parameters." << std::endl;
+      std::cout << std::endl;
+      std::cout << "Options:" << std::endl;
+      std::cout << "-h   Prints help information and exits" << std::endl;
+      std::cout << "-t   Testmode, which does not store images and provides extended statistics" << std::endl;
+      std::cout << std::endl;
+      std::cout << "Parameters:" << std::endl;
+      std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
+      std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
+      std::cout << "n=<n>          Optional number of images to be received (default is 1)" << std::endl;
+      std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
 #ifdef WIN32
-      std::cout << "- Streaming can be aborted by hitting the 'Enter' key." << std::endl;
+      std::cout << std::endl;
+      std::cout << "Streaming can be aborted by hitting the 'Enter' key." << std::endl;
 #endif
-      std::cout << "- Components can be enabled with 'ComponentSelector=<component> ComponentEnable=1'." << std::endl;
-      std::cout << std::endl;
-      std::cout << "Parameter '-t' switches to test mode, which prevents storing images." << std::endl;
-      std::cout << std::endl;
-      std::cout << "<device-id>   Device from which data will be streamed" << std::endl;
-      std::cout << "n=<n>         Number of images to receive. Default is 1" << std::endl;
-      std::cout << "<key>=<value> Values set via GenICam before streaming images" << std::endl;
-
       ret=1;
     }
   }
