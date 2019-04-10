@@ -6,3 +6,4 @@ build
 .*
 !.gitignore
 !.gitlab-ci.yml
+!.dockerignore
