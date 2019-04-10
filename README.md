@@ -115,46 +115,121 @@ text on the standard output.
 NOTE: If any tool returns the error `No transport layers found in path ...`,
 then read the section 'Transport Layer' below.
 
-* `gc_info`
+### gc_info
 
-  Lists all available systems (i.e. transport layers), interfaces and devices
-  with some information. If a device ID is given on the command line, then the
-  complete GenICam nodemap with all parameters and their current values are
-  listed.
+Lists all available systems (i.e. transport layers), interfaces and devices
+with some information. If a device ID is given on the command line, then the
+complete GenICam nodemap with all parameters and their current values are
+listed.
 
-* `gc_config`
+```
+gc_info -h | -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)
 
-  Can be used to list network specific information of GenICam compatible GigE
-  Vision 2 cameras. The network settings as well as all other parameters
-  provided via GenICam can be changed.
+Provides information about GenICam transport layers, interfaces and devices.
 
-* `gc_stream`
+Options: 
+-h   Prints help information and exits
+-l   List all all available devices on all interfaces
+-o   Filename to store XML description from specified device
 
-  This tool shows how to configure and stream images from a camera. GenICam
-  features can be configured directly from the command line. Images will be
-  stored in PGM or PPM format, depending on the image format.
+Parameters:
+<interface-id> Optional GenICam ID of interface for connecting to the device
+<device-id>    GenICam device ID, serial number or user defined name of device
+<node>         Optional name of category or parameter to be reported
+<key>=<value>  Optional GenICam parameters to be changed in the given order before reporting
+```
 
-  Streams of the Roboception rc_visard can be enabled or disabled directly on
-  the command line by setting the appropriate GenICam parameters. The following
-  command enables intensity images, disables disparity images and stores 10
-  images:
+### gc_config
 
-      gc_stream <ID> ComponentSelector=Intensity ComponentEnable=1 ComponentSelector=Disparity ComponentEnable=0 n=10
+Can be used to list network specific information of GenICam compatible GigE
+Vision 2 cameras. The network settings as well as all other parameters
+provided via GenICam can be changed.
 
-  NOTE: Many image viewers can display PGM and PPM format. The sv tool of cvkit
-  (https://github.com/roboception/cvkit) can also be used.
+```
+gc_config -h | -l | ([<interface-id>:]<device-id> <options> ...)
 
-* `gc_pointcloud`
+Configuration of a GigE Vision device via GenICam.
 
-  This tool streams the left image, disparity, confidence and error from a
-  Roboception rc_visard sensor. It takes the first set of time synchronous
-  images, computes a colored point cloud and stores it in PLY ASCII format.
-  This tool demonstrates how to synchronize different images according to
-  their timestamps.
+-h             Prints help information and exits
+-l             Lists all available GigE Vision devices
 
-  NOTE: PLY is a standard format for scanned 3D data that can be read by many
-  programs. The plyv tool of cvkit (https://github.com/roboception/cvkit) can
-  also be used for visualization.
+Parameters:
+<interface-id> Optional GenICam ID of interface for connecting to the device
+<device-id>    GenICam device ID, serial number or user defined name of device
+
+Options:
+-n <id>        Set user defined id
+-d 1|0         Switch DHCP on or off
+-p 1|0         Switch persistent IP on or off
+-t 1|0         Switch precision time protocol (ptp) on or off
+-i <ip>        Set persistent IP address
+-s <ip>        Set subnet mask for persistent IP address
+-g <ip>        Set default gateway for persistent IP address
+--iponly       Show current IP of device instead of full summary
+<key>=<value>  Optional GenICam parameters to be changed in the given order
+```
+
+### gc_stream
+
+This tool shows how to configure and stream images from a camera. GenICam
+features can be configured directly from the command line. Images will be
+stored in PGM or PPM format, depending on the image format.
+
+Streams of the Roboception rc_visard can be enabled or disabled directly on
+the command line by setting the appropriate GenICam parameters. The following
+command enables intensity images, disables disparity images and stores 10
+images:
+
+```
+gc_stream <ID> ComponentSelector=Intensity ComponentEnable=1 ComponentSelector=Disparity ComponentEnable=0 n=10
+```
+
+NOTE: Many image viewers can display PGM and PPM format. The sv tool of cvkit
+(https://github.com/roboception/cvkit) can also be used.
+
+```
+gc_stream -h | [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ...
+
+Stores images from the specified device after applying the given optional GenICam parameters.
+
+Options:
+-h   Prints help information and exits
+-t   Testmode, which does not store images and provides extended statistics
+
+Parameters:
+<interface-id> Optional GenICam ID of interface for connecting to the device
+<device-id>    GenICam device ID, serial number or user defined name of device
+n=<n>          Optional number of images to be received (default is 1)
+<key>=<value>  Optional GenICam parameters to be changed in the given order
+```
+
+### gc_pointcloud
+
+This tool streams the left image, disparity, confidence and error from a
+Roboception rc_visard sensor. It takes the first set of time synchronous
+images, computes a colored point cloud and stores it in PLY ASCII format.
+This tool demonstrates how to synchronize different images according to
+their timestamps.
+
+NOTE: PLY is a standard format for scanned 3D data that can be read by many
+programs. The plyv tool of cvkit (https://github.com/roboception/cvkit) can
+also be used for visualization.
+
+```
+gc_pointcloud -h | [-o <output-filename>] [<interface-id>:]<device-id>
+
+Gets the first synchronized image set of the Roboception rc_visard, consisting
+of left, disparity, confidence and error image, creates a point cloud and
+stores it in ply ascii format.
+
+Options:
+-h        Prints help information and exits
+-o <file> Set name of output file (default is 'rc_visard_<timestamp>.ply')
+
+Parameters:
+<interface-id> Optional GenICam ID of interface for connecting to the device
+<device-id>    GenICam device ID, serial number or user defined name of device
+```
 
 Device ID
 ---------
