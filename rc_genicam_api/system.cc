@@ -81,6 +81,36 @@ int find(const std::vector<std::shared_ptr<System> > &list, const std::string &f
   return -1;
 }
 
+#ifdef _WIN32
+static std::string getPathToThisDll()
+{
+  HMODULE hm = nullptr;
+  if (GetModuleHandleEx(
+    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | 
+    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
+    reinterpret_cast<LPCSTR>(&getPathToThisDll), &hm) == 0)
+  {
+    return {};
+  }
+
+  char path[MAX_PATH];
+  if (GetModuleFileName(hm, path, sizeof(path)) == 0)
+  {
+    return {};
+  }
+
+  std::string p{ path };
+  const auto bs_pos = p.rfind('\\');
+  if (bs_pos != std::string::npos)
+  {
+    p = p.substr(0, bs_pos);
+  }
+
+  return p;
+}
+
+#endif
+
 }
 
 std::vector<std::shared_ptr<System> > System::getSystems()
@@ -124,6 +154,12 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
       path+=";";
       path+=procpath;
+    }
+
+    const auto path_to_this_dll = getPathToThisDll();
+    if (!path_to_this_dll.empty())
+    {
+      path += ";" + path_to_this_dll;
     }
 #else
     // otherwise, use the absolute install path to the default transport layer
