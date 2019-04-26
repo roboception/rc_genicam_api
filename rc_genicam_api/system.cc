@@ -86,8 +86,8 @@ static std::string getPathToThisDll()
 {
   HMODULE hm = nullptr;
   if (GetModuleHandleEx(
-    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | 
-    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
+    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
     reinterpret_cast<LPCSTR>(&getPathToThisDll), &hm) == 0)
   {
     return {};
@@ -145,6 +145,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
     const size_t n=256;
     char procpath[n];
+    std::string path_to_exe;
     if (GetModuleFileName(NULL, procpath, n-1) > 0)
     {
       procpath[n-1]='\0';
@@ -152,12 +153,12 @@ std::vector<std::shared_ptr<System> > System::getSystems()
       char *p=strrchr(procpath, '\\');
       if (p != 0) *p='\0';
 
-      path+=";";
-      path+=procpath;
+      path_to_exe=procpath;
+      path+=";" + path_to_exe;
     }
 
     const auto path_to_this_dll = getPathToThisDll();
-    if (!path_to_this_dll.empty())
+    if (!path_to_this_dll.empty() && path_to_this_dll != path_to_exe)
     {
       path += ";" + path_to_this_dll;
     }
