@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ConfigFile VendorName="Baumer">
-    <FileVersion>2.9.0.0</FileVersion>
+    <FileVersion>2.9.2.0</FileVersion>
     <!--
     This configuration file allows to change some default values of the Baumer gige producer.
     Please keep in mind that changes will affect all devices and may lead to non-optimal behavior.
@@ -16,15 +16,14 @@
             socket:            yes
             filter driver 3.x: yes
             filter driver 2.x: yes (deprecated)
-            default:           3
+            default:           44 (If the stream is opened by a read only device the value is set to 0 as default.)
             min:               0 (deactivates resend!)
             max:               4,294,967,295
             sdk support:       stream
-            hints:             If resends occur check the hardware connection or the dropped udp packets at your system.
-                               For high performance apps use a lower value to prevent rising of system load.
-                               A higher value allow to finished a complete data block and prevent a incomplete data block,
-                               maybe at the expense of a higher system load.
-
+            hints:             If resends occur check the hardware connection or the dropped udp packets of your
+                               system. For high performance applications use a lower value, this will reduce overall
+                               system load. A higher value can prevent incomplete data blocks (images) at the expense
+                               of a higher system load.
             -->
             <MaxResendsPerPacket>3</MaxResendsPerPacket>
 
@@ -33,22 +32,24 @@
             socket:            yes
             filter driver 3.x: yes
             filter driver 2.x: no (deprecated)
-            default:           20
+            default:           100
             min:               0 (may result in high number of resend requests!)
             max:               4,294,967,295
             sdk support:       stream
-            hint:              Only used if MaxResendsPerPacket > 1.
-                               For high performance apps keep in mind, that many packets are residence in some input fifo queues(network cards, udp stack e.q.)
-                               and a resend request not immediately appear as resend for the sdk choose a higher value.
-                               Lower value leads to a rapid filling up outstanding packets, higher values are prevent incomplete data blocks
-                               because resend packets became the change to be received before the data block marked as incomplete while MaxResendsPerPacket
-                               already reached internally zero.
+            hint:              This parameter is only relevant if MaxResendsPerPacket > 1.
+                               Each Packet will pass through several fifo queues (e.g. network cards, udp stack)
+                               before it arrives at application level where missing packets are detected.
+                               Therefore we have to wait a certain number of packets to ensure the resent package
+                               has arrived in our application before requesting the packet again.
+                               If incomplete frames occur this parameter can be raised to allow more time to pass
+                               for the resent packet to be recovered.
             -->
-            <ResendRetryThreshold>20</ResendRetryThreshold>
+            <ResendRetryThreshold>100</ResendRetryThreshold>
 
             <!--
-            Set a timeout for completion a data block if no packet received and a resend request must be generated.
-            This time controls when a data block / image will be aborted if outstanding packets are not received.
+            Sets a timeout for when an expected packet is marked as missing and a resent request is generated.
+            This timeout also controls when a data block / image will be aborted if outstanding packets are
+            not received.
             socket:            yes
             filter driver 3.x: yes
             filter driver 2.x: no (deprecated)
@@ -56,9 +57,11 @@
             min:               10
             max:               4,294,967,295
             sdk support:       stream
-            hint:              Especially in trigger mode and no packets received this timeout determine when the first resend was generated.
-                               Lower value produce a higher system load through repeated system calls.
-                               Higher value are depends on the response time of the application.
+            hint:              Especially in trigger mode there might be no packets received for quite a while after an
+                               image finished. To enable resents for the last packets of an image in those cases this
+                               timeout is used.
+                               Lower values can produce a higher system load through repeated system calls.
+                               Higher values can reduce the response time of the application.
             -->
             <ResendHostTimeout>1000</ResendHostTimeout>
 
@@ -72,7 +75,7 @@
             min:               1 (deactivate frame rate calculation)
             max:               4,294,967,295
             sdk support:       stream
-            hints:             Lower value refresh the calculation faster but the average is not so exactly.
+            hints:             Lower value refresh the calculation faster but the average is not as exact.
                                Higher value provide a better average but leads to changes are not catch.
             -->
             <ThroughputCalculationEntries>25</ThroughputCalculationEntries>
