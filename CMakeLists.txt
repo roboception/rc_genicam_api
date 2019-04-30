@@ -31,10 +31,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.5.1)
 
 project(rc_genicam_api)
+
+include(cmake/install_dirs.cmake)
+include(cmake/project_name.cmake)
 include(cmake/project_version.cmake)
+
+# For CMake Version >= 3.0: issue FATAL_ERROR if link dependency contains
+# double-colons but is not an imported target.
+if (POLICY CMP0028)
+  cmake_policy(SET CMP0028 NEW)
+endif ()
 
 enable_testing()
 
@@ -45,48 +54,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 # - Standard definitions -
-set(rc_genicam_api_COMPILE_CXX_OPTIONS)
-list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS -Wall)
-if (CMAKE_MAJOR_VERSION VERSION_LESS "3.1.0")
-list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS -std=c++11)
-else ()
-  set(CMAKE_CXX_STANDARD 11)
-endif ()
-
-if (CMAKE_COMPILER_IS_GNUCC)
-  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS -Wno-unknown-pragmas)
-endif ()
-
-# In case of Visual Studio, enable exporting all symbols and disable some
-# warnings
-
+set(CMAKE_CXX_STANDARD 11)
 if (WIN32)
-  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS /DGENICAM_NO_AUTO_IMPLIB)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-endif ()
-
-if (MSVC)
-  list(APPEND rc_genicam_api_COMPILE_CXX_OPTIONS "/wd4003"
-  "/wd4514"
-  "/wd4710"
-  "/wd4820"
-  "/wd4435"
-  "/wd4668"
-  "/wd4127"
-  "/wd4265"
-  "/wd4996"
-  "/wd4437"
-  "/wd4571"
-  "/wd4355"
-  "/wd4061"
-  "/wd4800"
-  "/wd4711"
-  "/wd4774"
-  "/wd4625"
-  "/wd4626"
-  "/wd5026"
-  "/wd5027"
-  "/wd5039")
 endif ()
 
 # - Options -
@@ -98,6 +68,14 @@ option(INSTALL_COMPLETION "Install bash completion" OFF)
 
 # - Build individual parts -
 find_package(Genicam REQUIRED NO_CMAKE_PATH PATHS ${CMAKE_CURRENT_SOURCE_DIR}/genicam CONFIG NO_DEFAULT_PATH)
+add_library(${PROJECT_NAMESPACE}::genicam ALIAS genicam)
+install(TARGETS genicam
+    EXPORT PROJECTTargets
+    COMPONENT bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 add_subdirectory(baumer)
 add_subdirectory(genicam)
 

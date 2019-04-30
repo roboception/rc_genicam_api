@@ -70,10 +70,10 @@ GenTLException::GenTLException(const std::string &msg,
   }
 }
 
-GenTLException::~GenTLException() throw()
+GenTLException::~GenTLException()
 { }
 
-const char *GenTLException::what() const throw()
+const char *GenTLException::what() const noexcept
 {
   return s.c_str();
 }

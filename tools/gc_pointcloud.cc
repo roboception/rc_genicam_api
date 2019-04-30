@@ -52,7 +52,7 @@
 #include <cmath>
 #include <algorithm>
 
-#ifdef WIN32
+#ifdef _WIN32
 #undef min
 #undef max
 #endif
