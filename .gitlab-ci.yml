@@ -80,7 +80,7 @@ variables:
 #### Jobs ####
 ##############
 gen_dox:
-  <<: *amd64_trusty_job
+  <<: *amd64_bionic_job
   variables:
     TESTING_DEBS: "true"
   stage: deploy
