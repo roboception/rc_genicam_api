@@ -55,8 +55,8 @@ class GenTLException : public std::exception
     GenTLException(const std::string &msg);
     GenTLException(const std::string &msg, const std::shared_ptr<const GenTLWrapper> &gentl);
 
-    virtual ~GenTLException() throw();
-    virtual const char *what() const throw();
+    virtual ~GenTLException();
+    virtual const char *what() const noexcept;
 };
 
 }

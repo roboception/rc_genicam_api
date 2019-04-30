@@ -157,7 +157,6 @@ set(abiversion "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}")
 # To use it within your library or tests you need to add the include directory:
 # > target_include_directories(yourtarget PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
 if (EXISTS "${PROJECT_SOURCE_DIR}/cmake/project_version.h.in")
-    string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
     configure_file(cmake/project_version.h.in  ${PROJECT_NAME}/project_version.h @ONLY)
     configure_file(cmake/project_version.cc.in ${PROJECT_NAME}/project_version.cc @ONLY)
 endif ()

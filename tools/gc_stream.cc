@@ -55,7 +55,7 @@
 #include <thread>
 #include <chrono>
 
-#ifdef WIN32
+#ifdef _WIN32
 #undef min
 #undef max
 #endif
@@ -137,7 +137,7 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
   if (chunkadapter)
   {
     // Append out1 and out2 status to file name: _<out1>_<out2>
-    int line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
+    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
     bool out1 = line_status & 0x01;
     bool out2 = line_status & 0x02;
     name << "_" << std::noboolalpha << out1 << "_" << out2;
@@ -341,7 +341,7 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
       name << "_Disparity";
 
       // Append out1 and out2 status to file name: _<out1>_<out2>
-      int line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
+      std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
       bool out1 = line_status & 0x01;
       bool out2 = line_status & 0x02;
       name << "_" << std::noboolalpha << out1 << "_" << out2;
@@ -446,7 +446,7 @@ void interruptHandler(int)
   user_interrupt=true;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 void checkUserInterrupt()
 {
@@ -564,7 +564,7 @@ int main(int argc, char *argv[])
 
         if (stream.size() > 0)
         {
-#ifdef WIN32
+#ifdef _WIN32
           // start background thread for checking user input
           std::thread thread_cui(checkUserInterrupt);
           thread_cui.detach();
@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
 
           std::cout << "Package size: " << rcg::getString(nodemap, "GevSCPSPacketSize") << std::endl;
 
-#ifdef WIN32
+#ifdef _WIN32
           std::cout << "Press 'Enter' to abort grabbing." << std::endl;
 #endif
           std::cout << std::endl;
@@ -752,7 +752,7 @@ int main(int argc, char *argv[])
       std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
       std::cout << "n=<n>          Optional number of images to be received (default is 1)" << std::endl;
       std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
-#ifdef WIN32
+#ifdef _WIN32
       std::cout << std::endl;
       std::cout << "Streaming can be aborted by hitting the 'Enter' key." << std::endl;
 #endif

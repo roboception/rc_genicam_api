@@ -98,14 +98,6 @@ gen_dox:
 
 # Test (on every commit)
 ########################
-test:trusty:amd64:
-  <<: *amd64_trusty_job
-  extends: .test
-
-test:trusty:armhf:
-  <<: *armhf_trusty_job
-  extends: .test
-
 test:xenial:amd64:
   <<: *amd64_xenial_job
   extends: .test
@@ -120,14 +112,6 @@ test:bionic:amd64:
 
 # Deploy testing (only on master)
 #################################
-package_testing:trusty:amd64:
-  <<: *amd64_trusty_job
-  extends: .package_testing
-
-package_testing:trusty:armhf:
-  <<: *armhf_trusty_job
-  extends: .package_testing
-
 package_testing:xenial:amd64:
   <<: *amd64_xenial_job
   extends: .package_testing
@@ -142,14 +126,6 @@ package_testing:bionic:amd64:
 
 # Deploy stable (only for releases, version tags)
 #################################################
-package_stable:trusty:amd64:
-  <<: *amd64_trusty_job
-  extends: .package_stable
-
-package_stable:trusty:armhf:
-  <<: *armhf_trusty_job
-  extends: .package_stable
-
 package_stable:xenial:amd64:
   <<: *amd64_xenial_job
   extends: .package_stable

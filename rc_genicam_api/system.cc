@@ -42,7 +42,7 @@
 
 #include <iostream>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <cstring>
 #undef min
@@ -140,7 +140,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
   if (path.size() == 0)
   {
-#ifdef WIN32
+#ifdef _WIN32
     // under Windows, use the path to the current executable as fallback
 
     const size_t n=256;

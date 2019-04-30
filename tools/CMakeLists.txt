@@ -36,24 +36,59 @@ project(tools CXX)
 # build programs
 
 add_executable(gc_info gc_info.cc)
-target_link_libraries(gc_info rc_genicam_api_static)
+target_link_libraries(gc_info
+  PRIVATE
+      ${PROJECT_NAMESPACE}::rc_genicam_api_static)
+target_compile_options(gc_info PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 add_executable(gc_config gc_config.cc)
-target_link_libraries(gc_config rc_genicam_api_static)
+target_link_libraries(gc_config
+  PRIVATE
+    ${PROJECT_NAMESPACE}::rc_genicam_api_static)
+target_compile_options(gc_config PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 add_executable(gc_stream gc_stream.cc)
-target_link_libraries(gc_stream rc_genicam_api_static)
+target_link_libraries(gc_stream
+  PRIVATE
+    ${PROJECT_NAMESPACE}::rc_genicam_api_static)
+target_compile_options(gc_stream PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 if (UNIX)
-  target_link_libraries(gc_stream pthread)
+  find_package(Threads REQUIRED)
+  target_link_libraries(gc_stream
+    PRIVATE
+      ${CMAKE_THREAD_LIBS_INIT})
 endif ()
 
 add_executable(gc_pointcloud gc_pointcloud.cc)
-target_link_libraries(gc_pointcloud rc_genicam_api_static)
+target_link_libraries(gc_pointcloud
+  PRIVATE
+    ${PROJECT_NAMESPACE}::rc_genicam_api_static)
+target_compile_options(gc_pointcloud PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 # install tools
 
-install(TARGETS gc_info COMPONENT bin DESTINATION bin)
-install(TARGETS gc_config COMPONENT bin DESTINATION bin)
-install(TARGETS gc_stream COMPONENT bin DESTINATION bin)
-install(TARGETS gc_pointcloud COMPONENT bin DESTINATION bin)
+install(TARGETS gc_info
+    EXPORT PROJECTTargets
+    COMPONENT bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS gc_config
+    EXPORT PROJECTTargets
+    COMPONENT bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS gc_stream
+    EXPORT PROJECTTargets
+    COMPONENT bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS gc_pointcloud
+    EXPORT PROJECTTargets
+    COMPONENT bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
