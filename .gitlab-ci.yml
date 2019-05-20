@@ -54,7 +54,11 @@ variables:
   stage: deploy
   script:
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON ..
+    - if [ -n "$ROS_DISTRO" ]; then
+        cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/$ROS_DISTRO" -DCMAKE_PREFIX_PATH="/opt/ros/$ROS_DISTRO" -DCMAKE_BUILD_TYPE=Release .. ;
+      else
+        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON .. ;
+      fi
     - make -j 4
     - make package
     - if [ -z "$APT_REPO" ]; then export APT_REPO=testing; fi
@@ -137,4 +141,22 @@ package_stable:xenial:armhf:
 
 package_stable:bionic:amd64:
   <<: *amd64_bionic_job
+  extends: .package_stable
+
+########################
+# package as ROS package
+########################
+
+ros_testing:melodic:amd64:
+  image: ros:melodic-perception
+  tags:
+    - amd64
+    - docker
+  extends: .package_testing
+
+ros_stable:melodic:amd64:
+  image: ros:melodic-perception
+  tags:
+    - amd64
+    - docker
   extends: .package_stable
