@@ -159,7 +159,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
     // update available interfaces
 
-    if (gentl->IFUpdateDeviceList(ifh, 0, 10) != GenTL::GC_ERR_SUCCESS)
+    if (gentl->IFUpdateDeviceList(ifh, 0, 100) != GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("Interface::getDevices()", gentl);
     }
