@@ -574,6 +574,22 @@ int main(int argc, char *argv[])
           }
         }
 
+        // disable component Intensity if component IntensityCombined is enabled
+
+        if (rcg::setEnum(nodemap, "ComponentSelector", "IntensityCombined", false) &&
+            rcg::getBoolean(nodemap, "ComponentEnable", true, true))
+        {
+          if (rcg::setEnum(nodemap, "ComponentSelector", "Intensity", false) &&
+              rcg::getBoolean(nodemap, "ComponentEnable", true, true))
+          {
+            rcg::setBoolean(nodemap, "ComponentEnable", false, true);
+
+            std::cout << std::endl;
+            std::cout << "NOTE: Disabling component 'Intensity' as 'IntensityCombined' is enabled."
+                      << std::endl;
+          }
+        }
+
         // print enabled streams
 
         {
