@@ -118,7 +118,8 @@ std::string ensureNewName(std::string name)
 
 std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                         const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
-                        const std::string &component, const rcg::Buffer *buffer, uint32_t part)
+                        const std::string &component, const rcg::Buffer *buffer, uint32_t part,
+                        size_t yoffset=0, size_t height=0)
 {
   // prepare file name
 
@@ -148,7 +149,13 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part))
   {
     size_t width=buffer->getWidth(part);
-    size_t height=buffer->getHeight(part);
+    size_t real_height=buffer->getHeight(part);
+
+    if (height == 0) height=real_height;
+
+    yoffset=std::min(yoffset, real_height);
+    height=std::min(height, real_height-yoffset);
+
     const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(part));
 
     size_t px=buffer->getXPadding(part);
@@ -169,6 +176,7 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
           std::streambuf *sb=out.rdbuf();
 
+          p+=(width+px)*yoffset;
           for (size_t k=0; k<height && out.good(); k++)
           {
             for (size_t i=0; i<width; i++)
@@ -196,6 +204,7 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
           // copy image data, pgm is always big endian
 
+          p+=(2*width+px)*yoffset;
           if (buffer->isBigEndian())
           {
             for (size_t k=0; k<height && out.good(); k++)
@@ -240,6 +249,7 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
           std::streambuf *sb=out.rdbuf();
 
           size_t pstep=(width>>2)*6+px;
+          p+=pstep*yoffset;
           for (size_t k=0; k<height && out.good(); k++)
           {
             for (size_t i=0; i<width; i+=4)
@@ -419,7 +429,8 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
 void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                     const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
-                    const std::string &component, const rcg::Buffer *buffer)
+                    const std::string &component, const rcg::Buffer *buffer,
+                    size_t height=0)
 {
   if (chunkadapter)
   {
@@ -451,7 +462,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
     rcg::setString(nodemap, "ChunkComponentSelector", component.c_str());
 
     int width=rcg::getInteger(nodemap, "ChunkWidth");
-    int height=rcg::getInteger(nodemap, "ChunkHeight");
+    if (height == 0) height=rcg::getInteger(nodemap, "ChunkHeight");
     double f=rcg::getFloat(nodemap, "ChunkScan3dFocalLength");
     double t=rcg::getFloat(nodemap, "ChunkScan3dBaseline");
     double u=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointU");
@@ -695,17 +706,33 @@ int main(int argc, char *argv[])
 
                         if (name.size() == 0)
                         {
-                          name=storeBuffer(nodemap, chunkadapter, component, buffer, part);
+                          if (component == "IntensityCombined")
+                          {
+                            // splitting left and right image of combined format of
+                            // Roboceptions rc_visard camera
+
+                            size_t h2=buffer->getHeight(part)/2;
+                            name=storeBuffer(nodemap, chunkadapter, "Intensity", buffer, part, 0, h2);
+                            storeBuffer(nodemap, chunkadapter, "IntensityRight", buffer, part, h2, h2);
+                          }
+                          else
+                          {
+                            name=storeBuffer(nodemap, chunkadapter, component, buffer, part);
+                          }
                         }
 
                         // store 3D parameters for intensity and disparity
                         // components (nothing is done if chunk parameters are
                         // not available)
 
-                        if (component == "Intensity" || component == "IntensityCombined" ||
-                            component == "Disparity")
+                        if (component == "Intensity" || component == "Disparity")
                         {
                           storeParameter(nodemap, chunkadapter, component, buffer);
+                        }
+                        else if (component == "IntensityCombined")
+                        {
+                          size_t h2=buffer->getHeight(part)/2;
+                          storeParameter(nodemap, chunkadapter, "Intensity", buffer, h2);
                         }
 
                         // report success
