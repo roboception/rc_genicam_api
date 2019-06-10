@@ -198,6 +198,19 @@ void Stream::startStreaming(int na)
     err=true;
   }
 
+  // lock parameters before streaming starts
+
+  if (!err)
+  {
+    std::shared_ptr<GenApi::CNodeMapRef> nmap=parent->getRemoteNodeMap();
+    GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(nmap->_GetNode("TLParamsLocked"));
+
+    if (GenApi::IsWritable(p))
+    {
+      p->SetValue(1);
+    }
+  }
+
   // start streaming
 
   uint64_t n=GENTL_INFINITE;
@@ -263,6 +276,16 @@ void Stream::stopStreaming()
 
     event=0;
     bn=0;
+
+    // unlock parameters
+
+    std::shared_ptr<GenApi::CNodeMapRef> nmap=parent->getRemoteNodeMap();
+    GenApi::IInteger *pi=dynamic_cast<GenApi::IInteger *>(nmap->_GetNode("TLParamsLocked"));
+
+    if (GenApi::IsWritable(pi))
+    {
+      pi->SetValue(0);
+    }
   }
 }
 
