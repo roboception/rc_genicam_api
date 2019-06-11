@@ -1,3 +1,12 @@
+2.2.1 (2019-06-11)
+------------------
+
+- Automatically splitting the stereo images in rc_visards special combined format into Intenstiy and IntensityRight images
+- Using TLParamsLocked correctly in streaming class as some cameras require this
+- gc_stream now disables component Intensity if IntensityCombined is enabled
+- gc_stream now creates parameter file for each Intensity image as well
+- Increased timeout for updating the device list to 100 ms as 10 ms can be too less for some cameras / producers
+
 2.2.0 (2019-05-02)
 ------------------
 
