@@ -275,10 +275,13 @@ void Stream::stopStreaming()
 
     // free all buffers
 
-    GenTL::BUFFER_HANDLE p=0;
-    while (gentl->DSGetBufferID(stream, 0, &p) == GenTL::GC_ERR_SUCCESS)
+    for (size_t i=0; i<bn; i++)
     {
-      gentl->DSRevokeBuffer(stream, p, 0, 0);
+      GenTL::BUFFER_HANDLE p=0;
+      if (gentl->DSGetBufferID(stream, 0, &p) == GenTL::GC_ERR_SUCCESS)
+      {
+        gentl->DSRevokeBuffer(stream, p, 0, 0);
+      }
     }
 
     event=0;
