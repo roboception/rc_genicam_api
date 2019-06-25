@@ -335,6 +335,11 @@ size_t Buffer::getXPadding(std::uint32_t part) const
 
 size_t Buffer::getYPadding() const
 {
+  if (multipart)
+  {
+    return 0;
+  }
+
   return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_YPADDING);
 }
 
