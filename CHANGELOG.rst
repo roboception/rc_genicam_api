@@ -1,3 +1,10 @@
+2.2.2 (2019-06-25)
+------------------
+
+- Set TLParamsLocked before requesting maximum buffer size
+- Only free as many buffers as allocated to avoid errors off GenTL producer
+- Request global buffer YPadding only for none multipart buffers to avoid errors of GenTL producer
+
 2.2.1 (2019-06-11)
 ------------------
 
