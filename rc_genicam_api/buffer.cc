@@ -88,7 +88,7 @@ inline std::string getBufferString(const std::shared_ptr<const GenTLWrapper> &ge
 
   if (stream != 0 && buffer != 0)
   {
-    if (gentl->DSGetBufferInfo(stream, buffer, cmd, &type, &ret, &size) == GenTL::GC_ERR_SUCCESS)
+    if (gentl->DSGetBufferInfo(stream, buffer, cmd, &type, &tmp, &size) == GenTL::GC_ERR_SUCCESS)
     {
       if (type == GenTL::INFO_DATATYPE_STRING)
       {
