@@ -1,3 +1,9 @@
+2.2.3 (2019-07-25)
+------------------
+
+- Fixed Windows install issues
+- Fixing segfault in Buffer::getTLType()
+
 2.2.2 (2019-06-25)
 ------------------
 
