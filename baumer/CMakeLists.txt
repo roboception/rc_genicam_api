@@ -64,17 +64,17 @@ elseif ("${ARCHITECTURE}" STREQUAL "WIN32_i86")
       bsysgige.xml
       bsysusb.xml
     COMPONENT bin
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/rc_genicam_api
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
   )
 elseif ("${ARCHITECTURE}" STREQUAL "WIN64_x64")
   install(
     FILES
-      Win32_x64/bgapi2_gige.cti
-      Win32_x64/bgapi2_usb.cti
+      Win64_x64/bgapi2_gige.cti
+      Win64_x64/bgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
     COMPONENT bin
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/rc_genicam_api
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
   )
 else ()
   message(FATAL_ERROR "Unknown architecture")
