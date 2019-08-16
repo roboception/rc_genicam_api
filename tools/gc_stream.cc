@@ -539,10 +539,11 @@ int main(int argc, char *argv[])
     {
       // find specific device accross all systems and interfaces and open it
 
-      std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i++]);
+      std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i]);
 
       if (dev)
       {
+        i++;
         dev->open(rcg::Device::CONTROL);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
@@ -826,7 +827,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+        std::cerr << "Device '" << argv[i] << "' not found!" << std::endl;
         ret=1;
       }
     }

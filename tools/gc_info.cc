@@ -445,15 +445,15 @@ int main(int argc, char *argv[])
             {
               // report all features
 
-              std::cout << "Device:        " << dev->getID() << std::endl;
-              std::cout << "Vendor:        " << dev->getVendor() << std::endl;
-              std::cout << "Model:         " << dev->getModel() << std::endl;
-              std::cout << "TL type:       " << dev->getTLType() << std::endl;
-              std::cout << "Display name:  " << dev->getDisplayName() << std::endl;
-              std::cout << "User name:     " << dev->getUserDefinedName() << std::endl;
-              std::cout << "Serial number: " << dev->getSerialNumber() << std::endl;
-              std::cout << "Version:       " << dev->getVersion() << std::endl;
-              std::cout << "TS Frequency:  " << dev->getTimestampFrequency() << std::endl;
+              std::cout << "Device:            " << dev->getID() << std::endl;
+              std::cout << "Vendor:            " << dev->getVendor() << std::endl;
+              std::cout << "Model:             " << dev->getModel() << std::endl;
+              std::cout << "TL type:           " << dev->getTLType() << std::endl;
+              std::cout << "Display name:      " << dev->getDisplayName() << std::endl;
+              std::cout << "User defined name: " << dev->getUserDefinedName() << std::endl;
+              std::cout << "Serial number:     " << dev->getSerialNumber() << std::endl;
+              std::cout << "Version:           " << dev->getVersion() << std::endl;
+              std::cout << "TS Frequency:      " << dev->getTimestampFrequency() << std::endl;
               std::cout << std::endl;
 
               std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
