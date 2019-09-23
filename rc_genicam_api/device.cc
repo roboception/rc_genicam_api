@@ -468,6 +468,7 @@ std::vector<std::shared_ptr<Device> > getDevices()
 
 std::shared_ptr<Device> getDevice(const char *id)
 {
+  int found=0;
   std::shared_ptr<Device> ret;
 
   if (id != 0 && *id != '\0')
@@ -488,7 +489,7 @@ std::shared_ptr<Device> getDevice(const char *id)
 
     std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
 
-    for (size_t i=0; i<system.size() && !ret; i++)
+    for (size_t i=0; i<system.size(); i++)
     {
       system[i]->open();
 
@@ -500,12 +501,20 @@ std::shared_ptr<Device> getDevice(const char *id)
       {
         // if an interface is defined, then only search this interface
 
-        for (size_t k=0; k<interf.size() && !ret; k++)
+        for (size_t k=0; k<interf.size(); k++)
         {
           if (interf[k]->getID() == interfid)
           {
             interf[k]->open();
-            ret=interf[k]->getDevice(devid.c_str());
+
+            std::shared_ptr<Device> dev=interf[k]->getDevice(devid.c_str());
+
+            if (dev)
+            {
+              ret=dev;
+              found++;
+            }
+
             interf[k]->close();
           }
         }
@@ -514,10 +523,18 @@ std::shared_ptr<Device> getDevice(const char *id)
       {
         // if interface is not defined, then check all interfaces
 
-        for (size_t k=0; k<interf.size() && !ret; k++)
+        for (size_t k=0; k<interf.size(); k++)
         {
           interf[k]->open();
-          ret=interf[k]->getDevice(devid.c_str());
+
+          std::shared_ptr<Device> dev=interf[k]->getDevice(devid.c_str());
+
+          if (dev)
+          {
+            ret=dev;
+            found++;
+          }
+
           interf[k]->close();
         }
       }
@@ -525,6 +542,14 @@ std::shared_ptr<Device> getDevice(const char *id)
       system[i]->close();
     }
   }
+
+  if (found > 1)
+  {
+    std::cerr << "Finding device '" << id << "' through different interfaces or producers."
+              << std::endl;
+    ret.reset();
+  }
+
 
   return ret;
 }
