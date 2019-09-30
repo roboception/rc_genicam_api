@@ -523,11 +523,12 @@ std::shared_ptr<Device> getDevice(const char *id)
       {
         // if interface is not defined, then check all interfaces
 
-        for (size_t k=0; k<interf.size(); k++)
+        std::shared_ptr<Device> dev;
+        for (size_t k=0; k<interf.size() && !dev; k++)
         {
           interf[k]->open();
 
-          std::shared_ptr<Device> dev=interf[k]->getDevice(devid.c_str());
+          dev=interf[k]->getDevice(devid.c_str());
 
           if (dev)
           {
@@ -545,11 +546,10 @@ std::shared_ptr<Device> getDevice(const char *id)
 
   if (found > 1)
   {
-    std::cerr << "Finding device '" << id << "' through different interfaces or producers."
+    std::cerr << "ERROR: Finding device '" << id << "' through different producers."
               << std::endl;
     ret.reset();
   }
-
 
   return ret;
 }
