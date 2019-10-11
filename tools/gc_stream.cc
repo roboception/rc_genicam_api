@@ -191,6 +191,7 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
         }
         break;
 
+      case Mono16:
       case Coord3D_C16: // store 16 bit monochrome image
         {
           name << ".pgm";
