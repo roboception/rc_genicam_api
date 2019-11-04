@@ -171,7 +171,7 @@ MTU() {
     echo -en $XSOS_HEADING_SEPARATOR >&2
     return
   fi
-  mtu=$(ifconfig $iface | grep 'MTU:' | cut -d: -f2 | awk '{ print $1}')
+  mtu=$(cat /sys/class/net/$iface/mtu)
 
   echo -e "${c[H1]}MTU${c[0]}"
   if [[ $mtu -lt 8000 ]]; then
@@ -208,7 +208,7 @@ RMEM_MAX () {
 SOFTIRQ() {
   # Local vars:
   local softirq_input_file suffix= backlog= budget=
-  
+
   softirq_input_file=/proc/net/softnet_stat
   if [[ ! -r $softirq_input_file ]]; then
       echo -e "${c[Warn2]}Warning:${c[Warn1]} '/proc/net/softnet_stat' unreadable; skipping softirq check${c[0]}" >&2
@@ -221,18 +221,18 @@ SOFTIRQ() {
   budget=$(cat /proc/sys/net/core/netdev_budget 2>/dev/null) \
       && budget=" (Current value: net.core.netdev_budget = $budget)" \
       || budget=" (However, proc/sys/net/core/netdev_budget is missing)"
-  
+
   echo -e "${c[H1]}SOFTIRQ${c[0]}"
-  
+
   gawk '{if (strtonum("0x" $2) > 0) exit 177}' "$softirq_input_file"
-  
+
   if [[ $? -eq 177 ]]; then
     echo -e "${XSOS_INDENT_H1}${c[Warn1]}Backlog max has been reached, consider reviewing backlog tunable.${c[0]}$backlog"
   else
     echo -e "${XSOS_INDENT_H1}Backlog max is sufficient${c[0]}$backlog"
   fi
-  
-  
+
+
   gawk '{if (strtonum("0x" $3) > 0) exit 177}' "$softirq_input_file"
   if [[ $? -eq 177 ]]; then
     echo -e "${XSOS_INDENT_H1}${c[Warn1]}Budget is not sufficient, consider reviewing budget tunable.${c[0]}$budget"
