@@ -44,6 +44,7 @@ set(src
   config.cc
   image.cc
   imagelist.cc
+  image_store.cc
   pointcloud.cc
   ${CMAKE_CURRENT_BINARY_DIR}/project_version.cc
   $<$<PLATFORM_ID:Linux>:gentl_wrapper_linux.cc>
@@ -59,6 +60,7 @@ set(hh
   config.h
   image.h
   imagelist.h
+  image_store.h
   pointcloud.h
   pixel_formats.h
   ${CMAKE_CURRENT_BINARY_DIR}/project_version.h)

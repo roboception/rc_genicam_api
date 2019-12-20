@@ -1,7 +1,7 @@
 /*
  * This file is part of the rc_genicam_api package.
  *
- * Copyright (c) 2017 Roboception GmbH
+ * Copyright (c) 2017-2019 Roboception GmbH
  * All rights reserved
  *
  * Author: Heiko Hirschmueller
@@ -39,6 +39,7 @@
 #include <rc_genicam_api/stream.h>
 #include <rc_genicam_api/buffer.h>
 #include <rc_genicam_api/image.h>
+#include <rc_genicam_api/image_store.h>
 #include <rc_genicam_api/config.h>
 
 #include <rc_genicam_api/pixel_formats.h>
@@ -63,60 +64,35 @@
 namespace
 {
 
-/**
-  This method checks if the given file name already exists and produces a new
-  file name if this happens.
-*/
-
-std::string ensureNewName(std::string name)
+void printHelp()
 {
-  // check if given name is already used
+  // show help
 
-  std::ifstream file(name);
-
-  if (file.is_open())
-  {
-    file.close();
-
-    // split name in prefix and suffix
-
-    std::string suffix;
-
-    size_t i=name.rfind('.');
-    if (i != name.npos && name.size()-i <= 4)
-    {
-      suffix=name.substr(i);
-      name=name.substr(0, i);
-    }
-
-    // add number for finding name that is nor used
-
-    int n=1;
-    while (n < 100)
-    {
-      std::ostringstream s;
-      s << name << "_" << n << suffix;
-
-      file.open(s.str());
-      if (!file.is_open())
-      {
-        name=s.str();
-        break;
-      }
-
-      file.close();
-      n++;
-    }
-  }
-
-  return name;
+  std::cout << "gc_stream -h | [-f <fmt>] [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
+  std::cout << std::endl;
+  std::cout << "Stores images from the specified device after applying the given optional GenICam parameters." << std::endl;
+  std::cout << std::endl;
+  std::cout << "Options:" << std::endl;
+  std::cout << "-h         Prints help information and exits" << std::endl;
+  std::cout << "-t         Testmode, which does not store images and provides extended statistics" << std::endl;
+  std::cout << "-f pnm     Format for storing images. Default is pnm" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Parameters:" << std::endl;
+  std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
+  std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
+  std::cout << "n=<n>          Optional number of images to be received (default is 1)" << std::endl;
+  std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
+#ifdef _WIN32
+  std::cout << std::endl;
+  std::cout << "Streaming can be aborted by hitting the 'Enter' key." << std::endl;
+#endif
 }
 
 /**
-  Store image given in buffer in PGM or PPM format.
+  Store image in given buffer.
 */
 
-std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                         const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                         const std::string &component, const rcg::Buffer *buffer, uint32_t part,
                         size_t yoffset=0, size_t height=0)
@@ -148,136 +124,8 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part))
   {
-    size_t width=buffer->getWidth(part);
-    size_t real_height=buffer->getHeight(part);
-
-    if (height == 0) height=real_height;
-
-    yoffset=std::min(yoffset, real_height);
-    height=std::min(height, real_height-yoffset);
-
-    const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(part));
-
-    size_t px=buffer->getXPadding(part);
-
-    uint64_t format=buffer->getPixelFormat(part);
-    switch (format)
-    {
-      case Mono8: // store 8 bit monochrome image
-      case Confidence8:
-      case Error8:
-        {
-          name << ".pgm";
-          std::ofstream out(ensureNewName(name.str()), std::ios::binary);
-
-          out << "P5" << std::endl;
-          out << width << " " << height << std::endl;
-          out << 255 << "\n";
-
-          std::streambuf *sb=out.rdbuf();
-
-          p+=(width+px)*yoffset;
-          for (size_t k=0; k<height && out.good(); k++)
-          {
-            for (size_t i=0; i<width; i++)
-            {
-              sb->sputc(static_cast<char>(*p++));
-            }
-
-            p+=px;
-          }
-
-          out.close();
-        }
-        break;
-
-      case Mono16:
-      case Coord3D_C16: // store 16 bit monochrome image
-        {
-          name << ".pgm";
-          std::ofstream out(ensureNewName(name.str()), std::ios::binary);
-
-          out << "P5" << std::endl;
-          out << width << " " << height << std::endl;
-          out << 65535 << "\n";
-
-          std::streambuf *sb=out.rdbuf();
-
-          // copy image data, pgm is always big endian
-
-          p+=(2*width+px)*yoffset;
-          if (buffer->isBigEndian())
-          {
-            for (size_t k=0; k<height && out.good(); k++)
-            {
-              for (size_t i=0; i<width; i++)
-              {
-                sb->sputc(static_cast<char>(*p++));
-                sb->sputc(static_cast<char>(*p++));
-              }
-
-              p+=px;
-            }
-          }
-          else
-          {
-            for (size_t k=0; k<height && out.good(); k++)
-            {
-              for (size_t i=0; i<width; i++)
-              {
-                sb->sputc(static_cast<char>(p[1]));
-                sb->sputc(static_cast<char>(p[0]));
-                p+=2;
-              }
-
-              p+=px;
-            }
-          }
-
-          out.close();
-        }
-        break;
-
-      case YCbCr411_8: // convert and store as color image
-        {
-          name << ".ppm";
-          std::ofstream out(ensureNewName(name.str()), std::ios::binary);
-
-          out << "P6" << std::endl;
-          out << width << " " << height << std::endl;
-          out << 255 << "\n";
-
-          std::streambuf *sb=out.rdbuf();
-
-          size_t pstep=(width>>2)*6+px;
-          p+=pstep*yoffset;
-          for (size_t k=0; k<height && out.good(); k++)
-          {
-            for (size_t i=0; i<width; i+=4)
-            {
-              uint8_t rgb[12];
-              rcg::convYCbCr411toQuadRGB(rgb, p, static_cast<int>(i));
-
-              for (int j=0; j<12; j++)
-              {
-                sb->sputc(static_cast<char>(rgb[j]));
-              }
-            }
-
-            p+=pstep;
-          }
-
-          out.close();
-        }
-        break;
-
-      default:
-        std::cerr << "storeBuffer(): Unknown pixel format: "
-                  << GetPixelFormatName(static_cast<PfncFormat>(buffer->getPixelFormat(part)))
-                  << std::endl;
-        return std::string();
-        break;
-    }
+    rcg::Image image(buffer, part);
+    storeImage(name.str(), fmt, image, yoffset, height);
   }
   else if (buffer->getIsIncomplete())
   {
@@ -301,14 +149,15 @@ std::string storeBuffer(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
   disparity image returned.
 */
 
-std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+std::string storeBufferAsDisparity(rcg::ImgFmt fmt,
+                                   const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                                    const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                                    const rcg::Buffer *buffer, uint32_t part)
 {
   std::string dispname;
 
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part) &&
-      buffer->getPixelFormat(part) == Coord3D_C16 && chunkadapter)
+      buffer->getPixelFormat(part) == Coord3D_C16)
   {
     // get necessary information from ChunkScan3d parameters
 
@@ -324,101 +173,42 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
     double scale=rcg::getFloat(nodemap, "ChunkScan3dCoordinateScale");
     double offset=rcg::getFloat(nodemap, "ChunkScan3dCoordinateOffset");
 
-    // proceed if required information is given
+    // prepare file name
 
-    if (scale > 0)
+    std::ostringstream name;
+
+    uint64_t t_sec = buffer->getTimestampNS()/1000000000;
+    uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
+
+    name << "image_" << t_sec << "." << std::setfill('0') << std::setw(9) << t_nsec;
+    name << "_Disparity";
+
+    // Append out1 and out2 status to file name: _<out1>_<out2>
+
+    if (chunkadapter)
     {
-      // prepare file name
-
-      std::ostringstream name;
-
-      uint64_t t_sec = buffer->getTimestampNS()/1000000000;
-      uint64_t t_nsec = buffer->getTimestampNS()%1000000000;
-
-      name << "image_" << t_sec << "." << std::setfill('0') << std::setw(9) << t_nsec;
-
-      // convert values and store disparity image
-
-      size_t px=buffer->getXPadding(part);
-      size_t width=buffer->getWidth(part);
-      size_t height=buffer->getHeight(part);
-      const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(part))+
-                             2*(width+px)*(height+1);
-
-      name << "_Disparity";
-
-      // Append out1 and out2 status to file name: _<out1>_<out2>
       std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
       bool out1 = line_status & 0x01;
       bool out2 = line_status & 0x02;
       name << "_" << std::noboolalpha << out1 << "_" << out2;
-
-      dispname=name.str()+".pfm";
-
-      std::ofstream out(ensureNewName(dispname), std::ios::binary);
-
-      out << "Pf" << std::endl;
-      out << width << " " << height << std::endl;
-      out << 1 << "\n";
-
-      std::streambuf *sb=out.rdbuf();
-
-      // get 16 bit data, scale and add offset and store as big endian
-
-      bool msbfirst=true;
-
-      {
-        int pp=1;
-        char *cc=reinterpret_cast<char *>(&pp);
-        msbfirst=(cc[0] != 1);
-      }
-
-      for (size_t k=0; k<height && out.good(); k++)
-      {
-        p-=(width+px)<<2;
-        for (size_t i=0; i<width; i++)
-        {
-          int val;
-          if (buffer->isBigEndian())
-          {
-            val=(static_cast<int>(p[0])<<8)|p[1];
-          }
-          else
-          {
-            val=(static_cast<int>(p[1])<<8)|p[0];
-          }
-
-          p+=2;
-
-          float d=std::numeric_limits<float>::infinity();
-          if (val != inv)
-          {
-            d=static_cast<float>(val*scale+offset);
-          }
-
-          char *c=reinterpret_cast<char *>(&d);
-
-          if (msbfirst)
-          {
-            sb->sputc(c[0]);
-            sb->sputc(c[1]);
-            sb->sputc(c[2]);
-            sb->sputc(c[3]);
-          }
-          else
-          {
-            sb->sputc(c[3]);
-            sb->sputc(c[2]);
-            sb->sputc(c[1]);
-            sb->sputc(c[0]);
-          }
-
-          p+=px;
-        }
-      }
-
-      out.close();
     }
+
+    // store image
+
+    rcg::Image image(buffer, part);
+    storeImageAsDisparity(name.str(), fmt, image, inv, scale, offset);
+
+    dispname=name.str();
+  }
+  else if (buffer->getIsIncomplete())
+  {
+    std::cerr << "storeBuffer(): Received incomplete buffer" << std::endl;
+    return std::string();
+  }
+  else if (!buffer->getImagePresent(part))
+  {
+    std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
+    return std::string();
   }
 
   return dispname;
@@ -475,7 +265,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
     if (width > 0 && height > 0 && f > 0 && t > 0)
     {
-      std::ofstream out(ensureNewName(name.str()));
+      std::ofstream out(rcg::ensureNewFileName(name.str()));
 
       out << "# Created by gc_stream" << std::endl;
       out << std::fixed << std::setprecision(5);
@@ -529,18 +319,54 @@ int main(int argc, char *argv[])
   try
   {
     bool store=true;
+    rcg::ImgFmt fmt=rcg::PNM;
     int i=1;
 
-    if (i < argc)
+    // get parameters
+
+    while (i < argc && argv[i][0] == '-')
     {
-      if (std::string(argv[i]) == "-t")
+      std::string param=argv[i];
+
+      if (param == "-h")
+      {
+        printHelp();
+        return 0;
+      }
+      else if (param == "-t")
       {
         store=false;
         i++;
       }
+      else if (param == "-f")
+      {
+        i++;
+
+        if (i < argc)
+        {
+          std::string imgfmt=argv[i];
+          if (imgfmt == "pnm")
+          {
+            fmt=rcg::PNM;
+            i++;
+          }
+          else
+          {
+            throw std::invalid_argument(std::string("Invalid argument of '-f': ")+argv[i]);
+          }
+        }
+        else
+        {
+          throw std::invalid_argument("Argument expected after '-f'!");
+        }
+      }
+      else
+      {
+        throw std::invalid_argument("Unknown parameter: "+param);
+      }
     }
 
-    if (i < argc && std::string(argv[i]) != "-h")
+    if (i < argc)
     {
       // find specific device accross all systems and interfaces and open it
 
@@ -705,7 +531,7 @@ int main(int argc, char *argv[])
 
                         if (component == "Disparity")
                         {
-                          name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
+                          name=storeBufferAsDisparity(fmt, nodemap, chunkadapter, buffer, part);
                         }
 
                         // otherwise, store as ordinary image
@@ -718,12 +544,12 @@ int main(int argc, char *argv[])
                             // Roboceptions rc_visard camera
 
                             size_t h2=buffer->getHeight(part)/2;
-                            name=storeBuffer(nodemap, chunkadapter, "Intensity", buffer, part, 0, h2);
-                            storeBuffer(nodemap, chunkadapter, "IntensityRight", buffer, part, h2, h2);
+                            name=storeBuffer(fmt, nodemap, chunkadapter, "Intensity", buffer, part, 0, h2);
+                            storeBuffer(fmt, nodemap, chunkadapter, "IntensityRight", buffer, part, h2, h2);
                           }
                           else
                           {
-                            name=storeBuffer(nodemap, chunkadapter, component, buffer, part);
+                            name=storeBuffer(fmt, nodemap, chunkadapter, component, buffer, part);
                           }
                         }
 
@@ -838,25 +664,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      // show help
-
-      std::cout << argv[0] << " -h | [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
-      std::cout << std::endl;
-      std::cout << "Stores images from the specified device after applying the given optional GenICam parameters." << std::endl;
-      std::cout << std::endl;
-      std::cout << "Options:" << std::endl;
-      std::cout << "-h   Prints help information and exits" << std::endl;
-      std::cout << "-t   Testmode, which does not store images and provides extended statistics" << std::endl;
-      std::cout << std::endl;
-      std::cout << "Parameters:" << std::endl;
-      std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
-      std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
-      std::cout << "n=<n>          Optional number of images to be received (default is 1)" << std::endl;
-      std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
-#ifdef _WIN32
-      std::cout << std::endl;
-      std::cout << "Streaming can be aborted by hitting the 'Enter' key." << std::endl;
-#endif
+      printHelp();
       ret=1;
     }
   }
