@@ -235,9 +235,31 @@ void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoff
   }
 }
 
+}
+
+void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
+  size_t yoffset, size_t height)
+{
+  if (fmt == PNM)
+  {
+    storeImagePNM(name, image, yoffset, height);
+  }
+}
+
 void storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, int inv,
   float scale, float offset)
 {
+  if (image.getPixelFormat() != Coord3D_C16)
+  {
+    throw IOException(std::string("storeImageAsDisparityPFM(): Format Coord3D_C16 expected: ")+
+      GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
+  }
+
+  if (scale == 0)
+  {
+    throw IOException(std::string("storeImageAsDisparityPFM(): Scale must not be 0!"));
+  }
+
   // convert values and store disparity image
 
   size_t px=image.getXPadding();
@@ -309,30 +331,6 @@ void storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, 
   }
 
   out.close();
-}
-
-}
-
-void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
-  size_t yoffset, size_t height)
-{
-  if (fmt == PNM)
-  {
-    storeImagePNM(name, image, yoffset, height);
-  }
-}
-
-void storeImageAsDisparity(const std::string &name, ImgFmt fmt, const rcg::Image &image,
-  int inv, float scale, float offset)
-{
-  if (fmt == PNM && scale > 0)
-  {
-    storeImageAsDisparityPFM(name, image, inv, scale, offset);
-  }
-  else
-  {
-    storeImage(name, fmt, image, 0, 0);
-  }
 }
 
 }

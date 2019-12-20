@@ -77,13 +77,13 @@ void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
   @param name   Name of output file without suffix.
   @param fmt    Image file format.
   @param image  Image to be stored.
-  @param inv    Value to mark invalid pixels. Only used if fmt == PNM.
-  @param scale  Scale factor for valid values. Only used if fmt == PNM.
-  @param offset Offset for valid values. Only used if fmt == PNM.
+  @param inv    Value to mark invalid pixels.
+  @param scale  Scale factor for valid values.
+  @param offset Offset for valid values.
 */
 
-void storeImageAsDisparity(const std::string &name, ImgFmt fmt, const rcg::Image &image,
-  int inv=-1, float scale=0, float offset=0);
+void storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image,
+  int inv, float scale, float offset);
 
 }
 

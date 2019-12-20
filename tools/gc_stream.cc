@@ -157,7 +157,7 @@ std::string storeBufferAsDisparity(rcg::ImgFmt fmt,
   std::string dispname;
 
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part) &&
-      buffer->getPixelFormat(part) == Coord3D_C16)
+      buffer->getPixelFormat(part) == Coord3D_C16 && chunkadapter)
   {
     // get necessary information from ChunkScan3d parameters
 
@@ -185,18 +185,15 @@ std::string storeBufferAsDisparity(rcg::ImgFmt fmt,
 
     // Append out1 and out2 status to file name: _<out1>_<out2>
 
-    if (chunkadapter)
-    {
-      std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
-      bool out1 = line_status & 0x01;
-      bool out2 = line_status & 0x02;
-      name << "_" << std::noboolalpha << out1 << "_" << out2;
-    }
+    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
+    bool out1 = line_status & 0x01;
+    bool out2 = line_status & 0x02;
+    name << "_" << std::noboolalpha << out1 << "_" << out2;
 
     // store image
 
     rcg::Image image(buffer, part);
-    storeImageAsDisparity(name.str(), fmt, image, inv, scale, offset);
+    storeImageAsDisparityPFM(name.str(), image, inv, scale, offset);
 
     dispname=name.str();
   }
@@ -221,7 +218,7 @@ std::string storeBufferAsDisparity(rcg::ImgFmt fmt,
 void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                     const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                     const std::string &component, const rcg::Buffer *buffer,
-                    size_t height=0)
+                    size_t height=0, bool dispinfo=false)
 {
   if (chunkadapter)
   {
@@ -261,6 +258,20 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
     double exp=rcg::getFloat(nodemap, "ChunkExposureTime")/1000000.0;
     double gain=rcg::getFloat(nodemap, "ChunkGain");
 
+    int inv=-1;
+    double scale=0, offset=0;
+
+    if (dispinfo)
+    {
+      if (rcg::getBoolean(nodemap, "ChunkScan3dInvalidDataFlag"))
+      {
+        inv=static_cast<int>(rcg::getFloat(nodemap, "ChunkScan3dInvalidDataValue"));
+      }
+
+      scale=rcg::getFloat(nodemap, "ChunkScan3dCoordinateScale");
+      offset=rcg::getFloat(nodemap, "ChunkScan3dCoordinateOffset");
+    }
+
     // create parameter file
 
     if (width > 0 && height > 0 && f > 0 && t > 0)
@@ -276,6 +287,13 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
       out << "camera.gain=" << gain << std::endl;
       out << "rho=" << f*t << std::endl;
       out << "t=" << t << std::endl;
+
+      if (scale > 0)
+      {
+        out << "disp.inv=" << inv << std::endl;
+        out << "disp.scale=" << scale << std::endl;
+        out << "disp.offset=" << offset << std::endl;
+      }
 
       out.close();
     }
@@ -532,6 +550,12 @@ int main(int argc, char *argv[])
                         if (component == "Disparity")
                         {
                           name=storeBufferAsDisparity(fmt, nodemap, chunkadapter, buffer, part);
+
+                          if (name.size() != 0)
+                          {
+                            std::cout << "Image '" << name << "' stored" << std::endl;
+                            storeParameter(nodemap, chunkadapter, component, buffer);
+                          }
                         }
 
                         // otherwise, store as ordinary image
@@ -545,33 +569,52 @@ int main(int argc, char *argv[])
 
                             size_t h2=buffer->getHeight(part)/2;
                             name=storeBuffer(fmt, nodemap, chunkadapter, "Intensity", buffer, part, 0, h2);
-                            storeBuffer(fmt, nodemap, chunkadapter, "IntensityRight", buffer, part, h2, h2);
+
+                            if (name.size() > 0)
+                            {
+                              std::cout << "Image '" << name << "' stored" << std::endl;
+                            }
+
+                            name=storeBuffer(fmt, nodemap, chunkadapter, "IntensityRight", buffer, part, h2, h2);
+
+                            if (name.size() > 0)
+                            {
+                              std::cout << "Image '" << name << "' stored" << std::endl;
+                            }
                           }
                           else
                           {
                             name=storeBuffer(fmt, nodemap, chunkadapter, component, buffer, part);
+
+                            if (name.size() > 0)
+                            {
+                              std::cout << "Image '" << name << "' stored" << std::endl;
+                            }
                           }
-                        }
 
-                        // store 3D parameters for intensity and disparity
-                        // components (nothing is done if chunk parameters are
-                        // not available)
+                          // store 3D parameters for intensity and disparity
+                          // components (nothing is done if chunk parameters are
+                          // not available)
 
-                        if (component == "Intensity" || component == "Disparity")
-                        {
-                          storeParameter(nodemap, chunkadapter, component, buffer);
-                        }
-                        else if (component == "IntensityCombined")
-                        {
-                          size_t h2=buffer->getHeight(part)/2;
-                          storeParameter(nodemap, chunkadapter, "Intensity", buffer, h2);
+                          if (component == "Intensity")
+                          {
+                            storeParameter(nodemap, chunkadapter, component, buffer);
+                          }
+                          else if (component == "Disparity")
+                          {
+                            storeParameter(nodemap, chunkadapter, component, buffer, 0, true);
+                          }
+                          else if (component == "IntensityCombined")
+                          {
+                            size_t h2=buffer->getHeight(part)/2;
+                            storeParameter(nodemap, chunkadapter, "Intensity", buffer, h2, false);
+                          }
                         }
 
                         // report success
 
                         if (name.size() > 0)
                         {
-                          std::cout << "Image '" << name << "' stored" << std::endl;
                           retry=0;
                         }
                       }
