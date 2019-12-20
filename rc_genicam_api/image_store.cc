@@ -288,7 +288,7 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
         p+=(width+px)*yoffset;
         for (size_t k=0; k<height; k++)
         {
-          png_write_row(png, p);
+          png_write_row(png, const_cast<png_bytep>(p));
           p+=width+px;
         }
 
@@ -334,7 +334,7 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
         p+=(2*width+px)*yoffset;
         for (size_t k=0; k<height; k++)
         {
-          png_write_row(png, p);
+          png_write_row(png, const_cast<png_bytep>(p));
           p+=2*width+px;
         }
 
