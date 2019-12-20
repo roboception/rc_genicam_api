@@ -66,6 +66,8 @@ option(BUILD_DOC "Add target for building doxygen docs" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(INSTALL_COMPLETION "Install bash completion" OFF)
 
+find_package(PNG)
+
 # - Build individual parts -
 find_package(Genicam REQUIRED NO_CMAKE_PATH PATHS ${CMAKE_CURRENT_SOURCE_DIR}/genicam CONFIG NO_DEFAULT_PATH)
 add_library(${PROJECT_NAMESPACE}::genicam ALIAS genicam)

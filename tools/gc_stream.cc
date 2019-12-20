@@ -75,7 +75,7 @@ void printHelp()
   std::cout << "Options:" << std::endl;
   std::cout << "-h         Prints help information and exits" << std::endl;
   std::cout << "-t         Testmode, which does not store images and provides extended statistics" << std::endl;
-  std::cout << "-f pnm     Format for storing images. Default is pnm" << std::endl;
+  std::cout << "-f pnm|png Format for storing images. Default is pnm" << std::endl;
   std::cout << std::endl;
   std::cout << "Parameters:" << std::endl;
   std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
@@ -149,8 +149,7 @@ std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapR
   disparity image returned.
 */
 
-std::string storeBufferAsDisparity(rcg::ImgFmt fmt,
-                                   const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                                    const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                                    const rcg::Buffer *buffer, uint32_t part)
 {
@@ -366,12 +365,17 @@ int main(int argc, char *argv[])
           if (imgfmt == "pnm")
           {
             fmt=rcg::PNM;
-            i++;
+          }
+          else if (imgfmt == "png")
+          {
+            fmt=rcg::PNG;
           }
           else
           {
             throw std::invalid_argument(std::string("Invalid argument of '-f': ")+argv[i]);
           }
+
+          i++;
         }
         else
         {
@@ -547,9 +551,9 @@ int main(int argc, char *argv[])
 
                         // try storing disparity as float image with meta information
 
-                        if (component == "Disparity")
+                        if (component == "Disparity" && fmt == rcg::PNM)
                         {
-                          name=storeBufferAsDisparity(fmt, nodemap, chunkadapter, buffer, part);
+                          name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
 
                           if (name.size() != 0)
                           {

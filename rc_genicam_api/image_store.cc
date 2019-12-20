@@ -44,6 +44,10 @@
 #include <iomanip>
 #include <limits>
 
+#ifdef INCLUDE_PNG
+#include <png.h>
+#endif
+
 namespace rcg
 {
 
@@ -235,14 +239,190 @@ void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoff
   }
 }
 
+#ifdef INCLUDE_PNG
+
+void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoffset, size_t height)
+{
+  size_t width=image.getWidth();
+  size_t real_height=image.getHeight();
+
+  if (height == 0) height=real_height;
+
+  yoffset=std::min(yoffset, real_height);
+  height=std::min(height, real_height-yoffset);
+
+  const unsigned char *p=static_cast<const unsigned char *>(image.getPixels());
+
+  size_t px=image.getXPadding();
+
+  uint64_t format=image.getPixelFormat();
+  switch (format)
+  {
+    case Mono8: // store 8 bit monochrome image
+    case Confidence8:
+    case Error8:
+      {
+        // open file and init
+
+        FILE *out=fopen(ensureNewFileName(name+".png").c_str(), "wb");
+
+        if (!out)
+        {
+          throw new IOException("Cannot store file: "+ensureNewFileName(name+".pgm"));
+        }
+
+        png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+        png_infop info=png_create_info_struct(png);
+        setjmp(png_jmpbuf(png));
+
+        // write header
+
+        png_init_io(png, out);
+        png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_GRAY,
+          PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+          PNG_FILTER_TYPE_DEFAULT);
+        png_write_info(png, info);
+
+        // write image body
+
+        p+=(width+px)*yoffset;
+        for (size_t k=0; k<height; k++)
+        {
+          png_write_row(png, p);
+          p+=width+px;
+        }
+
+        // close file
+
+        png_write_end(png, info);
+        fclose(out);
+        png_destroy_write_struct(&png, &info);
+      }
+      break;
+
+    case Mono16:
+    case Coord3D_C16: // store 16 bit monochrome image
+      {
+        // open file and init
+
+        FILE *out=fopen(ensureNewFileName(name+".png").c_str(), "wb");
+
+        if (!out)
+        {
+          throw new IOException("Cannot store file: "+ensureNewFileName(name+".pgm"));
+        }
+
+        png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+        png_infop info=png_create_info_struct(png);
+        setjmp(png_jmpbuf(png));
+
+        // write header
+
+        png_init_io(png, out);
+        png_set_IHDR(png, info, width, height, 16, PNG_COLOR_TYPE_GRAY,
+          PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+          PNG_FILTER_TYPE_DEFAULT);
+        png_write_info(png, info);
+
+        // write image body
+
+        if (!image.isBigEndian())
+        {
+          png_set_swap(png);
+        }
+
+        p+=(2*width+px)*yoffset;
+        for (size_t k=0; k<height; k++)
+        {
+          png_write_row(png, p);
+          p+=2*width+px;
+        }
+
+        // close file
+
+        png_write_end(png, info);
+        fclose(out);
+        png_destroy_write_struct(&png, &info);
+      }
+      break;
+
+    case YCbCr411_8: // convert and store as color image
+      {
+        // open file and init
+
+        FILE *out=fopen(ensureNewFileName(name+".png").c_str(), "wb");
+
+        if (!out)
+        {
+          throw new IOException("Cannot store file: "+ensureNewFileName(name+".pgm"));
+        }
+
+        png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+        png_infop info=png_create_info_struct(png);
+        setjmp(png_jmpbuf(png));
+
+        // write header
+
+        png_init_io(png, out);
+        png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
+          PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+          PNG_FILTER_TYPE_DEFAULT);
+        png_write_info(png, info);
+
+        // write image body
+
+        uint8_t *tmp=new uint8_t [3*width];
+
+        size_t pstep=(width>>2)*6+px;
+
+        p+=pstep*yoffset;
+        for (size_t k=0; k<height; k++)
+        {
+          for (size_t i=0; i<width; i+=4)
+          {
+            rcg::convYCbCr411toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+          }
+
+          png_write_row(png, tmp);
+          p+=pstep;
+        }
+
+        // close file
+
+        png_write_end(png, info);
+        fclose(out);
+        png_destroy_write_struct(&png, &info);
+      }
+      break;
+
+    default:
+      throw IOException(std::string("storeImage(): Unknown pixel format: ")+
+        GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
+      break;
+  }
+}
+
+#endif
+
 }
 
 void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
   size_t yoffset, size_t height)
 {
-  if (fmt == PNM)
+  switch (fmt)
   {
-    storeImagePNM(name, image, yoffset, height);
+    case PNG:
+#ifdef INCLUDE_PNG
+      storeImagePNG(name, image, yoffset, height);
+#else
+      throw IOException("storeImage(): Support for PNG image file format is not compiled in!");
+#endif
+      break;
+
+    default:
+    case PNM:
+      storeImagePNM(name, image, yoffset, height);
+      break;
   }
 }
 

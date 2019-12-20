@@ -188,13 +188,14 @@ NOTE: Many image viewers can display PGM and PPM format. The sv tool of cvkit
 (https://github.com/roboception/cvkit) can also be used.
 
 ```
-gc_stream -h | [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ...
+gc_stream -h | [-f <fmt>] [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ...
 
 Stores images from the specified device after applying the given optional GenICam parameters.
 
 Options:
--h   Prints help information and exits
--t   Testmode, which does not store images and provides extended statistics
+-h         Prints help information and exits
+-t         Testmode, which does not store images and provides extended statistics
+-f pnm|png Format for storing images. Default is pnm
 
 Parameters:
 <interface-id> Optional GenICam ID of interface for connecting to the device

@@ -43,7 +43,7 @@
 namespace rcg
 {
 
-enum ImgFmt { PNM };
+enum ImgFmt { PNM, PNG };
 
 /**
   This method checks if the given file name already exists and produces a new
@@ -75,7 +75,6 @@ void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
   error, e.g. if input or output format is not supported.
 
   @param name   Name of output file without suffix.
-  @param fmt    Image file format.
   @param image  Image to be stored.
   @param inv    Value to mark invalid pixels.
   @param scale  Scale factor for valid values.

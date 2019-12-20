@@ -94,6 +94,12 @@ elseif (WIN32)
   set(GENTL_INSTALL_PATH "${CMAKE_INSTALL_FULL_BINDIR}")
 endif ()
 
+if (PNG_FOUND)
+  include_directories(${PNG_INCLUDE_DIRS})
+  add_definitions(-DINCLUDE_PNG)
+  add_definitions(${PNG_DEFINITIONS})
+endif ()
+
 add_library(rc_genicam_api_private_properties INTERFACE)
 add_library(${PROJECT_NAMESPACE}::rc_genicam_api_private_properties ALIAS
     rc_genicam_api_private_properties)
@@ -121,6 +127,7 @@ target_include_directories(rc_genicam_api_static
 target_link_libraries(rc_genicam_api_static
   PUBLIC
     ${PROJECT_NAMESPACE}::genicam
+    ${PNG_LIBRARIES}
   PRIVATE
     ${PROJECT_NAMESPACE}::rc_genicam_api_private_properties)
 target_compile_options(rc_genicam_api_static
@@ -140,6 +147,7 @@ if (BUILD_SHARED_LIBS)
     PUBLIC
       ${PROJECT_NAMESPACE}::genicam
     PRIVATE
+      ${PNG_LIBRARIES}
       ${PROJECT_NAMESPACE}::rc_genicam_api_private_properties)
   target_compile_options(rc_genicam_api
     PUBLIC
