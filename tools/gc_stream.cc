@@ -122,23 +122,22 @@ std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapR
 
   // store image (see e.g. the sv tool of cvkit for show images)
 
+  std::string full_name;
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part))
   {
     rcg::Image image(buffer, part);
-    storeImage(name.str(), fmt, image, yoffset, height);
+    full_name=storeImage(name.str(), fmt, image, yoffset, height);
   }
   else if (buffer->getIsIncomplete())
   {
     std::cerr << "storeBuffer(): Received incomplete buffer" << std::endl;
-    return std::string();
   }
   else if (!buffer->getImagePresent(part))
   {
     std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
-    return std::string();
   }
 
-  return name.str();
+  return full_name;
 }
 
 /**
@@ -192,19 +191,15 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
     // store image
 
     rcg::Image image(buffer, part);
-    storeImageAsDisparityPFM(name.str(), image, inv, scale, offset);
-
-    dispname=name.str();
+    dispname=storeImageAsDisparityPFM(name.str(), image, inv, scale, offset);
   }
   else if (buffer->getIsIncomplete())
   {
     std::cerr << "storeBuffer(): Received incomplete buffer" << std::endl;
-    return std::string();
   }
   else if (!buffer->getImagePresent(part))
   {
     std::cerr << "storeBuffer(): Received buffer without image" << std::endl;
-    return std::string();
   }
 
   return dispname;

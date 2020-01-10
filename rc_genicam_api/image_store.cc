@@ -110,7 +110,8 @@ class IOException : public std::exception
     std::string msg;
 };
 
-void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoffset, size_t height)
+std::string storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoffset,
+  size_t height)
 {
   size_t width=image.getWidth();
   size_t real_height=image.getHeight();
@@ -125,13 +126,16 @@ void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoff
   size_t px=image.getXPadding();
 
   uint64_t format=image.getPixelFormat();
+  std::string full_name;
+
   switch (format)
   {
     case Mono8: // store 8 bit monochrome image
     case Confidence8:
     case Error8:
       {
-        std::ofstream out(ensureNewFileName(name+".pgm"), std::ios::binary);
+        full_name=ensureNewFileName(name+".pgm");
+        std::ofstream out(full_name, std::ios::binary);
 
         out << "P5" << std::endl;
         out << width << " " << height << std::endl;
@@ -157,7 +161,8 @@ void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoff
     case Mono16:
     case Coord3D_C16: // store 16 bit monochrome image
       {
-        std::ofstream out(ensureNewFileName(name+".pgm"), std::ios::binary);
+        full_name=ensureNewFileName(name+".pgm");
+        std::ofstream out(full_name, std::ios::binary);
 
         out << "P5" << std::endl;
         out << width << " " << height << std::endl;
@@ -202,7 +207,8 @@ void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoff
 
     case YCbCr411_8: // convert and store as color image
       {
-        std::ofstream out(ensureNewFileName(name+".ppm"), std::ios::binary);
+        full_name=ensureNewFileName(name+".ppm");
+        std::ofstream out(full_name, std::ios::binary);
 
         out << "P6" << std::endl;
         out << width << " " << height << std::endl;
@@ -237,11 +243,14 @@ void storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoff
         GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
       break;
   }
+
+  return full_name;
 }
 
 #ifdef INCLUDE_PNG
 
-void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoffset, size_t height)
+std::string storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoffset,
+  size_t height)
 {
   size_t width=image.getWidth();
   size_t real_height=image.getHeight();
@@ -256,6 +265,8 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
   size_t px=image.getXPadding();
 
   uint64_t format=image.getPixelFormat();
+  std::string full_name;
+
   switch (format)
   {
     case Mono8: // store 8 bit monochrome image
@@ -264,7 +275,8 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
       {
         // open file and init
 
-        FILE *out=fopen(ensureNewFileName(name+".png").c_str(), "wb");
+        full_name=ensureNewFileName(name+".png");
+        FILE *out=fopen(full_name.c_str(), "wb");
 
         if (!out)
         {
@@ -305,11 +317,12 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
       {
         // open file and init
 
-        FILE *out=fopen(ensureNewFileName(name+".png").c_str(), "wb");
+        full_name=ensureNewFileName(name+".png");
+        FILE *out=fopen(full_name.c_str(), "wb");
 
         if (!out)
         {
-          throw new IOException("Cannot store file: "+ensureNewFileName(name+".pgm"));
+          throw new IOException("Cannot store file: "+full_name);
         }
 
         png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
@@ -350,11 +363,12 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
       {
         // open file and init
 
-        FILE *out=fopen(ensureNewFileName(name+".png").c_str(), "wb");
+        full_name=ensureNewFileName(name+".png");
+        FILE *out=fopen(full_name.c_str(), "wb");
 
         if (!out)
         {
-          throw new IOException("Cannot store file: "+ensureNewFileName(name+".pgm"));
+          throw new IOException("Cannot store file: "+full_name);
         }
 
         png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
@@ -400,20 +414,24 @@ void storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoff
         GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
       break;
   }
+
+  return full_name;
 }
 
 #endif
 
 }
 
-void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
+std::string storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
   size_t yoffset, size_t height)
 {
+  std::string ret;
+
   switch (fmt)
   {
     case PNG:
 #ifdef INCLUDE_PNG
-      storeImagePNG(name, image, yoffset, height);
+      ret=storeImagePNG(name, image, yoffset, height);
 #else
       throw IOException("storeImage(): Support for PNG image file format is not compiled in!");
 #endif
@@ -421,12 +439,14 @@ void storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
 
     default:
     case PNM:
-      storeImagePNM(name, image, yoffset, height);
+      ret=storeImagePNM(name, image, yoffset, height);
       break;
   }
+
+  return ret;
 }
 
-void storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, int inv,
+std::string storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, int inv,
   float scale, float offset)
 {
   if (image.getPixelFormat() != Coord3D_C16)
@@ -448,7 +468,8 @@ void storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, 
   const unsigned char *p=static_cast<const unsigned char *>(image.getPixels())+
     2*(width+px)*(height+1);
 
-  std::ofstream out(ensureNewFileName(name+".pfm"), std::ios::binary);
+  std::string full_name=ensureNewFileName(name+".pfm");
+  std::ofstream out(full_name, std::ios::binary);
 
   out << "Pf" << std::endl;
   out << width << " " << height << std::endl;
@@ -511,6 +532,8 @@ void storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, 
   }
 
   out.close();
+
+  return full_name;
 }
 
 }
