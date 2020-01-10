@@ -1,10 +1,15 @@
+2.3.1 (2020-01-10)
+------------------
+
+- Reporting full name of stored images, including suffix
+
 2.3.0 (2019-12-20)
 ------------------
 
 - Tool gc_stream:
   * now also stores the exposure time and gain in parameter files
   * added storing 16 bit images
-  * Added parameter '-fmt png' for storing images in PNG format
+  * Added parameter '-f png' for storing images in PNG format
   * Reporting all stored images (IntensityRight was missing)
 - Tool gc_info:
   * print User defined name
