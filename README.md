@@ -71,6 +71,21 @@ layer is not found when calling the tools.
     make
     make install
 
+#### Bash completion
+
+To install bash completion, configure cmake with `-DINSTALL_COMPLETION=ON`
+
+#### Debian package
+
+A Debian package can be built with e.g.
+
+    cd <main-directory>
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make
+    make package
+
 ### Windows and Visual Studio
 
 Building is based on cmake. Therefore, cmake must be downloaded and installed
