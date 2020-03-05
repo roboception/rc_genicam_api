@@ -1,6 +1,5 @@
 build
 cmake-build-*
-doc
 
 *~
 *.swp

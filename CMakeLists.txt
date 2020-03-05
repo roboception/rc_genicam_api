@@ -62,6 +62,7 @@ endif ()
 # - Options -
 
 option(BUILD_TOOLS "Build commandline tools" ON)
+option(BUILD_DOC "Add target for building doxygen docs" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(INSTALL_COMPLETION "Install bash completion" OFF)
 
@@ -105,6 +106,11 @@ endif ()
 #set(PROJECT_STATIC_LIBRARIES rc_genicam_api_static)
 
 include(cmake/configure_link_libs.cmake)
+
+# add a target to generate API documentation with Doxygen
+if (BUILD_DOC)
+  add_subdirectory(doc)
+endif()
 
 # Install catkin package.xml
 install(FILES package.xml COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})
