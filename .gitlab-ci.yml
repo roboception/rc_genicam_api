@@ -91,21 +91,19 @@ variables:
 #### Jobs ####
 ##############
 gen_dox:
-  <<: *amd64_bionic_job
-  variables:
-    TESTING_DEBS: "true"
+  image: registry.roboception.de/tools/docker_images:bionic-buildimage
+  tags:
+    - amd64
+    - docker
   stage: deploy
+  before_script:
+    - pip install git+https://github.com/ros-infrastructure/rosdoc_lite.git
   script:
-    - apt-get install -y doxygen ncftp
-    - mkdir build && cd build
-    - cmake ..
-    - make doc
+    - rosdoc_lite .
     - upload_dox.sh doc/html
   only:
     - master
     - tags
-  tags:
-    - docs
 
 # Test (on every commit)
 ########################
