@@ -26,12 +26,14 @@
 
     <license>BSD</license>
 
+    <url type="website">http://wiki.ros.org/rc_genicam_api</url>
     <url type="repository">https://github.com/roboception/rc_genicam_api</url>
     <url type="bugtracker">https://github.com/roboception/rc_genicam_api/issues</url>
 
     <buildtool_depend>cmake</buildtool_depend>
     <build_export_depend>catkin</build_export_depend>
 
+    <depend>libpng-dev</depend>
     <depend>libusb-1.0</depend>
 
     <doc_depend>doxygen</doc_depend>
