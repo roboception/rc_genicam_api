@@ -1,3 +1,8 @@
+2.3.2 (2020-03-06)
+------------------
+
+- add libpng-dev dependency in package.xml
+
 2.3.1 (2020-01-10)
 ------------------
 
@@ -17,7 +22,7 @@
   * Moved functions to store images from gc_stream tool into core library
   * Moved function to store point cloud from tool to library
 - Fixed:
-  * Do not return device if it can be found on different producers 
+  * Do not return device if it can be found on different producers
   * reporting device name instead of test option when misspelling the device in 'gc_stream -t <device> ...' call
   * net_perf_check.sh: fix getting mtu
 
