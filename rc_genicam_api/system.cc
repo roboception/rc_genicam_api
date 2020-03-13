@@ -213,6 +213,13 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 void System::clearSystems()
 {
   std::lock_guard<std::mutex> lock(system_mtx);
+
+  // clear all interfaces explicitly as part of ENUM-WORKAROUND
+  for (size_t i=0; i<slist.size(); i++)
+  {
+    slist[i]->clearInterfaces();
+  }
+
   slist.clear();
 }
 
@@ -223,7 +230,7 @@ const std::string &System::getFilename() const
 
 void System::open()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
 
   if (n_open == 0)
   {
@@ -238,7 +245,7 @@ void System::open()
 
 void System::close()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
 
   if (n_open > 0)
   {
@@ -275,15 +282,21 @@ int find(const std::vector<std::shared_ptr<Interface> > &list, const std::string
 
 std::vector<std::shared_ptr<Interface> > System::getInterfaces()
 {
-  std::lock_guard<std::mutex> lock(mtx);
-  std::vector<std::shared_ptr<Interface> > ret;
+  std::lock_guard<std::recursive_mutex> lock(mtx);
+  std::vector<std::shared_ptr<Interface> > ret=ilist;
 
-  if (tl != 0)
+  // ENUM-WORKAROUND: Interfaces are only enumerated once and kept open as a
+  // (temporary) workaround for a bug in the Baumer GenTL layer 2.1.0 for GEV
+  // that is used by default. The bug causes memory and CPU time to
+  // increase on every call of TLUpdateInterfaceList().
+
+  if (tl != 0 && ilist.size() == 0)
   {
     // get list of previously requested interfaces that are still in use
 
     std::vector<std::shared_ptr<Interface> > current;
 
+/*
     for (size_t i=0; i<ilist.size(); i++)
     {
       std::shared_ptr<Interface> p=ilist[i].lock();
@@ -292,6 +305,7 @@ std::vector<std::shared_ptr<Interface> > System::getInterfaces()
         current.push_back(p);
       }
     }
+*/
 
     // update available interfaces
 
@@ -338,6 +352,13 @@ std::vector<std::shared_ptr<Interface> > System::getInterfaces()
     {
       ilist.push_back(ret[i]);
     }
+
+    // open interfaces to avoid re-enumeration as part of ENUM-WORKAROUND
+
+    for (size_t i=0; i<ret.size(); i++)
+    {
+      ret[i]->open();
+    }
   }
 
   return ret;
@@ -380,55 +401,55 @@ std::string cTLGetInfo(GenTL::TL_HANDLE tl, const std::shared_ptr<const GenTLWra
 
 std::string System::getID()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_ID);
 }
 
 std::string System::getVendor()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_VENDOR);
 }
 
 std::string System::getModel()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_MODEL);
 }
 
 std::string System::getVersion()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_VERSION);
 }
 
 std::string System::getTLType()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_TLTYPE);
 }
 
 std::string System::getName()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_NAME);
 }
 
 std::string System::getPathname()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_PATHNAME);
 }
 
 std::string System::getDisplayName()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   return cTLGetInfo(tl, gentl, GenTL::TL_INFO_DISPLAYNAME);
 }
 
 bool System::isCharEncodingASCII()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   bool ret=true;
 
   GenTL::INFO_DATATYPE type;
@@ -456,7 +477,7 @@ bool System::isCharEncodingASCII()
 
 int System::getMajorVersion()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   uint32_t ret=0;
 
   GenTL::INFO_DATATYPE type;
@@ -476,7 +497,7 @@ int System::getMajorVersion()
 
 int System::getMinorVersion()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   uint32_t ret=0;
 
   GenTL::INFO_DATATYPE type;
@@ -496,7 +517,7 @@ int System::getMinorVersion()
 
 std::shared_ptr<GenApi::CNodeMapRef> System::getNodeMap()
 {
-  std::lock_guard<std::mutex> lock(mtx);
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   if (tl != 0 && !nodemap)
   {
     cport=std::shared_ptr<CPort>(new CPort(gentl, &tl));
@@ -509,6 +530,17 @@ std::shared_ptr<GenApi::CNodeMapRef> System::getNodeMap()
 void *System::getHandle() const
 {
   return tl;
+}
+
+void System::clearInterfaces()
+{
+  // close and clear all interfaces as part of ENUM-WORKAROUND
+  for (size_t i=0; i<ilist.size(); i++)
+  {
+    ilist[i]->close();
+  }
+
+  ilist.clear();
 }
 
 System::System(const std::string &_filename)

@@ -225,6 +225,8 @@ class System : public std::enable_shared_from_this<System>
 
   private:
 
+    void clearInterfaces(); // Needed for ENUM-WORKAROUND
+
     System(const std::string &_filename);
     System(class System &); // forbidden
     System &operator=(const System &); // forbidden
@@ -232,7 +234,7 @@ class System : public std::enable_shared_from_this<System>
     std::string filename;
     std::shared_ptr<const GenTLWrapper> gentl;
 
-    std::mutex mtx;
+    std::recursive_mutex mtx;
 
     int n_open;
     void *tl;
@@ -240,7 +242,8 @@ class System : public std::enable_shared_from_this<System>
     std::shared_ptr<CPort> cport;
     std::shared_ptr<GenApi::CNodeMapRef> nodemap;
 
-    std::vector<std::weak_ptr<Interface> > ilist;
+    // Changed from weak_ptr to shared_ptr as part of ENUM-WORKAROUND
+    std::vector<std::shared_ptr<Interface> > ilist;
 };
 
 }
