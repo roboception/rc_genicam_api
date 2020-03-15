@@ -1,3 +1,8 @@
+2.3.4 (2020-03-15)
+------------------
+
+- Workaround for Baumer GenTL GEV interface enumeration bug
+
 2.3.3 (2020-03-06)
 ------------------
 
