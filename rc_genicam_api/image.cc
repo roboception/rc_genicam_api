@@ -132,6 +132,9 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
 void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
               uint32_t ds, uint32_t i, uint32_t k)
 {
+  if (ds < 1)
+    ds = 1;
+
   i*=ds;
   k*=ds;
 
