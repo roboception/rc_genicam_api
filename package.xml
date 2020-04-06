@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
     <name>rc_genicam_api</name>
-    <version>2.3.4</version>
+    <version>2.3.5</version>
     <description>
       GenICam/GigE Vision Convenience Layer.
 
@@ -31,7 +31,6 @@
     <url type="bugtracker">https://github.com/roboception/rc_genicam_api/issues</url>
 
     <buildtool_depend>cmake</buildtool_depend>
-    <build_export_depend>catkin</build_export_depend>
 
     <depend>libpng-dev</depend>
     <depend>libusb-1.0</depend>

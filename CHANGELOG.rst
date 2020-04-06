@@ -1,3 +1,9 @@
+2.3.5 (2020-04-06)
+------------------
+
+- ensure that downscale factor doesn't lead to division by zero
+- remove build_export_depend on catkin from package.xml
+
 2.3.4 (2020-03-15)
 ------------------
 
