@@ -43,9 +43,15 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include <algorithm>
 
 #ifdef INCLUDE_PNG
 #include <png.h>
+#endif
+
+#ifdef _WIN32
+#undef min
+#undef max
 #endif
 
 namespace rcg
