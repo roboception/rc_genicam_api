@@ -176,7 +176,6 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
   for (size_t i=0; i<name.size(); i++)
   {
-    std::cout << "GenTL path: " << name[i] << std::endl;
     int k=find(slist, name[i]);
 
     if (k >= 0)
@@ -192,7 +191,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
       }
       catch (const std::exception& e)
       {
-        std::cout << e.what() << std::endl;
+        std::cerr << "catched exception while creating system from " << name[i] << ": " << e.what() << std::endl;
         // ignore transport layers that cannot be used
       }
     }
