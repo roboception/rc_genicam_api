@@ -192,7 +192,6 @@ std::vector<std::shared_ptr<System> > System::getSystems()
       catch (const std::exception& e)
       {
         std::cerr << "catched exception while creating system from " << name[i] << ": " << e.what() << std::endl;
-        // ignore transport layers that cannot be used
       }
     }
   }
