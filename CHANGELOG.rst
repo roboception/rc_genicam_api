@@ -1,3 +1,8 @@
+2.3.7 (2020-07-27)
+------------------
+
+- Improved finding devices, e.g. by IP if GenTL provider supports this
+
 2.3.6 (2020-04-17)
 ------------------
 
