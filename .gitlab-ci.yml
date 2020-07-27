@@ -1,7 +1,7 @@
 before_script:
   - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME
   - export DEBIAN_FRONTEND=noninteractive
-  - apt-get update -yq && apt-get install -y libusb-1.0 libpng-dev
+  - apt-get update -yq && apt-get install -y lintian libusb-1.0 libpng-dev
 
 variables:
   GET_SOURCES_ATTEMPTS: 3
