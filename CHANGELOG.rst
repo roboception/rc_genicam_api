@@ -1,3 +1,8 @@
+2.4.0 (2020-07-27)
+------------------
+
+- gc_stream now puts status of GPIO out and in lines in two separate bit fields in file name
+
 2.3.7 (2020-07-27)
 ------------------
 
