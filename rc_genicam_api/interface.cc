@@ -236,6 +236,27 @@ std::shared_ptr<Device> Interface::getDevice(const char *devid)
     }
   }
 
+  if (!ret && ifh != 0)
+  {
+    // try to open the device in a last attempt to check if the producer is
+    // able to find it
+
+    GenTL::DEV_HANDLE dev=0;
+
+    GenTL::GC_ERROR err=gentl->IFOpenDevice(ifh, devid, GenTL::DEVICE_ACCESS_READONLY, &dev);
+
+    if (err == GenTL::GC_ERR_SUCCESS)
+    {
+      gentl->DevClose(dev);
+    }
+
+    if (err == GenTL::GC_ERR_SUCCESS || err == GenTL::GC_ERR_RESOURCE_IN_USE ||
+        err == GenTL::GC_ERR_ACCESS_DENIED)
+    {
+      ret=std::shared_ptr<Device>(new Device(shared_from_this(), gentl, devid));
+    }
+  }
+
   return ret;
 }
 
