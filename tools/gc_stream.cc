@@ -89,6 +89,50 @@ void printHelp()
 }
 
 /**
+  Get status of digital input and output lines as separate bit fields if available.
+*/
+
+std::string getDigitalIO(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap)
+{
+  try
+  {
+    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll", 0, 0, true);
+
+    std::string out;
+    std::string in;
+
+    std::vector<std::string> io;
+    rcg::getEnum(nodemap, "LineSelector", io, true);
+
+    for (int i=static_cast<int>(io.size())-1; i>=0; i--)
+    {
+      rcg::setEnum(nodemap, "LineSelector", io[i].c_str(), true);
+
+      std::string mode=rcg::getString(nodemap, "LineMode", true);
+
+      if (mode == "Input") in+=std::to_string((line_status>>i)&0x1);
+      if (mode == "Output") out+=std::to_string((line_status>>i)&0x1);
+    }
+
+    if (out.size() > 0 || in.size() > 0)
+    {
+      if (out.size() == 0) out.push_back('0');
+      if (in.size() == 0) in.push_back('0');
+
+      std::ostringstream ret;
+      ret << "_" << out << "_" << in;
+      return ret.str();
+    }
+  }
+  catch (const std::exception &)
+  {
+    // just ignore and return empty string
+  }
+
+  return std::string();
+}
+
+/**
   Store image in given buffer.
 */
 
@@ -113,11 +157,7 @@ std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapR
 
   if (chunkadapter)
   {
-    // Append out1 and out2 status to file name: _<out1>_<out2>
-    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
-    bool out1 = line_status & 0x01;
-    bool out2 = line_status & 0x02;
-    name << "_" << std::noboolalpha << out1 << "_" << out2;
+    name << getDigitalIO(nodemap);
   }
 
   // store image (see e.g. the sv tool of cvkit for show images)
@@ -183,10 +223,7 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 
     // Append out1 and out2 status to file name: _<out1>_<out2>
 
-    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
-    bool out1 = line_status & 0x01;
-    bool out2 = line_status & 0x02;
-    name << "_" << std::noboolalpha << out1 << "_" << out2;
+    name << getDigitalIO(nodemap);
 
     // store image
 
@@ -232,11 +269,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
     // Append out1 and out2 status to file name: _<out1>_<out2>
 
-    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll");
-    bool out1 = line_status & 0x01;
-    bool out2 = line_status & 0x02;
-    name << "_" << std::noboolalpha << out1 << "_" << out2;
-
+    name << getDigitalIO(nodemap);
     name << "_param.txt";
 
     // get 3D parameter
