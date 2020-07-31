@@ -4,7 +4,9 @@ before_script:
   - apt-get update -yq && apt-get install -y lintian libusb-1.0 libpng-dev
 
 variables:
-  GET_SOURCES_ATTEMPTS: 3
+  GET_SOURCES_ATTEMPTS: "3"
+  GIT_DEPTH: "0"
+  GIT_SUBMODULE_STRATEGY: "recursive"
 
 #########################
 # Templates using anchors
@@ -43,6 +45,12 @@ variables:
   image: registry.roboception.de/tools/docker_images:armhf-bionic-buildimage
   tags:
     - armhf
+    - docker
+
+.amd64_focal_t: &amd64_focal_job
+  image: registry.roboception.de/tools/docker_images:focal-buildimage
+  tags:
+    - amd64
     - docker
 
 #############
@@ -124,6 +132,10 @@ test:bionic:armhf:
   <<: *armhf_bionic_job
   extends: .test
 
+test:focal:amd64:
+  <<: *amd64_focal_job
+  extends: .test_latest
+
 # Deploy testing (only on master)
 #################################
 package_testing:xenial:amd64:
@@ -142,6 +154,10 @@ package_testing:bionic:armhf:
   <<: *armhf_bionic_job
   extends: .package_testing
 
+test_stable:focal:amd64:
+  <<: *amd64_focal_job
+  extends: .test_stable
+
 # Deploy stable (only for releases, version tags)
 #################################################
 package_stable:xenial:amd64:
@@ -158,6 +174,10 @@ package_stable:bionic:amd64:
 
 package_stable:bionic:armhf:
   <<: *armhf_bionic_job
+  extends: .package_stable
+
+package_stable:focal:amd64:
+  <<: *amd64_focal_job
   extends: .package_stable
 
 ########################
