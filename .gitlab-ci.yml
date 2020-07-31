@@ -134,7 +134,7 @@ test:bionic:armhf:
 
 test:focal:amd64:
   <<: *amd64_focal_job
-  extends: .test_latest
+  extends: .test
 
 # Deploy testing (only on master)
 #################################
@@ -156,7 +156,7 @@ package_testing:bionic:armhf:
 
 test_stable:focal:amd64:
   <<: *amd64_focal_job
-  extends: .test_stable
+  extends: .package_testing
 
 # Deploy stable (only for releases, version tags)
 #################################################
