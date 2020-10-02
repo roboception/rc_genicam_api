@@ -418,72 +418,79 @@ int main(int argc, char *argv[])
 
             std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap(xml);
 
-            while (k < argc)
+            if (nodemap)
             {
-              std::string p=argv[k++];
-
-              if (p.find('=') != std::string::npos)
+              while (k < argc)
               {
-                // split argument in key and value
+                std::string p=argv[k++];
 
-                size_t j=p.find('=');
-                std::string value=p.substr(j+1);
-                std::string key=p.substr(0, j);
+                if (p.find('=') != std::string::npos)
+                {
+                  // split argument in key and value
 
-                // set key=value pair through GenICam
+                  size_t j=p.find('=');
+                  std::string value=p.substr(j+1);
+                  std::string key=p.substr(0, j);
 
-                rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+                  // set key=value pair through GenICam
+
+                  rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+                }
+                else
+                {
+                  // call the command
+                  rcg::callCommand(nodemap, p.c_str(), true);
+                }
+              }
+
+              if (depth > 1)
+              {
+                // report all features
+
+                std::cout << "Device:            " << dev->getID() << std::endl;
+                std::cout << "Vendor:            " << dev->getVendor() << std::endl;
+                std::cout << "Model:             " << dev->getModel() << std::endl;
+                std::cout << "TL type:           " << dev->getTLType() << std::endl;
+                std::cout << "Display name:      " << dev->getDisplayName() << std::endl;
+                std::cout << "User defined name: " << dev->getUserDefinedName() << std::endl;
+                std::cout << "Serial number:     " << dev->getSerialNumber() << std::endl;
+                std::cout << "Version:           " << dev->getVersion() << std::endl;
+                std::cout << "TS Frequency:      " << dev->getTimestampFrequency() << std::endl;
+                std::cout << std::endl;
+
+                std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
+
+                std::cout << "Available streams:" << std::endl;
+                for (size_t i=0; i<stream.size(); i++)
+                {
+                  std::cout << "  Stream ID: " << stream[i]->getID() << std::endl;
+                }
+
+                std::cout << std::endl;
+
+                std::cout << "Available features:" << std::endl;
+                printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth);
               }
               else
               {
-                // call the command
-                rcg::callCommand(nodemap, p.c_str(), true);
+                // report requested node only
+
+                GenApi::INode *p=nodemap->_GetNode(node.c_str());
+
+                if (p)
+                {
+                  printNode(std::string(), p, depth);
+                }
+                else
+                {
+                  std::cerr << "Unknown node: " << node << std::endl;
+                  ret=1;
+                }
               }
-            }
-
-            if (depth > 1)
-            {
-              // report all features
-
-              std::cout << "Device:            " << dev->getID() << std::endl;
-              std::cout << "Vendor:            " << dev->getVendor() << std::endl;
-              std::cout << "Model:             " << dev->getModel() << std::endl;
-              std::cout << "TL type:           " << dev->getTLType() << std::endl;
-              std::cout << "Display name:      " << dev->getDisplayName() << std::endl;
-              std::cout << "User defined name: " << dev->getUserDefinedName() << std::endl;
-              std::cout << "Serial number:     " << dev->getSerialNumber() << std::endl;
-              std::cout << "Version:           " << dev->getVersion() << std::endl;
-              std::cout << "TS Frequency:      " << dev->getTimestampFrequency() << std::endl;
-              std::cout << std::endl;
-
-              std::vector<std::shared_ptr<rcg::Stream> > stream=dev->getStreams();
-
-              std::cout << "Available streams:" << std::endl;
-              for (size_t i=0; i<stream.size(); i++)
-              {
-                std::cout << "  Stream ID: " << stream[i]->getID() << std::endl;
-              }
-
-              std::cout << std::endl;
-
-              std::cout << "Available features:" << std::endl;
-              printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth);
             }
             else
             {
-              // report requested node only
-
-              GenApi::INode *p=nodemap->_GetNode(node.c_str());
-
-              if (p)
-              {
-                printNode(std::string(), p, depth);
-              }
-              else
-              {
-                std::cerr << "Unknown node: " << node << std::endl;
-                ret=1;
-              }
+              std::cerr << "Nodemap not available!" << std::endl;
             }
 
             dev->close();
