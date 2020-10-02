@@ -714,14 +714,23 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
 
         if (val != 0)
         {
-          ret=val->GetCurrentEntry()->GetSymbolic();
+          GenApi::StringList_t entries;
+          val->GetSymbolics(entries);
 
-          GenApi::StringList_t entry;
-          val->GetSymbolics(entry);
-
-          for (size_t i=0; i<entry.size(); i++)
+          for (size_t i=0; i<entries.size(); i++)
           {
-            list.push_back(std::string(entry[i]));
+            list.push_back(std::string(entries[i]));
+          }
+
+          GenApi::IEnumEntry *entry=val->GetCurrentEntry();
+
+          if (entry != 0)
+          {
+            ret=entry->GetSymbolic();
+          }
+          else if (exception)
+          {
+            throw std::invalid_argument(std::string("Current value is not defined: ")+name);
           }
         }
         else if (exception)
