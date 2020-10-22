@@ -284,7 +284,6 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
     double v=rcg::getFloat(nodemap, "ChunkScan3dPrincipalPointV");
     double exp=rcg::getFloat(nodemap, "ChunkExposureTime")/1000000.0;
     double gain=rcg::getFloat(nodemap, "ChunkGain");
-
     int inv=-1;
     double scale=0, offset=0;
 
@@ -314,6 +313,30 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
       out << "camera.gain=" << gain << std::endl;
       out << "rho=" << f*t << std::endl;
       out << "t=" << t << std::endl;
+
+      try
+      {
+        float v=rcg::getFloat(nodemap, "ChunkRcNoise", 0, 0, true);
+        out << "camera.noise=" << v << std::endl;
+      }
+      catch (const std::exception &)
+      { }
+
+      try
+      {
+        float v=rcg::getFloat(nodemap, "ChunkRcBrightness", 0, 0, true);
+        out << "camera.brightness=" << v << std::endl;
+      }
+      catch (const std::exception &)
+      { }
+
+      try
+      {
+        float v=rcg::getFloat(nodemap, "ChunkRcAdaptiveOut1Reduction", 0, 0, true);
+        out << "camera.adaptive_out1_reduction=" << v << std::endl;
+      }
+      catch (const std::exception &)
+      { }
 
       if (scale > 0)
       {
