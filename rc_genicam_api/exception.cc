@@ -37,6 +37,8 @@
 
 #include "gentl_wrapper.h"
 
+#include <sstream>
+
 namespace rcg
 {
 
@@ -56,18 +58,22 @@ GenTLException::GenTLException(const std::string &msg,
 
   gentl->GCGetLastError(&err, tmp, &tmp_size);
 
+  std::ostringstream out;
+
   if (msg.size() > 0 && err != GenTL::GC_ERR_SUCCESS)
   {
-    s=msg+": "+tmp;
+    out << msg << ": " << tmp << " (" << err << ")";
   }
   else if (msg.size() > 0)
   {
-    s=msg;
+    out << msg;
   }
   else
   {
-    s=tmp;
+    out << tmp << " (" << err << ")";
   }
+
+  s=out.str();
 }
 
 GenTLException::~GenTLException()
