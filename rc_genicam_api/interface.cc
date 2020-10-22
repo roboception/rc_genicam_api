@@ -159,9 +159,10 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
     // update available interfaces
 
-    if (gentl->IFUpdateDeviceList(ifh, 0, 100) != GenTL::GC_ERR_SUCCESS)
+    GenTL::GC_ERROR err=gentl->IFUpdateDeviceList(ifh, 0, 100);
+    if (err != GenTL::GC_ERR_SUCCESS)
     {
-      throw GenTLException(std::string("Interface::getDevices() (1) ")+id, gentl);
+      throw GenTLException(std::string("Interface::getDevices() (1) ")+id+" "+std::to_string(err), gentl);
     }
 
     // create list of interfaces, using either existing interfaces or
