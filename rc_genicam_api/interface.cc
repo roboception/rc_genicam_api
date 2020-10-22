@@ -161,7 +161,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
     if (gentl->IFUpdateDeviceList(ifh, 0, 100) != GenTL::GC_ERR_SUCCESS)
     {
-      throw GenTLException("Interface::getDevices() 1", gentl);
+      throw GenTLException(std::string("Interface::getDevices() (1) ")+id, gentl);
     }
 
     // create list of interfaces, using either existing interfaces or
@@ -170,7 +170,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
     uint32_t n=0;
     if (gentl->IFGetNumDevices(ifh, &n) != GenTL::GC_ERR_SUCCESS)
     {
-      throw GenTLException("Interface::getDevices() 2", gentl);
+      throw GenTLException(std::string("Interface::getDevices() (2) ")+id, gentl);
     }
 
     for (uint32_t i=0; i<n; i++)
@@ -180,7 +180,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
       if (gentl->IFGetDeviceID(ifh, i, tmp, &size) != GenTL::GC_ERR_SUCCESS)
       {
-        throw GenTLException("Interface::getDevices() 3", gentl);
+        throw GenTLException(std::string("Interface::getDevices() (3) ")+id, gentl);
       }
 
       int k=find(current, tmp);
