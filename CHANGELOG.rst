@@ -1,3 +1,8 @@
+2.4.4 (2020-10-23)
+------------------
+
+- Trying to fix problem that interface handle becomes invalid
+
 2.4.3 (2020-10-22)
 ------------------
 
