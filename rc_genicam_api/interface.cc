@@ -160,6 +160,26 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
     // update available interfaces
 
     GenTL::GC_ERROR err=gentl->IFUpdateDeviceList(ifh, 0, 100);
+
+    if (err == GenTL::GC_ERR_INVALID_HANDLE)
+    {
+      // the interface handle is invalid, try to reopen the interface
+
+      if (gentl->TLUpdateInterfaceList(parent->getHandle(), 0, 10) != GenTL::GC_ERR_SUCCESS)
+      {
+        throw GenTLException(std::string("Interface::getDevices() (recovery 1) ")+id, gentl);
+      }
+
+      if (gentl->TLOpenInterface(parent->getHandle(), id.c_str(), &ifh) != GenTL::GC_ERR_SUCCESS)
+      {
+        throw GenTLException(std::string("Interface::getDevices() (recovery 2) ")+id, gentl);
+      }
+
+      // try to repeat discovery of devices
+
+      err=gentl->IFUpdateDeviceList(ifh, 0, 100);
+    }
+
     if (err != GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException(std::string("Interface::getDevices() (1) ")+id+" "+std::to_string(err), gentl);
