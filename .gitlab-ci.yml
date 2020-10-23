@@ -154,7 +154,7 @@ package_testing:bionic:armhf:
   <<: *armhf_bionic_job
   extends: .package_testing
 
-test_stable:focal:amd64:
+package_testing:focal:amd64:
   <<: *amd64_focal_job
   extends: .package_testing
 
