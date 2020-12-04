@@ -69,10 +69,10 @@ namespace GENAPI_NAMESPACE
 
                     Base::InternalSetValue( Value, Verify );
 
-                    if( Verify )
-                        Base::InternalCheckError();
-
                 }
+
+                if (Verify)
+                    Base::InternalCheckError();
 
 #pragma BullseyeCoverage off
                 GCLOGINFOPOP( Base::m_pValueLog, "...SetValue" );

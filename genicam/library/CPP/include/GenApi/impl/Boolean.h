@@ -37,6 +37,7 @@
 #include "ValueT.h"
 #include "BaseT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "PolyReference.h"
 
 namespace GENAPI_NAMESPACE

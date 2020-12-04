@@ -1,32 +1,30 @@
-//-----------------------------------------------------------------------------
-//  (c) 2006 by Basler Vision Technologies
-//  Section:  Vision Components
-//  Project:  GenApi
-//    Author:  Fritz Dierks
-//  $Header$
-//
-//  License: This file is published under the license of the EMVA GenICam  Standard Group.
-//  A text file describing the legal terms is included in  your installation as 'GenICam_license.pdf'.
-//  If for some reason you are missing  this file please contact the EMVA or visit the website
-//  (http://www.genicam.org) for a full copy.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
-//  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-//  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD  GROUP
-//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL,
-//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT  LIMITED TO,
-//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  DATA, OR PROFITS;
-//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  THEORY OF LIABILITY,
-//  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)
-//  ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//  POSSIBILITY OF SUCH DAMAGE.
-//-----------------------------------------------------------------------------
-/**
-\file
-\brief    Implementation of CLog.
-\ingroup Log_PublicUtilities
-*/
+/****************************************************************************
+
+(c) 2017 by STEMMER IMAGING GmbH
+Project: Modular Logging
+Author:  Quang Nguyen
+
+License: This file is published under the license of the EMVA GenICam  Standard Group.
+A text file describing the legal terms is included in  your installation as 'GenICam_license.pdf'.
+If for some reason you are missing  this file please contact the EMVA or visit the website
+(http://www.genicam.org) for a full copy.
+
+THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD  GROUP
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT  LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
+
+
+
 
 #ifndef LOG_CLOG_H_
 #define LOG_CLOG_H_
@@ -35,135 +33,109 @@
 #   pragma warning (push, 3)
 #   pragma warning(disable:4706)  // assignment within conditional expression
 #endif
-
-#include <log4cpp/Portability.hh>
-#include <log4cpp/Priority.hh>
-
-namespace LOG4CPP_NS
-{
-    class Category;
-    class Appender;
-}
+//#pragma warning (push, 3)
+//#pragma warning(disable:4706)  // assignment within conditional expression
 
 #include <stdio.h>
-#include <Base/GCBase.h>
+#include <map>
 #include <Log/LogDll.h>
+
+#include <Base/GCBase.h>
+#include <Log/ILogger.h>
+#include <Log/ILoggerFactory.h>
+
 
 namespace GENICAM_NAMESPACE
 {
-
     /**
-    \brief Helper class encapsulating log4cpp
+    \brief This logging class initializes the logger. By default that would be Log4cpp
     \ingroup Log_PublicUtilities
     */
     class LOG_DECL CLog
     {
     public:
+        //! Checks if a category/logger exists
+        //! First checks the local logger map
+        //! Finally checks via ILoggerFactory::Exist() in the ILoggerFactory implementation
+        static bool Exist(const gcstring &LoggerName);
+        static bool Exist(const char* LoggerName);
 
-        //! Retrieves the root category
-        static LOG4CPP_NS::Category& GetRootLogger( void );
 
         //! Retrieves (and if necessary create) a category by name
-        static LOG4CPP_NS::Category& GetLogger( const gcstring &LoggerName );
-        static LOG4CPP_NS::Category& GetLogger( const char LoggerName[] );
+		//! Stores logger which have been requested before in a map
+        static ILogger& GetLogger(const gcstring &LoggerName);
+        static ILogger& GetLogger(const char* LoggerName);
 
-        //! Checks if a category exists
-        static bool Exists( const gcstring &LoggerName );
-        static bool Exists( const char LoggerName[] );
+        static void PushIndent();
+        static void PopIndent();
 
-        //! Push nested diagnostic context
-        static void PushNDC( const gcstring &ContextName );
-        static void PushNDC( const char ContextName[] );
+        // No logger is being used
+        static void OmitLogger();
+        
+        // Will take ownership of the ILoggerFactory. ShutDown will delete that object
+        static void SetLoggerFactory(ILoggerFactory&);
+        static ILoggerFactory* GetLoggerFactory();
 
-        //! Pop nested diagnostic context
-        static void PopNDC( void );
-
-        //! initializes log4cpp
-        static void Initialize( void );
-
-        //! de-initializes log4cpp
-        static void ShutDown( void );
-
-        //! Configures log4cpp to output messages >=ERROR on the Windows debug console
-        static void ConfigureDefault();
-
-        //! Configures log4cpp from a file
-        static bool ConfigureFromFile( const gcstring &FileName );
-        static bool ConfigureFromFile( const char FileName[] );
-
-        //! Configures log4cpp from a file whose name is given by the environment variable GENICAM_LOG_CONFIG_VERSION
-        static bool ConfigureFromEnvironment( void );
-
-        //! Configures log4cpp from a string
-        static bool ConfigureFromString( const gcstring &ConfigData );
-        static bool ConfigureFromString( const char ConfigData[] );
-
-        //! removes all appenders from all existing categories
-        static void RemoveAllAppenders(void);
-
-        //! Creates a new file appender (used by some test modules)
-        static LOG4CPP_NS::Appender *CreateFileAppender( const gcstring &aName, const gcstring &aPath, bool aAppend = false, const gcstring &aPattern = "" );
-
-        //! Add/remove an appender to/from a category
-        static void AddAppender( LOG4CPP_NS::Category *aCategory, LOG4CPP_NS::Appender *aAppender );
-
-        static void RemoveAppender( LOG4CPP_NS::Category *aCategory, LOG4CPP_NS::Appender *aAppender );
-
-
-        //! Set priority for a category
-        static void SetPriorityInfo( LOG4CPP_NS::Category *aCategory );
-        static void SetPriorityError( LOG4CPP_NS::Category *aCategory );
-
-        //! Check whether logging is possible and enabled for a specific category
-        static bool IsInfoEnabled( LOG4CPP_NS::Category *aCategory );
-        static bool IsWarnEnabled( LOG4CPP_NS::Category *aCategory );
-        static bool IsDebugEnabled( LOG4CPP_NS::Category *aCategory );
-
-        //! Logging functions
-        static void LogPush( LOG4CPP_NS::Category *aCategory, LOG4CPP_NS::Priority::Value aPriority, const char *aStringFormat, ... );
-        static void LogPop( LOG4CPP_NS::Category *aCategory, LOG4CPP_NS::Priority::Value aPriority, const char *aStringFormat, ... );
-        static void Log( LOG4CPP_NS::Category *aCategory, LOG4CPP_NS::Priority::Value aPriority, const char *aStringFormat, ... );
-        static void LogVA( LOG4CPP_NS::Category *aCategory, LOG4CPP_NS::Priority::Value aPriority, const char *aStringFormat, va_list arg );
+        //! de-initializes the logging framework
+        static void ShutDown(void);
 
     private:
-        //! Makes sure log4cpp has been found.
-        static void MakeSureLoggerHasBeenFound( void );
 
-        //! Reference counter for Initialize/Shutdown
-        static int g_RefCount;
-        
-        //! A wrapper which bridges log4cpp and this class.
-        static const void *g_pLog4cpp;
-
-        //! A type corresponds to a library handle which can be platform specific.
+      //! A type corresponds to a library handle which can be platform specific.
 #if defined (_WIN32)
-        typedef  HMODULE lib_handle_t;
+      typedef  HMODULE lib_handle_t;
 #else
-        typedef void * lib_handle_t;
+      typedef void * lib_handle_t;
 #endif
-        
-        //! A handle to an associated logger library.
-        static lib_handle_t g_pLibHandle;
 
-        //! Opens a library.
-        static lib_handle_t OpenLibrary( const gcstring Name );
+      // Default initializer
+      static void DefaultInitializer();
 
-        //! Finds a symbol and return its pointer.
-        static void *FindSymbol( lib_handle_t Handle, const gcstring Name );
+      //! Opens a library.
+      static lib_handle_t OpenLibrary(const gcstring Name);
+
+      //! Finds a symbol and return its pointer.
+      static void *FindSymbol(lib_handle_t Handle, const gcstring Name);
+
+      //! Makes sure log4cpp has been found.
+      static void MakeSureLoggerHasBeenFound();
+
+      static bool ExistInMap(gcstring loggerName);
+      // Delete all available ILoggers
+      static void DeleteLoggerMap();
+
+      // Contains the logger factory unless it has not been loaded
+      static ILoggerFactory* m_LogFactory;
+
+
         
-        //! A truth value of a proposition "Has found log4cpp."
-        static bool g_HasFoundLogger;
+      //! A handle to an associated logger library.
+      static lib_handle_t g_pLibHandle;
+        
+      // True if logger has been found
+      static bool m_LoggerHasBeenFound;
+      static bool m_OmitLogger;
 
     };
 
 }
 
-// Logging macros (can be replaced by real functions for compilers not supporting it?)
-#define GCLOGINFO( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ ); }
-#define GCLOGINFOPUSH( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::LogPush( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ ); }
-#define GCLOGINFOPOP( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::LogPop( cat, LOG4CPP_NS::Priority::INFO, ##__VA_ARGS__ ); }
-#define GCLOGWARN( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::WARN, ##__VA_ARGS__ ); }
-#define GCLOGERROR( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::ERROR, ##__VA_ARGS__ ); }
-#define GCLOGDEBUG( cat, ... ) if(GENICAM_NAMESPACE::CLog::Exists("")) { GENICAM_NAMESPACE::CLog::Log( cat, LOG4CPP_NS::Priority::DEBUG,  ##__VA_ARGS__ ); }
+#if defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wvariadic-macros"
+#endif
+
+// Logging macros
+#define GCLOGINFO( cat, ... )       if(cat && GENICAM_NAMESPACE::CLog::Exist("")) { (cat)->Log(GENICAM_NAMESPACE::ILogger::INFO, ##__VA_ARGS__ ); }
+#define GCLOGINFOPUSH( cat, ... )   if(cat && GENICAM_NAMESPACE::CLog::Exist("")) { (cat)->Log(GENICAM_NAMESPACE::ILogger::INFO, ##__VA_ARGS__ ); GENICAM_NAMESPACE::CLog::PushIndent();}
+#define GCLOGWARN( cat, ... )       if(cat && GENICAM_NAMESPACE::CLog::Exist("")) { (cat)->Log(GENICAM_NAMESPACE::ILogger::WARN, ##__VA_ARGS__ ); }
+#define GCLOGERROR( cat, ... )      if(cat && GENICAM_NAMESPACE::CLog::Exist("")) { (cat)->Log(GENICAM_NAMESPACE::ILogger::ERR, ##__VA_ARGS__ ); }
+#define GCLOGDEBUG( cat, ... )      if(cat && GENICAM_NAMESPACE::CLog::Exist("")) { (cat)->Log(GENICAM_NAMESPACE::ILogger::DEBUG, ##__VA_ARGS__ ); }
+#define GCLOGINFOPOP( cat, ... )    if(cat && GENICAM_NAMESPACE::CLog::Exist("")) { (cat)->Log(GENICAM_NAMESPACE::ILogger::INFO, ##__VA_ARGS__ ); GENICAM_NAMESPACE::CLog::PopIndent();}
+
+
+#if defined(__GNUC__)
+#   pragma GCC diagnostic pop
+#endif
 
 #endif // LOG_CLOG_H_

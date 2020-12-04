@@ -197,7 +197,7 @@ namespace GENICAM_NAMESPACE
 #define GENICAM_UNUSED(unused_var)    ((void)(unused_var))
 
 #if !defined(GENICAM_DEPRECATED)
-#   if defined(__GNUC__) && (__GNUC__ >= 3) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 1) // is at least GCC 3.1 compiler?
+#   if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__ ) >= 301) // is at least GCC 3.1 compiler?
 #       define GENICAM_DEPRECATED(FUNCTION) FUNCTION __attribute__ ((deprecated))
 #   elif defined(_MSC_VER) && (_MSC_VER >= 1300) // is at least VC 2003 compiler?
 #       define GENICAM_DEPRECATED(FUNCTION) __declspec(deprecated) FUNCTION

@@ -36,6 +36,7 @@
 #include "ValueT.h"
 #include "BaseT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 
 namespace GENAPI_NAMESPACE
 {

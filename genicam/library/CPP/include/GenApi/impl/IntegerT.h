@@ -88,9 +88,6 @@ namespace GENAPI_NAMESPACE
                     // sets the value
                     Base::InternalSetValue(Value, Verify);
 
-                    if( Verify )
-                        Base::InternalCheckError();
-
                     #if ! defined( DISABLE_VALUE_CACHING ) || (DISABLE_VALUE_CACHING == 0)
                         // Fill cache
                         if( WriteThrough == static_cast<INode *>(this)->GetCachingMode() )
@@ -102,6 +99,9 @@ namespace GENAPI_NAMESPACE
                     #endif
 
                 }
+
+                if (Verify)
+                    Base::InternalCheckError();
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...SetValue" );
 

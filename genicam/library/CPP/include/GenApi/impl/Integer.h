@@ -36,6 +36,7 @@
 #include "ValueT.h"
 #include "IntegerT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "PrivateTypes.h"
 #include "PolyReference.h"
 #include <map>

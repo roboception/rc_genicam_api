@@ -38,6 +38,8 @@
 #include "ValueT.h"
 #include "EnumerationT.h"
 #include "PolyReference.h"
+#include "NodeMap.h"
+
 
 namespace GENAPI_NAMESPACE
 {
@@ -46,7 +48,7 @@ namespace GENAPI_NAMESPACE
     // CEnumeration class
     //*************************************************************
 
-    class CEnumerationImpl : public CNodeImpl, public IEnumeration
+    class CEnumerationImpl : public IEnumeration, public CNodeImpl
     {
     public:
         //! Constructor

@@ -36,6 +36,7 @@
 #include "BaseT.h"
 #include "ValueT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "CommandT.h"
 #include "PolyReference.h"
 
@@ -56,7 +57,7 @@ namespace GENAPI_NAMESPACE
     * \ingroup GenApi_PublicImpl
     */
 
-    class CCommandImpl : public  ICommand, public CNodeImpl
+    class CCommandImpl : public ICommand, public CNodeImpl
     {
     public:
         //! Constructor
@@ -100,13 +101,11 @@ namespace GENAPI_NAMESPACE
         virtual bool InternalIsDone(bool Verify, bool &FireCallbacks );
         // \}
 
-
     public:
         //! \name INodePrivate implementation
         virtual void SetProperty( CProperty &Property );
         virtual bool GetProperty( CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList ) const;
-        
-        
+
         //-------------------------------------------------------------
         // Initializing
         //-------------------------------------------------------------
@@ -117,7 +116,7 @@ namespace GENAPI_NAMESPACE
         // Member variables
         //-------------------------------------------------------------
 
-        //! possible stati of the command node
+        //! possible statuses of the command node
         typedef enum _EStatus
         {
             statusUninitialized,
@@ -128,7 +127,7 @@ namespace GENAPI_NAMESPACE
         //! the internal status of the command node
         EStatus m_Status;
 
-        //! Reference to value or node representing the válue
+        //! Reference to value or node representing the value
         CIntegerPolyRef m_Value;
 
         //! Value for On

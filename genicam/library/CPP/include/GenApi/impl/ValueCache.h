@@ -61,6 +61,9 @@ namespace GENAPI_NAMESPACE
         /// Query whether value is valid
         bool IsValueValid( int64_t Address, uint32_t Size ) const;
 
+        /// Set the cache shield for a specific address
+        void SetCacheShield(int64_t Address, bool shield) const;
+
         /// Query wheher value is implemented
         //bool IsValuePresent( int64_t Address ) const;
 

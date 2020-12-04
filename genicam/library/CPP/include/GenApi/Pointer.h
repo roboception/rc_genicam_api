@@ -257,6 +257,8 @@ namespace GENAPI_NAMESPACE
     //! SmartPointer for IPortConstruct interface pointer
     typedef CPointer<IPortConstruct> CPortConstructPtr;
 
+    //! SmartPointer for IPortStackedConstruct interface pointer
+    typedef CPointer<IPortStackedConstruct> CPortStackedConstructPtr;
 
     //! Returns the name of the main interface as string
     //! DEPRECATED, use IBase::GetPrincipalInterfaceType() instead

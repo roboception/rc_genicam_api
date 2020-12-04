@@ -24,7 +24,7 @@
 //-----------------------------------------------------------------------------
 /*!
 \file
-\brief    Definition of function for laoding a DLL dynamically
+\brief    Definition of function for loading a DLL dynamically
 \ingroup GenApi_PublicImpl
 */
 
@@ -37,7 +37,7 @@
 #if defined (_MSC_VER)
 // nothing
 #elif defined (__GNUC__)
-#  if !defined(__x86_64) && !defined(__arm__) && !defined(VXWORKS)
+#  if !defined(__x86_64) && !defined(__arm__) && !defined(__aarch64__) && !defined(VXWORKS)
 #   define  __cdecl __attribute__((cdecl))
 #  else
 #   define  __cdecl /* use default calling convention */

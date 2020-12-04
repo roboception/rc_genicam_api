@@ -38,7 +38,10 @@
 #include "../IString.h"
 #include "Node.h"
 #include "NodeT.h"
+//#include "NodeMap.h"
 #include "BaseT.h"
+
+class CNodeImpl;
 
 namespace GENAPI_NAMESPACE
 {
@@ -56,6 +59,7 @@ namespace GENAPI_NAMESPACE
         public IPortConstruct,
         public IChunkPort,
         public IPortRecorder,
+        public IPortStackedConstruct,
         public CNodeImpl
     {
     public:
@@ -98,6 +102,9 @@ namespace GENAPI_NAMESPACE
         //! Sets pointer the real port implementation; this function may called only once
         void SetPortImpl(IPort* pPort);
 
+        //! Sets pointer the real port implementation; this function may called only once
+        void SetPortImpl(IPortStacked *pPort);
+
         //-------------------------------------------------------------
         // IChunkPort implementation
         //-------------------------------------------------------------
@@ -134,6 +141,18 @@ namespace GENAPI_NAMESPACE
         virtual void Replay( IPortWriteList *pPortRecorder, bool Invalidate = true );
 
         //-------------------------------------------------------------
+        // IPortStacked Interface
+        //-------------------------------------------------------------
+        //! Start stacking writes
+        virtual void EnabledStack();
+
+        //! Flush the write stack to the device.
+        virtual void FlushStack();
+        
+        //! Disable the write stack, all data in the stack will be lost.
+        virtual void DisableStack();
+
+        //-------------------------------------------------------------
         // Initializing
         //-------------------------------------------------------------
         
@@ -153,6 +172,9 @@ namespace GENAPI_NAMESPACE
         //! Pointer to node giving access to the real port implementation
         IPort *m_pPort;
 
+        //! Pointer to node giving access to the real port implementation with stack.
+        IPortStacked *m_pPortStack;
+
         //! Pointer to node giving access to the real port implementation
         IPortWriteList *m_pPortWriteList;
 
@@ -167,6 +189,12 @@ namespace GENAPI_NAMESPACE
 
         //! Determines if the port adapter must cache the chunk data
         EYesNo m_CacheChunkData;
+
+        //! Determines if write stacking is allowed
+        bool m_isStackingEnabled;
+
+        //! Write stack
+        std::vector<PORT_REGISTER_STACK_ENTRY> m_writeStackData;
     };
 
     class CPort : public BaseT<  NodeT< CPortImplIntern > >

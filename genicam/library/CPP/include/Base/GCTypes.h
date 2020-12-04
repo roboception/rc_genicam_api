@@ -275,10 +275,8 @@ namespace GENICAM_NAMESPACE
 using GENICAM_NAMESPACE::Version_t;
 
 // mark a variable as unused. This prevents unused parameter/ unused local variable warnings on warning level 4.
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__GNUC__)
 #   define GC_UNUSED(unused_var) (void)(unused_var)
-#elif defined(__GNUC__)
-#   define GC_UNUSED(unused_var) // no changes to unused params with GCC
 #else
 #   error Unsupported compiler or platform
 #endif

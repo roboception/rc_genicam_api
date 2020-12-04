@@ -52,12 +52,13 @@
 #include "PolyReference.h"
 #include "NodeMapData/NodeMapDataTypes.h"
 #include "NodeMapData/NodeData.h"
-#include "NodeMap.h"
+//#include "NodeMap.h"
 #include "../IUserData.h"
 #include <list>
 
 class CProperty;
 class CNodeDataMap;
+class CNodeMap;
 
 namespace GENAPI_NAMESPACE
 {
@@ -550,6 +551,9 @@ namespace GENAPI_NAMESPACE
             //! indicates that the cache has been filled and should not be cleared at the end of the operation
             bool m_DontDeleteThisCache;
 
+            //! indicates that this terminal node was written and not yet invalidated.
+            bool m_TerminalNodeWritten;
+
             //! Used to ensure that PostSetValue() is called in any case
             class PostSetValueFinalizer
             {
@@ -618,25 +622,25 @@ namespace GENAPI_NAMESPACE
             // end of the class' memory layout
 
             //! Logger for messages concerning the AccessMode
-            LOG4CPP_NS::Category *m_pAccessLog;
+            GENICAM_NAMESPACE::ILogger *m_pAccessLog;
 
             //! Logger for messages concerning the getting and setting values
-            LOG4CPP_NS::Category *m_pValueLog;
+            GENICAM_NAMESPACE::ILogger *m_pValueLog;
 
             //! Logger for messages concerning the range check
-            LOG4CPP_NS::Category *m_pRangeLog;
+            GENICAM_NAMESPACE::ILogger *m_pRangeLog;
 
             //! Logger for messages concerning the port access
-            LOG4CPP_NS::Category *m_pPortLog;
+            GENICAM_NAMESPACE::ILogger *m_pPortLog;
 
             //! Logger for messages concerning the caching access
-            LOG4CPP_NS::Category *m_pCacheLog;
+            GENICAM_NAMESPACE::ILogger *m_pCacheLog;
 
             //! Logger for things done during pre-processing of the node map, e.g. determining dependencies
-            LOG4CPP_NS::Category *m_pPreProcLog;
+            GENICAM_NAMESPACE::ILogger *m_pPreProcLog;
 
             //! Logger for messages concerning miscellaneous access which does not fit to the other categories
-            LOG4CPP_NS::Category *m_pMiscLog;
+            GENICAM_NAMESPACE::ILogger *m_pMiscLog;
 
         //@}
 

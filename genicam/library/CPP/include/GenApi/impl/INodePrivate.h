@@ -91,7 +91,9 @@ namespace GENAPI_NAMESPACE
         enum ESetInvalidMode
         {
             simOnlyMe,  //!< Invalidate only the node itself
-            simAll  //!< Invalidate the node and all of its dependents
+            simAll,  //!< Invalidate the node and all of its dependents
+            simDependentsAfterWrite, // !< Invalidate all of its dependents but not itself after a write of a terninal node
+            simDependents // !< Invalidate all of its dependents but not itself
         };
 
         //! Invalidate the node resp. the node and all of its dependents

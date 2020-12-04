@@ -16,6 +16,8 @@
 
 LOG4CPP_NS_BEGIN
 
+#ifdef _WIN32
+
 /**
  * Win32DebugAppender simply sends the log message to the default system
  * debugger on Win32 systems.  This is useful for users of MSVC and Borland
@@ -57,5 +59,7 @@ LOG4CPP_NS_END
 #else // WIN32
 #error NTEventLoggAppender is not available on on Win32 platforms
 #endif	// WIN32
+
+#endif  // _WIN32
 
 #endif // _LOG4CPP_WIN32DEBUGAPPENDER_HH

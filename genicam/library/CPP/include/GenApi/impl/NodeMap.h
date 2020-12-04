@@ -37,8 +37,11 @@
 #include "GenApi/IDeviceInfo.h"
 #include "GenApi/Synch.h"
 #include "Base/GCString.h"
+#include "Base/GCStringVector.h"
 #include "GenApi/impl/Value2String.h"
 #include "GenApi/IUserData.h"
+#include "GenApi/impl/ConcatenatedWriteImpl.h"
+#include "GenApi/impl/Port.h"
 #include <map>
 
 #ifdef _MSC_VER 
@@ -77,10 +80,15 @@ namespace GENAPI_NAMESPACE
             virtual void InvalidateNodes() const;
             virtual bool Connect(IPort* pPort, const GENICAM_NAMESPACE::gcstring& PortName) const;
             virtual bool Connect(IPort* pPort) const;
+            virtual bool Connect(IPortStacked* pPort, const GENICAM_NAMESPACE::gcstring& PortName);
+            virtual bool Connect(IPortStacked* pPort);
             virtual GENICAM_NAMESPACE::gcstring GetDeviceName();
             virtual void Poll(int64_t ElapsedTime);
             virtual CLock& GetLock() const;
             virtual uint64_t GetNumNodes() const;
+            virtual CNodeWriteConcatenator *NewNodeWriteConcatenator() const;
+            virtual bool ConcatenatedWrite(CNodeWriteConcatenator *, bool featureStreaming = true, GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL);
+
             virtual bool ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL ) const;
         //@}
 
@@ -241,6 +249,9 @@ namespace GENAPI_NAMESPACE
         //! The pointer to the lock guarding access to the node map
         //! This may be changed by the user if he decides to use another lock
         CLock& m_Lock;
+
+    private:
+        std::list<CPort *> m_connectedPort;
 
 
         //-------------------------------------------------------------

@@ -62,15 +62,11 @@ namespace GENAPI_NAMESPACE
 
                 {
                     typename Base::PostSetValueFinalizer PostSetValueCaller(this, CallbacksToFire);  // dtor calls Base::PostSetValue
-
                     Base::PreSetValue(); // invalidates all nodes if this is the first call in a chain of SetValue-like calls
-
                     Base::InternalExecute(Verify);
-
-                    if( Verify )
-                        Base::InternalCheckError();
-
                 }
+                if (Verify && Base::m_Status != Base::statusBusy)
+                    Base::InternalCheckError();
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...Execute" );
 
@@ -128,7 +124,6 @@ namespace GENAPI_NAMESPACE
                     {
                         (*it)->CollectCallbacksToFire(CallbacksToFire, true);
                         DeleteDoubleCallbacks(CallbacksToFire);
-                        (*it)->SetInvalid(INodePrivate::simAll);
                     }
                 }
 

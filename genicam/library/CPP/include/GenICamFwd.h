@@ -61,6 +61,7 @@ namespace GENAPI_NAMESPACE
     interface INodeMap;
     interface IPort;
     interface IPortConstruct;
+    interface IPortStackedConstruct;
     interface IPortRecorder;
     interface IPortReplay;
     interface IPortWriteList;

@@ -34,6 +34,7 @@
 #include "../IEnumEntry.h"
 #include "Node.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "BaseT.h"
 #include "ValueT.h"
 #include "EnumEntry.h"

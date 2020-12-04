@@ -34,6 +34,7 @@
 #include <GenApi/GenApiDll.h>
 #include <GenApi/Types.h>
 #include <GenApi/IPort.h>
+#include <GenApi/IPortStacked.h>
 
 namespace GENAPI_NAMESPACE
 {
@@ -49,6 +50,20 @@ namespace GENAPI_NAMESPACE
     {
         //! Sets pointer the real port implementation; this function may called only once
         virtual void SetPortImpl(IPort* pPort) = 0;
+
+        //! Determines if the port adapter must perform an endianess swap
+        virtual EYesNo GetSwapEndianess() = 0;
+    };
+
+    /**
+    \brief Interface for ports
+    \ingroup GenApi_PublicImpl
+    */
+    interface GENAPI_DECL_ABSTRACT IPortStackedConstruct
+    {
+
+        //! Sets pointer the real port implementation; this function may called only once
+        virtual void SetPortImpl(IPortStacked *pPort) = 0;
 
         //! Determines if the port adapter must perform an endianess swap
         virtual EYesNo GetSwapEndianess() = 0;

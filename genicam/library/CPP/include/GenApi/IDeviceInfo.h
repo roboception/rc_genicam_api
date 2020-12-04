@@ -32,6 +32,7 @@
 #define GENAPI_DEVICEINFO_H
 
 #include <Base/GCBase.h>
+#include <GenApi/Types.h>
 
 #ifdef _MSC_VER
 #   pragma warning ( push )

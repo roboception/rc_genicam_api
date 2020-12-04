@@ -38,6 +38,7 @@
 #include "Port.h"
 #include "PrivateTypes.h"
 #include "Node.h"
+#include "NodeMap.h"
 #include "../IInteger.h"
 #include "../IEnumeration.h"
 

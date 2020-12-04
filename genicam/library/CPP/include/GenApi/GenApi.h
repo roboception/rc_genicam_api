@@ -47,6 +47,7 @@
 #include <GenApi/IEnumEntry.h>
 #include <GenApi/IBoolean.h>
 #include <GenApi/IPort.h>
+#include <GenApi/IPortStacked.h>
 #include <GenApi/IPortRecorder.h>
 #include <GenApi/IPortConstruct.h>
 #include <GenApi/IChunkPort.h>

@@ -77,6 +77,8 @@ namespace GENAPI_NAMESPACE
                 AutoLock l(Base::GetLock());
                 typename Base::EntryMethodFinalizer E( this, meSetValue );
 
+                Base::m_ValueCacheValid = false;
+
                 GCLOGINFOPUSH( Base::m_pValueLog, "SetValue( %f )...", Value );
 
                 if( Verify )
@@ -96,9 +98,6 @@ namespace GENAPI_NAMESPACE
                     // sets the value
                     Base::InternalSetValue(Value, Verify);
 
-                    if( Verify )
-                        Base::InternalCheckError();
-
                     #if ! defined( DISABLE_VALUE_CACHING ) || (DISABLE_VALUE_CACHING == 0)
                         // Fill cache
                         if( WriteThrough == static_cast<INode *>(this)->GetCachingMode() )
@@ -110,6 +109,8 @@ namespace GENAPI_NAMESPACE
                     #endif
 
                 }
+                if (Verify)
+                    Base::InternalCheckError();
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...SetValue" );
 

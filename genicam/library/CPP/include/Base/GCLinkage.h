@@ -59,11 +59,12 @@
 // _MSC_VER==1700 : VC110 : Visual C++ 2012
 // _MSC_VER==1800 : VC120 : Visual C++ 2013
 // _MSC_VER==1900 : VC140 : Visual C++ 2015
-#   if !( _MSC_VER==1400 || _MSC_VER==1500 || _MSC_VER==1600 || _MSC_VER==1700 || _MSC_VER==1800 || _MSC_VER==1900 ) && ! defined(GENICAM_USER_ACCEPTS_ANY_COMPILER)
+// _MSC_VER==1915 : VC150 : Visual C++ 2015
+#   if !( _MSC_VER==1400 || _MSC_VER==1500 || _MSC_VER==1600 || _MSC_VER==1700 || _MSC_VER==1800 || _MSC_VER>=1900 || _MSC_VER<=1915 ) && ! defined(GENICAM_USER_ACCEPTS_ANY_COMPILER)
 #     define COMPILER_VERSION_2( s ) #s
 #     define COMPILER_VERSION_STRING(version) COMPILER_VERSION_2( version )
 #     pragma message( "Notice: Using GenICam with untested compiler, version " COMPILER_VERSION_STRING(_MSC_VER) " detected!" )
-#     pragma message( "Following versions were tested: 1400, 1500, 1600, 1700, 1800, 1900." )
+#     pragma message( "Following versions were tested: 1400, 1500, 1600, 1700, 1800, 1900-1915." )
 #     undef COMPILER_VERSION_2
 #     undef COMPILER_VERSION_STRING
 #   endif

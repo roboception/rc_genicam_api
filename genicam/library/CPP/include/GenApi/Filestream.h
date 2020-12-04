@@ -33,6 +33,7 @@
 // #include <algorithm>
 // #include <iostream>
 // #include <streambuf>
+#include <cstring>
 #include <iomanip>
 #include <iosfwd>
 #include <cstring> // memcpy
@@ -161,7 +162,7 @@ namespace GENAPI_NAMESPACE
 
         /*!
         * @brief
-        * writes data into a file.
+        * writes data into a file
         *
         * @param buf
         * source buffer
@@ -173,10 +174,10 @@ namespace GENAPI_NAMESPACE
         * count of bytes to write
         *
         * @param pFileName
-        * file name of the file to write into The file name must exist in the Enumeration FileSelector
+        * file name of the file to write into. The file name must exist in the Enumeration FileSelector
         *
         * @returns
-        * count of bytes written
+        * count of bytes written. If less than len bytes are written an error has occurred.
         *
         */
         virtual GenICam_streamsize write(const char * buf, int64_t offs, int64_t len, const char * pFileName);
@@ -196,10 +197,10 @@ namespace GENAPI_NAMESPACE
         * count of bytes to read
         *
         * @param pFileName
-        * file name of the file to write into The file name must exist in the Enumeration FileSelector
+        * file name of the file to write into. The file name must exist in the Enumeration FileSelector
         *
         * @returns
-        * count of bytes successfully read
+        * count of bytes successfully read. . If less than len bytes are written an error has occurred.
         *
         */
         virtual GenICam_streamsize read(char * buf, int64_t offs, GenICam_streamsize len, const char * pFileName);
@@ -436,40 +437,45 @@ namespace GENAPI_NAMESPACE
 
         filebuf_type *open(GENAPI_NAMESPACE::INodeMap * pInterface, const char * pFileName, std::ios_base::openmode mode) {
 
-            // create Genicam Access
-            m_pAdapter = new FileProtocolAdapter();
-
-            // attach to nodemap
-            if (!m_pAdapter || !m_pAdapter->attach(pInterface)){
-                delete m_pAdapter;
-                m_pAdapter = 0;
-                return 0;
-            }
-
-
-            // open file via Adapter
+            FileProtocolAdapter *pAdapter = NULL;
+            char_type *pBuffer = NULL;
+            filebuf_type *pFileBuf = NULL;
             try
             {
-                if (!(m_pAdapter->openFile(pFileName, mode))){
-                    delete m_pAdapter;
-                    m_pAdapter = 0;
-                    return 0;
+                pAdapter = new FileProtocolAdapter();
+                if (pAdapter)
+                {
+                    if (pAdapter->attach( pInterface ))
+                    {
+                        if (pAdapter->openFile( pFileName, mode ))
+                        {
+                            if (int64_t bufSize = pAdapter->getBufSize( pFileName, mode ))
+                            {
+                                pBuffer = new char_type[GENICAM_NAMESPACE::INTEGRAL_CAST<size_t>( bufSize ) / sizeof( char_type )];
+                                if (pBuffer)
+                                {
+                                    std::basic_streambuf<CharType, Traits>::setp( pBuffer, pBuffer + bufSize );
+                                    m_file = pFileName;
+                                    std::swap( m_pAdapter, pAdapter );
+                                    std::swap( m_pBuffer, pBuffer );
+                                    pFileBuf = this;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch (...)
             {
-                delete m_pAdapter;
-                m_pAdapter = 0;
+                delete pAdapter;
+                delete pBuffer;
                 throw;
             }
+            delete pAdapter;
+            delete pBuffer;
 
-            m_file = pFileName;
-            // allocate buffer according to fileinfo
-            const int64_t bufSize = m_pAdapter->getBufSize(m_file,mode);
-            m_pBuffer = new char_type[GENICAM_NAMESPACE::INTEGRAL_CAST<size_t>(bufSize) / sizeof(char_type)];
-            std::basic_streambuf<CharType, Traits>::setp(m_pBuffer, m_pBuffer + bufSize);
+            return pFileBuf;
 
-            return this;
         }
 
         bool

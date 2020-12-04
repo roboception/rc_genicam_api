@@ -24,58 +24,58 @@ set(GENICAM_LIB_SUFFIX)
 
 if ("${ARCHITECTURE}" STREQUAL "arm")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc46_v3_1
-    libMathParser_gcc46_v3_1
-    libGenApi_gcc46_v3_1
-    libNodeMapData_gcc46_v3_1
-    liblog4cpp_gcc46_v3_1
-    libXmlParser_gcc46_v3_1
-    libLog_gcc46_v3_1)
+    libGCBase_gcc494_v3_2
+    libGenApi_gcc494_v3_2
+    liblog4cpp_gcc494_v3_2
+    libLog_gcc494_v3_2
+    libMathParser_gcc494_v3_2
+    libNodeMapData_gcc494_v3_2
+    libXmlParser_gcc494_v3_2)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux32_ARMhf)
   set(GENICAM_LIB_SUFFIX ".so")
 elseif ("${ARCHITECTURE}" STREQUAL "aarch64")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc48_v3_1
-    libMathParser_gcc48_v3_1
-    libGenApi_gcc48_v3_1
-    libNodeMapData_gcc48_v3_1
-    liblog4cpp_gcc48_v3_1
-    libXmlParser_gcc48_v3_1
-    libLog_gcc48_v3_1)
+    libGCBase_gcc49_v3_2
+    libGenApi_gcc49_v3_2
+    liblog4cpp_gcc49_v3_2
+    libLog_gcc49_v3_2
+    libMathParser_gcc49_v3_2
+    libNodeMapData_gcc49_v3_2
+    libXmlParser_gcc49_v3_2)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux64_ARM)
   set(GENICAM_LIB_SUFFIX ".so")
 elseif ("${ARCHITECTURE}" STREQUAL "i686")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc42_v3_1
-    libMathParser_gcc42_v3_1
-    libGenApi_gcc42_v3_1
-    libNodeMapData_gcc42_v3_1
-    liblog4cpp_gcc42_v3_1
-    libXmlParser_gcc42_v3_1
-    libLog_gcc42_v3_1)
+    libGCBase_gcc48_v3_2
+    libGenApi_gcc48_v3_2
+    liblog4cpp_gcc48_v3_2
+    libLog_gcc48_v3_2
+    libMathParser_gcc48_v3_2
+    libNodeMapData_gcc48_v3_2
+    libXmlParser_gcc48_v3_2)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux32_i86)
   set(GENICAM_LIB_SUFFIX ".so")
 elseif ("${ARCHITECTURE}" STREQUAL "x86_64")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc42_v3_1
-    libMathParser_gcc42_v3_1
-    libGenApi_gcc42_v3_1
-    libNodeMapData_gcc42_v3_1
-    liblog4cpp_gcc42_v3_1
-    libXmlParser_gcc42_v3_1
-    libLog_gcc42_v3_1)
+    libGCBase_gcc48_v3_2
+    libGenApi_gcc48_v3_2
+    liblog4cpp_gcc48_v3_2
+    libLog_gcc48_v3_2
+    libMathParser_gcc48_v3_2
+    libNodeMapData_gcc48_v3_2
+    libXmlParser_gcc48_v3_2)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux64_x64)
   set(GENICAM_LIB_SUFFIX ".so")
 elseif ("${ARCHITECTURE}" STREQUAL "WIN32_i86")
   set(GENICAM_LIBRARIES
-    GCBase_MD_VC120_v3_1
-    GenApi_MD_VC120_v3_1)
+    GCBase_MD_VC141_v3_2
+    GenApi_MD_VC141_v3_2)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/library/CPP/lib/Win32_i86)
   set(GENICAM_LIB_SUFFIX ".lib")
 elseif ("${ARCHITECTURE}" STREQUAL "WIN64_x64")
   set(GENICAM_LIBRARIES
-    GCBase_MD_VC120_v3_1
-    GenApi_MD_VC120_v3_1)
+    GCBase_MD_VC141_v3_2
+    GenApi_MD_VC141_v3_2)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/library/CPP/lib/Win64_x64)
   set(GENICAM_LIB_SUFFIX ".lib")
 else ()
@@ -90,7 +90,7 @@ foreach(GENICAM_LIB ${GENICAM_LIBRARIES})
   message(STATUS "Adding imported: ${GENICAM_NAMESPACE_LIB}")
   set_property(TARGET ${GENICAM_NAMESPACE_LIB} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
   set_property(TARGET ${GENICAM_NAMESPACE_LIB} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-  
+
   set(GENICAM_LIB_FILE "${GENICAM_LIBRARIES_DIR}/${GENICAM_LIB}${GENICAM_LIB_SUFFIX}")
   if (UNIX)
 	  set_target_properties(${GENICAM_NAMESPACE_LIB}

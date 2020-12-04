@@ -132,6 +132,12 @@ namespace GENAPI_NAMESPACE
         //! Retrieves the node from the central map by name
         virtual INode* _GetNode(const GENICAM_NAMESPACE::gcstring& key) const;
 
+        //! Create a new write concatenator object
+        virtual CNodeWriteConcatenator *_NewNodeWriteConcatenator() const;
+
+        //! Execute the transaction
+        virtual bool _ConcatenatedWrite(CNodeWriteConcatenator*, bool featureStreaming = true, GENICAM_NAMESPACE::gcstring_vector* pErrorList = NULL);
+
         //! Invalidates all nodes
         virtual void _InvalidateNodes() const;
 
@@ -143,6 +149,12 @@ namespace GENAPI_NAMESPACE
 
         //! Parse all Swissknife equations
         virtual bool _ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL ) const;
+        //! Connects a port to a port node with given name
+        virtual bool _Connect(IPortStacked* pPort, const GENICAM_NAMESPACE::gcstring& PortName) const;
+
+        //! Connects a port to the standard port "Device"
+        virtual bool _Connect(IPortStacked* pPort) const;
+
         //! Pointer to the NodeMap
         INodeMap *_Ptr;
 
@@ -387,8 +399,7 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->GetDeviceName();
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
@@ -396,8 +407,7 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->Poll(ElapsedTime);
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
@@ -405,8 +415,23 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->GetNodes(Nodes);
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+    }
+
+    template<class TCameraParams>
+    inline CNodeWriteConcatenator  *CNodeMapRefT<TCameraParams>::_NewNodeWriteConcatenator() const
+    {
+        if (_Ptr)
+            return _Ptr->NewNodeWriteConcatenator();
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+    }
+
+    template<class TCameraParams>
+    inline bool CNodeMapRefT<TCameraParams>::_ConcatenatedWrite(CNodeWriteConcatenator* pConcatenatedWrite, bool featureStreaming, GENICAM_NAMESPACE::gcstring_vector* pErrorList)
+    {
+        if (_Ptr)
+            return _Ptr->ConcatenatedWrite(pConcatenatedWrite, featureStreaming, pErrorList);
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
@@ -414,8 +439,7 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->GetNode(key);
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
@@ -423,19 +447,15 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->InvalidateNodes();
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
     inline bool CNodeMapRefT<TCameraParams>::_ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList ) const
     {
-        bool ret = false;
         if (_Ptr)
-            ret = _Ptr->ParseSwissKnifes(pErrorList);
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
-        return ret;
+            return _Ptr->ParseSwissKnifes(pErrorList);
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
@@ -443,8 +463,7 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->Connect(pPort, PortName);
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
     template<class TCameraParams>
@@ -452,10 +471,24 @@ namespace GENAPI_NAMESPACE
     {
         if(_Ptr)
             return _Ptr->Connect(pPort);
-        else
-            throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
 
+    template<class TCameraParams>
+    inline bool CNodeMapRefT<TCameraParams>::_Connect(IPortStacked* pPort, const GENICAM_NAMESPACE::gcstring& PortName) const
+    {
+        if (_Ptr)
+            return _Ptr->Connect(pPort, PortName);
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+    }
+
+    template<class TCameraParams>
+    inline bool CNodeMapRefT<TCameraParams>::_Connect(IPortStacked* pPort) const
+    {
+        if (_Ptr)
+            return _Ptr->Connect(pPort);
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+    }
 
     template<class TCameraParams>
     inline bool CNodeMapRefT<TCameraParams>::_ClearXMLCache()

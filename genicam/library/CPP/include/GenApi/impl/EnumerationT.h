@@ -89,10 +89,9 @@ namespace GENAPI_NAMESPACE
 
                     Base::InternalSetIntValue(Value, Verify);
 
-                    if( Verify )
-                        Base::InternalCheckError();
-
                 }
+                if (Verify)
+                    Base::InternalCheckError();
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...SetIntValue" );
 

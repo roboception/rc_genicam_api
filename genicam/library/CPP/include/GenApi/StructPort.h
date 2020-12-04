@@ -75,7 +75,7 @@ namespace GENAPI_NAMESPACE
             int64_t InternalAddress = Address - m_BaseAddress;
 
             CDataStruct *pDataStruct = static_cast<CDataStruct*>(this);
-            if( InternalAddress < 0 || Length < 0 || InternalAddress + Length > sizeof(CDataStruct) )
+            if( ( InternalAddress < 0 ) || ( Length < 0 ) || ( InternalAddress + Length > static_cast<int64_t>( sizeof(CDataStruct) ) ) )
                 throw RUNTIME_EXCEPTION("CTestPortStruct::Read - Invalid address and/or length");
             memcpy( pBuffer, (uint8_t*)pDataStruct + InternalAddress, (size_t)Length );
             m_NumReads++;
@@ -87,7 +87,7 @@ namespace GENAPI_NAMESPACE
             int64_t InternalAddress = Address - m_BaseAddress;
 
             CDataStruct *pDataStruct = static_cast<CDataStruct*>(this);
-            if( InternalAddress < 0 || Length < 0 || InternalAddress + Length > sizeof(CDataStruct) )
+            if( ( InternalAddress < 0 ) || ( Length < 0 ) || ( InternalAddress + Length > static_cast<int64_t>( sizeof(CDataStruct) ) ) )
                 throw RUNTIME_EXCEPTION("CTestPortStruct::Write - Invalid address and/or length");
             memcpy( (uint8_t*)pDataStruct + InternalAddress, pBuffer, (size_t)Length );
             m_NumWrites++;

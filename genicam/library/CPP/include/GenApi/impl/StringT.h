@@ -67,12 +67,11 @@ namespace GENAPI_NAMESPACE
 
                     Base::InternalSetValue(Value, Verify);
 
-                    if( Verify )
-                        Base::InternalCheckError();
-
                     // now Base::PostSetValue is called by ~PostSetValueFinalizer, i.e. updates are fired
                     // if this is the call on the top of a chain of SetValue calls
                 }
+                if (Verify)
+                    Base::InternalCheckError();
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...SetValue" );
 

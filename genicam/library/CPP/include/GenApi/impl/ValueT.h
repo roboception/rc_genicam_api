@@ -92,10 +92,10 @@ namespace GENAPI_NAMESPACE
                     Base::PreSetValue(); // invalidates all nodes if this is the first call in a chain of SetValue-like calls
 
                     Base::InternalFromString(ValueStr, Verify);
-
-                    if( Verify )
-                        Base::InternalCheckError();
                 }
+
+                if (Verify)
+                    Base::InternalCheckError();
 
                 // fire callbacks inside the lock
                 std::list<CNodeCallback*>::iterator ptrCallback;

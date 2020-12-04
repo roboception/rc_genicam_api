@@ -38,6 +38,7 @@
 #include "BaseT.h"
 #include "ValueT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "IntegerT.h"
 
 

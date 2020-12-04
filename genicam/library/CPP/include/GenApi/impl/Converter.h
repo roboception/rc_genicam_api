@@ -36,6 +36,7 @@
 #include "BaseT.h"
 #include "ValueT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "SwissKnife.h"
 #include "FloatT.h"
 #include "PolyReference.h"

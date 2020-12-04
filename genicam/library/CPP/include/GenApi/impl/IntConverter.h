@@ -37,6 +37,7 @@
 #include "BaseT.h"
 #include "ValueT.h"
 #include "NodeT.h"
+#include "NodeMap.h"
 #include "IntSwissKnife.h"
 #include "IntegerT.h"
 #include "MathParser/Int64MathParser.h"

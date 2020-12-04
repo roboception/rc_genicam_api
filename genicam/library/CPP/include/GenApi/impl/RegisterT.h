@@ -65,7 +65,7 @@ namespace GENAPI_NAMESPACE
                 AutoLock l(Base::GetLock());
                 typename Base::EntryMethodFinalizer E( this, meSet );
 
-                if( GENICAM_NAMESPACE::CLog::IsInfoEnabled( Base::m_pValueLog ) && pBuffer )
+                if( pBuffer )
                 {
                     {
                         static const char fmt[] =
@@ -105,9 +105,9 @@ namespace GENAPI_NAMESPACE
                     Base::PreSetValue(); // invalidates all nodes if this is the first call in a chain of SetValue like calls
                     Base::InternalSet(pBuffer, Length);
 
-                    if( Verify )
-                        Base::InternalCheckError();
                 }
+                if( Verify )
+                    Base::InternalCheckError();
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...Set" );
 
@@ -145,34 +145,33 @@ namespace GENAPI_NAMESPACE
             if( Verify )
                 Base::InternalCheckError();
 
-            if (GENICAM_NAMESPACE::CLog::IsInfoEnabled(Base::m_pValueLog))
+
+            static const char fmt[] =
+                "...Get( %" FMT_I64 "d ) = 0x";
+
+            static const int BufferLen(256);
+            char _pBuffer[256];
+            int BufferLeft(_snprintf(_pBuffer, BufferLen, fmt, Length));
+
+            /* MANTIS 0000062 */
+            for(int i = 0; i < Length; i++)
             {
-                static const char fmt[] =
-                    "...Get( %" FMT_I64 "d ) = 0x";
-
-                static const int BufferLen(256);
-                char _pBuffer[256];
-                int BufferLeft(_snprintf(_pBuffer, BufferLen, fmt, Length));
-
-                /* MANTIS 0000062 */
-                for(int i = 0; i < Length; i++)
-                {
-                    const int n = _snprintf(_pBuffer + BufferLeft,
-                                            BufferLen - BufferLeft,
-                                            "%02X", (unsigned int) pBuffer[i]);
+                const int n = _snprintf(_pBuffer + BufferLeft,
+                                        BufferLen - BufferLeft,
+                                        "%02X", (unsigned int) pBuffer[i]);
 #pragma BullseyeCoverage off
-                    #ifdef _MSC_VER
-                        if (n < 0)
-                            break;
-                    #else
-                        if (BufferLeft + n >= BufferLen)
-                            break;
-                    #endif
+                #ifdef _MSC_VER
+                    if (n < 0)
+                        break;
+                #else
+                    if (BufferLeft + n >= BufferLen)
+                        break;
+                #endif
 #pragma BullseyeCoverage on
-                    BufferLeft += n;
-                }
-                GCLOGINFOPOP( Base::m_pValueLog, "%s", _pBuffer );
+                BufferLeft += n;
             }
+            GCLOGINFOPOP( Base::m_pValueLog, "%s", _pBuffer );
+            
         }
 
         //! Implementation of IRegister::GetLength()
