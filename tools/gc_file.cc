@@ -200,11 +200,10 @@ int main(int argc, char *argv[])
       std::cout << std::endl;
       std::cout << "-h            Prints help information and exits" << std::endl;
       std::cout << "-f            Lists names of files on the device" << std::endl;
-      std::cout << "-s <dev-file> Selects a file on the device" << std::endl;
       std::cout << "-w <file>     Writes the given local file into the selected file on the device" << std::endl;
       std::cout << "-r <file>     Reads the selected file on the device and stores it as local file" << std::endl;
       std::cout << std::endl;
-      std::cout << "The selected file is printed on std out if none of -l, -w and -r are given." << std::endl;
+      std::cout << "The selected file is printed on std out if none of -f, -w and -r are given." << std::endl;
       ret=1;
     }
   }
