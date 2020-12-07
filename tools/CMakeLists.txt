@@ -66,6 +66,12 @@ target_link_libraries(gc_pointcloud
     ${PROJECT_NAMESPACE}::rc_genicam_api_static)
 target_compile_options(gc_pointcloud PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
+add_executable(gc_file gc_file.cc)
+target_link_libraries(gc_file
+  PRIVATE
+      ${PROJECT_NAMESPACE}::rc_genicam_api_static)
+target_compile_options(gc_file PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
+
 # install tools
 
 install(TARGETS gc_info
@@ -87,6 +93,12 @@ install(TARGETS gc_stream
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS gc_pointcloud
+    EXPORT PROJECTTargets
+    COMPONENT bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS gc_file
     EXPORT PROJECTTargets
     COMPONENT bin
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
