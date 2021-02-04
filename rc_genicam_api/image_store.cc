@@ -286,7 +286,7 @@ std::string storeImagePNG(const std::string &name, const rcg::Image &image, size
 
         if (!out)
         {
-          throw new IOException("Cannot store file: "+ensureNewFileName(name+".pgm"));
+          throw new IOException("Cannot store file: "+full_name);
         }
 
         png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
