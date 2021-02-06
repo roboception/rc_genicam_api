@@ -159,7 +159,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
     // update available interfaces
 
-    GenTL::GC_ERROR err=gentl->IFUpdateDeviceList(ifh, 0, 100);
+    GenTL::GC_ERROR err=gentl->IFUpdateDeviceList(ifh, 0, 1000);
 
     if (err == GenTL::GC_ERR_INVALID_HANDLE)
     {
@@ -177,7 +177,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
       // try to repeat discovery of devices
 
-      err=gentl->IFUpdateDeviceList(ifh, 0, 100);
+      err=gentl->IFUpdateDeviceList(ifh, 0, 1000);
     }
 
     if (err != GenTL::GC_ERR_SUCCESS)
