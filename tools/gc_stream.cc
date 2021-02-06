@@ -332,8 +332,8 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
       try
       {
-        float v=rcg::getFloat(nodemap, "ChunkRcAdaptiveOut1Reduction", 0, 0, true);
-        out << "camera.adaptive_out1_reduction=" << v << std::endl;
+        float v=rcg::getFloat(nodemap, "ChunkRcOut1Reduction", 0, 0, true);
+        out << "camera.out1_reduction=" << v << std::endl;
       }
       catch (const std::exception &)
       { }
