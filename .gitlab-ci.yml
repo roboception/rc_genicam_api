@@ -11,30 +11,6 @@ variables:
 #########################
 # Templates using anchors
 #########################
-.amd64_trusty_t: &amd64_trusty_job
-  image: registry.roboception.de/tools/docker_images:buildimage
-  tags:
-    - amd64
-    - docker
-
-.armhf_trusty_t: &armhf_trusty_job
-  image: registry.roboception.de/tools/docker_images:armhf-buildimage
-  tags:
-    - armhf
-    - docker
-
-.amd64_xenial_t: &amd64_xenial_job
-  image: registry.roboception.de/tools/docker_images:xenial-buildimage
-  tags:
-    - amd64
-    - docker
-
-.armhf_xenial_t: &armhf_xenial_job
-  image: registry.roboception.de/tools/docker_images:armhf-xenial-buildimage
-  tags:
-    - armhf
-    - docker
-
 .amd64_bionic_t: &amd64_bionic_job
   image: registry.roboception.de/tools/docker_images:bionic-buildimage
   tags:
@@ -116,14 +92,6 @@ gen_dox:
 
 # Test (on every commit)
 ########################
-test:xenial:amd64:
-  <<: *amd64_xenial_job
-  extends: .test
-
-test:xenial:armhf:
-  <<: *armhf_xenial_job
-  extends: .test
-
 test:bionic:amd64:
   <<: *amd64_bionic_job
   extends: .test
@@ -138,14 +106,6 @@ test:focal:amd64:
 
 # Deploy testing (only on master)
 #################################
-package_testing:xenial:amd64:
-  <<: *amd64_xenial_job
-  extends: .package_testing
-
-package_testing:xenial:armhf:
-  <<: *armhf_xenial_job
-  extends: .package_testing
-
 package_testing:bionic:amd64:
   <<: *amd64_bionic_job
   extends: .package_testing
@@ -160,14 +120,6 @@ package_testing:focal:amd64:
 
 # Deploy stable (only for releases, version tags)
 #################################################
-package_stable:xenial:amd64:
-  <<: *amd64_xenial_job
-  extends: .package_stable
-
-package_stable:xenial:armhf:
-  <<: *armhf_xenial_job
-  extends: .package_stable
-
 package_stable:bionic:amd64:
   <<: *amd64_bionic_job
   extends: .package_stable
