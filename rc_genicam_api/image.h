@@ -143,6 +143,29 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i);
 void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
               uint32_t ds, uint32_t i, uint32_t k);
 
+/**
+  Converts image to RGB and monochrome format. Supported input pixel formats
+  are:
+
+  Mono8, Confidence8, Error8, YCbCr411, RGB8, BayerRG8, BayerBG8, BayerGR8,
+  BayerGB8
+
+  @param rgb_out     Pointer to target array for rgb image. The array must have
+                     a size of 3*width*height pixel. The pointer can be 0.
+  @param mono_out    Pointer to target array for monochrome image. The array
+                     must have a size of width*height pixel. The pointer can be 0.
+  @param raw         Pointer to input pixels.
+  @param pixelformat Pixel format of input.
+  @param width       Width of image.
+  @param height      Height of image.
+  @param xpadding    Padding of input image.
+  @return            False, if pixelformat is not supported. In this case,
+                     nothing is written to the target pointers.
+*/
+
+bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint64_t pixelformat,
+  size_t width, size_t height, size_t xpadding);
+
 }
 
 #endif

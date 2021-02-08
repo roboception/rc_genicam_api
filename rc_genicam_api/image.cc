@@ -190,4 +190,353 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
   }
 }
 
+namespace
+{
+
+/*
+  Convert at green pixel in green-red row.
+*/
+
+inline void convertGreenGR(uint8_t &r, uint8_t &g, uint8_t &b,
+  const uint8_t *&row0, const uint8_t *&row1, const uint8_t *&row2)
+{
+  r=static_cast<uint8_t>((static_cast<int>(*row1)+row1[2]+1)>>1);
+  g=row1[1];
+  b=static_cast<uint8_t>((static_cast<int>(row0[1])+row2[1]+1)>>1);
+
+  row0++; row1++; row2++;
+}
+
+/*
+  Convert at green pixel in green-blue row.
+*/
+
+inline void convertGreenGB(uint8_t &r, uint8_t &g, uint8_t &b,
+  const uint8_t *&row0, const uint8_t *&row1, const uint8_t *&row2)
+{
+  r=static_cast<uint8_t>((static_cast<int>(row0[1])+row2[1]+1)>>1);
+  g=row1[1];
+  b=static_cast<uint8_t>((static_cast<int>(*row1)+row1[2]+1)>>1);
+
+  row0++; row1++; row2++;
+}
+
+/*
+  Convert at red pixel.
+*/
+
+inline void convertRed(uint8_t &r, uint8_t &g, uint8_t &b,
+  const uint8_t *&row0, const uint8_t *&row1, const uint8_t *&row2)
+{
+  r=row1[1];
+  g=static_cast<uint8_t>((static_cast<int>(row0[1])+row2[1]+*row1+row1[2]+2)>>2);
+  b=static_cast<uint8_t>((static_cast<int>(*row0)+row0[2]+*row2+row2[2]+2)>>2);
+
+  row0++; row1++; row2++;
+}
+
+/*
+  Convert at blue pixel.
+*/
+
+inline void convertBlue(uint8_t &r, uint8_t &g, uint8_t &b,
+  const uint8_t *&row0, const uint8_t *&row1, const uint8_t *&row2)
+{
+  r=static_cast<uint8_t>((static_cast<int>(*row0)+row0[2]+*row2+row2[2]+2)>>2);
+  g=static_cast<uint8_t>((static_cast<int>(row0[1])+row2[1]+*row1+row1[2]+2)>>2);
+  b=row1[1];
+
+  row0++; row1++; row2++;
+}
+
+/*
+  Convert RGB to monochrome.
+*/
+
+inline uint8_t rgb2Grey(uint8_t r, uint8_t g, uint8_t b)
+{
+  return static_cast<uint8_t>((9798*static_cast<uint32_t>(r)+
+                               19234*static_cast<uint32_t>(g)+
+                               3736*static_cast<uint32_t>(b))/32768);
+}
+
+inline void storeRGBMono(uint8_t *&rgb_out, uint8_t *&mono_out, uint8_t red, uint8_t green,
+  uint8_t blue)
+{
+  if (rgb_out)
+  {
+    *rgb_out++ = red;
+    *rgb_out++ = green;
+    *rgb_out++ = blue;
+  }
+
+  if (mono_out)
+  {
+    *mono_out++ = rgb2Grey(red, green, blue);
+  }
+}
+
+/*
+  Convert green-red image row.
+*/
+
+void convertBayerGR(uint8_t *rgb_out, uint8_t *mono_out,
+  const uint8_t *row0, const uint8_t *row1, const uint8_t *row2,
+  bool greenfirst, size_t width)
+{
+  uint8_t red, green, blue;
+
+  // convert if first pixel is green
+
+  size_t i=0;
+
+  if (greenfirst)
+  {
+    convertGreenGR(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+
+    i++;
+  }
+
+  while (i+1 < width)
+  {
+    // convert at red pixel
+
+    convertRed(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+
+    // convert at green pixel
+
+    convertGreenGR(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+
+    i+=2;
+  }
+
+  // convert at red pixel
+
+  if (i < width)
+  {
+    convertRed(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+  }
+}
+
+/*
+  Convert green-blue image row.
+*/
+
+void convertBayerGB(uint8_t *rgb_out, uint8_t *mono_out,
+  const uint8_t *row0, const uint8_t *row1, const uint8_t *row2,
+  bool greenfirst, size_t width)
+{
+  uint8_t red, green, blue;
+
+  // convert if first pixel is green
+
+  size_t i=0;
+
+  if (greenfirst)
+  {
+    convertGreenGB(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+
+    i++;
+  }
+
+  while (i+1 < width)
+  {
+    // convert at red pixel
+
+    convertBlue(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+
+    // convert at green pixel
+
+    convertGreenGB(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+
+    i+=2;
+  }
+
+  // convert at red pixel
+
+  if (i < width)
+  {
+    convertBlue(red, green, blue, row0, row1, row2);
+    storeRGBMono(rgb_out, mono_out, red, green, blue);
+  }
+}
+
+}
+
+bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint64_t pixelformat,
+  size_t width, size_t height, size_t xpadding)
+{
+  bool ret=true;
+
+  switch (pixelformat)
+  {
+    case Mono8:
+    case Confidence8:
+    case Error8:
+      {
+        for (size_t k=0; k<height; k++)
+        {
+          if (rgb_out)
+          {
+            for (size_t i=0; i<width; i++)
+            {
+              uint8_t v=raw[i];
+              *rgb_out++ = v;
+              *rgb_out++ = v;
+              *rgb_out++ = v;
+            }
+          }
+
+          if (mono_out)
+          {
+            std::memcpy(mono_out, raw, width*sizeof(uint8_t));
+            mono_out+=width;
+          }
+
+          raw+=width+xpadding;
+        }
+      }
+      break;
+
+    case YCbCr411_8:
+      {
+        size_t pstep=(width>>2)*6+xpadding;
+        for (size_t k=0; k<height; k++)
+        {
+          for (size_t i=0; i<width; i+=4)
+          {
+            if (rgb_out)
+            {
+              uint8_t rgb[12];
+              rcg::convYCbCr411toQuadRGB(rgb, raw, static_cast<int>(i));
+
+              for (int j=0; j<12; j++)
+              {
+                *rgb_out++ = rgb[j];
+              }
+            }
+
+            if (mono_out)
+            {
+              *mono_out++ = raw[0];
+              *mono_out++ = raw[1];
+              *mono_out++ = raw[3];
+              *mono_out++ = raw[4];
+            }
+          }
+
+          raw+=pstep;
+        }
+      }
+      break;
+
+    case RGB8:
+      {
+        for (size_t k=0; k<height; k++)
+        {
+          if (rgb_out)
+          {
+            std::memcpy(rgb_out, raw, 3*width*sizeof(uint8_t));
+            rgb_out+=3*width;
+          }
+
+          if (mono_out)
+          {
+            size_t j=0;
+            for (size_t i=0; i<width; i++)
+            {
+              *mono_out++ = rgb2Grey(raw[j], raw[j+1], raw[j+2]);
+              j+=3;
+            }
+          }
+
+          raw+=3*width+xpadding;
+        }
+      }
+      break;
+
+    case BayerRG8:
+    case BayerBG8:
+    case BayerGR8:
+    case BayerGB8:
+      {
+        // In every row, every second pixel is green and every other pixel is
+        // either red or blue. This flag specifies if the current row is red or
+        // blue.
+
+        bool greenfirst=(pixelformat == BayerGR8 || pixelformat == BayerGB8);
+        bool red=(pixelformat == BayerRG8 || pixelformat == BayerGR8);
+
+        // setup temporary buffer that is 1 pixel larger than the image
+
+        std::unique_ptr<uint8_t []> buffer(new uint8_t [(width+2)*3]);
+        uint8_t *row[3];
+
+        row[0]=buffer.get();
+        row[1]=row[0]+width+2;
+        row[2]=row[1]+width+2;
+
+        // initialize buffer with 2 rows, extended by two pixel to avoid a special
+        // treatment for the image border
+
+        memcpy(row[1]+1, raw+width+xpadding, width*sizeof(uint8_t));
+        memcpy(row[2]+1, raw, width*sizeof(uint8_t));
+
+        row[1][0]=row[1][2]; row[1][width+1]=row[1][width-1];
+        row[2][0]=row[2][2]; row[2][width+1]=row[2][width-1];
+
+        // for all rows
+
+        for (size_t k=0; k<height; k++)
+        {
+          // store next extended row in buffer
+
+          if (k+1 < height)
+          {
+            uint8_t *p=row[0];
+            row[0]=row[1];
+            row[1]=row[2];
+            row[2]=p;
+
+            memcpy(row[2]+1, raw+(k+1)*(width+xpadding), width*sizeof(uint8_t));
+
+            row[2][0]=row[2][2]; row[2][width+1]=row[2][width-1];
+          }
+
+          if (red)
+          {
+            convertBayerGR(rgb_out, mono_out, row[0], row[1], row[2], greenfirst, width);
+
+            if (rgb_out) rgb_out+=3*width;
+            if (mono_out) mono_out+=width;
+          }
+          else
+          {
+            convertBayerGB(rgb_out, mono_out, row[0], row[1], row[2], greenfirst, width);
+
+            if (rgb_out) rgb_out+=3*width;
+            if (mono_out) mono_out+=width;
+          }
+
+          greenfirst=!greenfirst;
+          red=!red;
+        }
+      }
+      break;
+
+    default:
+      ret=false;
+      break;
+  }
+
+  return ret;
+}
+
 }

@@ -244,9 +244,50 @@ std::string storeImagePNM(const std::string &name, const rcg::Image &image, size
       }
       break;
 
-    default:
-      throw IOException(std::string("storeImage(): Unknown pixel format: ")+
-        GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
+    default: // try to store as color image
+      {
+        std::unique_ptr<uint8_t []> rgb_pixel(new uint8_t [3*width*height]);
+
+        if (format == RGB8)
+        {
+          p+=(3*width+px)*yoffset;
+        }
+        else
+        {
+          p+=(width+px)*yoffset;
+        }
+
+        if (convertImage(rgb_pixel.get(), 0, p, format, width, height, px))
+        {
+          p=rgb_pixel.get();
+
+          full_name=ensureNewFileName(name+".ppm");
+          std::ofstream out(full_name, std::ios::binary);
+
+          out << "P6" << std::endl;
+          out << width << " " << height << std::endl;
+          out << 255 << "\n";
+
+          std::streambuf *sb=out.rdbuf();
+
+          for (size_t k=0; k<height && out.good(); k++)
+          {
+            for (size_t i=0; i<width; i++)
+            {
+              sb->sputc(static_cast<char>(*p++));
+              sb->sputc(static_cast<char>(*p++));
+              sb->sputc(static_cast<char>(*p++));
+            }
+          }
+
+          out.close();
+        }
+        else
+        {
+          throw IOException(std::string("storeImage(): Unsupported pixel format: ")+
+            GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
+        }
+      }
       break;
   }
 
@@ -415,9 +456,65 @@ std::string storeImagePNG(const std::string &name, const rcg::Image &image, size
       }
       break;
 
-    default:
-      throw IOException(std::string("storeImage(): Unknown pixel format: ")+
-        GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
+    default: // try to store as color image
+      {
+        std::unique_ptr<uint8_t []> rgb_pixel(new uint8_t [3*width*height]);
+
+        if (format == RGB8)
+        {
+          p+=(3*width+px)*yoffset;
+        }
+        else
+        {
+          p+=(width+px)*yoffset;
+        }
+
+        if (convertImage(rgb_pixel.get(), 0, p, format, width, height, px))
+        {
+          p=rgb_pixel.get();
+
+          // open file and init
+
+          full_name=ensureNewFileName(name+".png");
+          FILE *out=fopen(full_name.c_str(), "wb");
+
+          if (!out)
+          {
+            throw new IOException("Cannot store file: "+full_name);
+          }
+
+          png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+          png_infop info=png_create_info_struct(png);
+          setjmp(png_jmpbuf(png));
+
+          // write header
+
+          png_init_io(png, out);
+          png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
+            PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+            PNG_FILTER_TYPE_DEFAULT);
+          png_write_info(png, info);
+
+          // write image body
+
+          for (size_t k=0; k<height; k++)
+          {
+            png_write_row(png, p);
+            p+=3*width;
+          }
+
+          // close file
+
+          png_write_end(png, info);
+          fclose(out);
+          png_destroy_write_struct(&png, &info);
+        }
+        else
+        {
+          throw IOException(std::string("storeImage(): Unsupported pixel format: ")+
+            GetPixelFormatName(static_cast<PfncFormat>(image.getPixelFormat())));
+        }
+      }
       break;
   }
 
