@@ -482,6 +482,15 @@ int main(int argc, char *argv[])
             if (value.size() > 0)
             {
               rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+
+              // remove chunk adapter, if user explicitely requested to turn
+              // off chunk mode
+
+              if (key == "ChunkModeActive" && (value == "0" || value == "false" ||
+                  value == "False" || value == "FALSE"))
+              {
+                chunkadapter.reset();
+              }
             }
             else
             {
