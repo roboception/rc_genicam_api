@@ -36,6 +36,8 @@
 #ifndef RC_GENICAM_API_BUFFER
 #define RC_GENICAM_API_BUFFER
 
+#include <GenApi/GenApi.h>
+
 #include <memory>
 #include <string>
 
@@ -461,6 +463,9 @@ class Buffer
     std::shared_ptr<const GenTLWrapper> gentl;
     void *buffer;
     bool multipart;
+
+    size_t payload_type;
+    std::shared_ptr<GenApi::CNodeMapRef> nodemap;
 };
 
 bool isHostBigEndian();
