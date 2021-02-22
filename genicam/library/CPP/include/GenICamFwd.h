@@ -29,10 +29,8 @@
 #ifndef GENICAM_FWD_H
 #define GENICAM_FWD_H
 
-#ifdef _WIN32
-#   include <objbase.h> // interface
-#else
-#   define interface struct
+#ifndef GENICAM_INTERFACE
+#   define GENICAM_INTERFACE struct
 #endif
 #include <Base/GCNamespace.h>
 #include <GenApi/GenApiNamespace.h>
@@ -47,29 +45,29 @@ namespace GENICAM_NAMESPACE
 // GenApi
 namespace GENAPI_NAMESPACE
 {
-    interface IBase;
-    interface IBoolean;
-    interface ICategory;
-    interface IChunkPort;
-    interface ICommand;
-    interface IDeviceInfo;
-    interface IEnumEntry;
-    interface IEnumeration;
-    interface IFloat;
-    interface IInteger;
-    interface INode;
-    interface INodeMap;
-    interface IPort;
-    interface IPortConstruct;
-    interface IPortStackedConstruct;
-    interface IPortRecorder;
-    interface IPortReplay;
-    interface IPortWriteList;
-    interface IRegister;
-    interface ISelector;
-    interface IString;
-    interface IUserData;
-    interface IValue;
+    GENICAM_INTERFACE IBase;
+    GENICAM_INTERFACE IBoolean;
+    GENICAM_INTERFACE ICategory;
+    GENICAM_INTERFACE IChunkPort;
+    GENICAM_INTERFACE ICommand;
+    GENICAM_INTERFACE IDeviceInfo;
+    GENICAM_INTERFACE IEnumEntry;
+    GENICAM_INTERFACE IEnumeration;
+    GENICAM_INTERFACE IFloat;
+    GENICAM_INTERFACE IInteger;
+    GENICAM_INTERFACE INode;
+    GENICAM_INTERFACE INodeMap;
+    GENICAM_INTERFACE IPort;
+    GENICAM_INTERFACE IPortConstruct;
+    GENICAM_INTERFACE IPortStackedConstruct;
+    GENICAM_INTERFACE IPortRecorder;
+    GENICAM_INTERFACE IPortReplay;
+    GENICAM_INTERFACE IPortWriteList;
+    GENICAM_INTERFACE IRegister;
+    GENICAM_INTERFACE ISelector;
+    GENICAM_INTERFACE IString;
+    GENICAM_INTERFACE IUserData;
+    GENICAM_INTERFACE IValue;
 
     class CLock;
 }

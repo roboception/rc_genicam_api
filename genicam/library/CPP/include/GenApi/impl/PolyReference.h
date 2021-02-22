@@ -1171,7 +1171,7 @@ namespace GENAPI_NAMESPACE
           }
 
           //! see IString interface
-          inline int64_t GetMaxLength( )
+          inline int64_t GetMaxLength( bool Verify = false )
           {
               switch(m_Type)
               {
@@ -1179,7 +1179,7 @@ namespace GENAPI_NAMESPACE
                   return m_Value.Value.max_size();
                   break;
               case typeIString:
-                  return m_Value.pString->GetMaxLength();
+                  return m_Value.pString->GetMaxLength(Verify);
                   break;
               case typeUninitialized:
 #pragma BullseyeCoverage off

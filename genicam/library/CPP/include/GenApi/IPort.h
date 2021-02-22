@@ -51,7 +51,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for ports
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IPort  : virtual public IBase
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPort  : virtual public IBase
     {
         //! Reads a chunk of bytes from the port
         virtual void Read(void *pBuffer, int64_t Address, int64_t Length) = 0;

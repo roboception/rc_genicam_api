@@ -5,6 +5,9 @@
 
 #include "GenApi/impl/MathParser/Lexer.h" // need the enum, so the compiler knows the size of one enum
 
-extern const hqCharType MathCharTypeTable[256];
+namespace GENAPI_NAMESPACE
+{
+    extern const hqCharType MathCharTypeTable[256];
+}
 
 #endif

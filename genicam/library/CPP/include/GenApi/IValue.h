@@ -45,7 +45,7 @@
 
 namespace GENAPI_NAMESPACE
 {
-    interface INode;
+    GENICAM_INTERFACE INode;
 
     //*************************************************************
     // IValue interface
@@ -55,7 +55,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for value properties
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IValue : virtual public IBase
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IValue : virtual public IBase
     {
         //! Get the INode interface of the node
         virtual INode* GetNode() { return dynamic_cast<INode*>(this); }

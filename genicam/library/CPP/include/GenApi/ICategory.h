@@ -48,7 +48,7 @@
 namespace GENAPI_NAMESPACE
 {
 
-    interface INode;
+    GENICAM_INTERFACE INode;
 
 
     //*************************************************************
@@ -59,7 +59,7 @@ namespace GENAPI_NAMESPACE
     \brief Gives access to a category node
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT ICategory  : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT ICategory  : virtual public IValue
     {
 
         //! Get all features of the category (including sub-categories)

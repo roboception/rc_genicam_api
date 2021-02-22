@@ -36,7 +36,7 @@
 
 namespace GENAPI_NAMESPACE
 {
-    interface IBase;
+    GENICAM_INTERFACE IBase;
 
     //*************************************************************
     // IReference interface
@@ -46,7 +46,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface to construct a reference
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT IReference
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IReference
     {
         //! sets the implementation to a reference
         virtual void SetReference( GENAPI_NAMESPACE::IBase *pBase ) = 0;
@@ -60,7 +60,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface to construct an enum reference
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT IEnumReference
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IEnumReference
     {
         //! sets the Enum value corresponding to a value
         virtual void SetEnumReference( int Index, GENICAM_NAMESPACE::gcstring Name) = 0;

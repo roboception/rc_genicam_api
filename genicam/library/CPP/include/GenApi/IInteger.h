@@ -51,7 +51,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for integer properties
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IInteger : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IInteger : virtual public IValue
     {
         //! Set node value
         /*!
@@ -112,7 +112,7 @@ namespace GENAPI_NAMESPACE
 
 #ifndef DOXYGEN_IGNORE
 
-    interface IFloat;
+    GENICAM_INTERFACE IFloat;
 
     /**
     \internal

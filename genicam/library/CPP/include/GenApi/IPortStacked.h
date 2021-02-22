@@ -58,7 +58,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for ports
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IPortStacked : virtual public IPort
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortStacked : virtual public IPort
     {
         using IPort::Write; // tell the compiler we want both Write functions (the one from the base class and the next one)
         //! Writes a chunk of bytes to the port

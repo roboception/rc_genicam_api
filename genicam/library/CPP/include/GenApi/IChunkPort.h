@@ -63,7 +63,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for ports attached to a chunk
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IChunkPort : virtual public IPort
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IChunkPort : virtual public IPort
     {
         //! Get the Id of the chunk the port should be attached to
         virtual GENICAM_NAMESPACE::gcstring GetChunkID() const =  0;

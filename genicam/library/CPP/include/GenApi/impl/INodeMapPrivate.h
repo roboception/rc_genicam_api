@@ -51,7 +51,7 @@ namespace GENAPI_NAMESPACE
     \brief NodeMap functions used for initialization
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT INodeMapPrivate : virtual public INodeMap
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT INodeMapPrivate : virtual public INodeMap
     {
         /**** Methods to create the node map ****/
 

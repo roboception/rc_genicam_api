@@ -40,7 +40,7 @@ namespace GENAPI_NAMESPACE
 {
 
     //! Basic interface to persist values to
-    interface GENAPI_DECL_ABSTRACT IPersistScript
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPersistScript
     {
         //! sets information about the node map
         virtual void SetInfo(const GENICAM_NAMESPACE::gcstring &Info) = 0;

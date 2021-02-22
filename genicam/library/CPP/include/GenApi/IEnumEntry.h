@@ -52,7 +52,7 @@ namespace GENAPI_NAMESPACE
     \ingroup GenApi_PublicInterface
     */
     /*! Maps of Enum Values to symbolic values */
-    interface GENAPI_DECL_ABSTRACT IEnumEntry  : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IEnumEntry  : virtual public IValue
     {
 
     public:

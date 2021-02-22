@@ -51,7 +51,7 @@ namespace GENAPI_NAMESPACE
     \brief Base interface common to all nodes
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IBase
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IBase
     {
         //! Get the access mode of the node
         virtual EAccessMode GetAccessMode() const = 0;

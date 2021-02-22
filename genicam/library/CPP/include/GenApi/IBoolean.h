@@ -50,7 +50,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for Boolean  properties
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IBoolean   : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IBoolean   : virtual public IValue
     {
     public:
         //! Set node value

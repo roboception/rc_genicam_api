@@ -46,7 +46,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for ports
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT IPortConstruct: virtual public IPort
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortConstruct: virtual public IPort
     {
         //! Sets pointer the real port implementation; this function may called only once
         virtual void SetPortImpl(IPort* pPort) = 0;
@@ -59,7 +59,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for ports
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT IPortStackedConstruct
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortStackedConstruct
     {
 
         //! Sets pointer the real port implementation; this function may called only once

@@ -112,7 +112,7 @@ namespace GENAPI_NAMESPACE
         //-------------------------------------------------------------
         //! \name IRegister implementation
         //\{
-        virtual void InternalSet(const uint8_t *pBuffer, int64_t Length) const;
+        virtual void InternalSet(const uint8_t *pBuffer, int64_t Length, bool Verify=true) const;
         virtual void InternalGet(uint8_t *pBuffer, int64_t Length, bool Verify = false, bool IgnoreCache = false);
         //\}
 

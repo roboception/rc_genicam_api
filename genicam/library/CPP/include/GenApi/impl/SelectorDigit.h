@@ -33,6 +33,7 @@
 #include "GenApi/IBase.h"
 #include "GenApi/INode.h"
 #include "GenApi/Pointer.h"
+#include "GenApi/IBoolean.h"
 
 #include <list>
 #ifdef _MSC_VER
@@ -113,6 +114,22 @@ namespace GENAPI_NAMESPACE
         bool m_DigitHasChanged;
     };
 
+    //-----------------------------------------------------
+    class CBooleanSelectorDigit : public ISelectorDigit
+    {
+    public:
+        explicit CBooleanSelectorDigit( IBase* pBase );
+    public:
+        virtual bool SetFirst();
+        virtual bool SetNext( bool Tick = true );
+        virtual void Restore();
+        virtual GENICAM_NAMESPACE::gcstring ToString();
+        virtual void GetSelectorList( GENAPI_NAMESPACE::FeatureList_t& SelectorList, bool Incremental = false );
+    private:
+        CBooleanPtr m_ptrBoolSelector;
+        bool m_currentValue;
+        bool m_originalValue;
+    };
 }
 #endif
 

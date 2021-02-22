@@ -54,7 +54,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface to access the node map
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT INodeMap
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT INodeMap
     {
         //! Retrieves all nodes in the node map
         virtual void GetNodes(NodeList_t &Nodes) const =  0;

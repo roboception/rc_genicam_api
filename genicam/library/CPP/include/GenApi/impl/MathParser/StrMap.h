@@ -17,6 +17,7 @@
 #ifndef _STRMAP_H_
 #define _STRMAP_H_
 
+#include "GenApi/GenApiNamespace.h"
 #include "MathParserDll.h"
 
 /**
@@ -24,42 +25,47 @@
 *
 * \brief Map for variables in swissknife expression
 */
-class MATHPARSERDLL_API CStrMap
+
+namespace GENAPI_NAMESPACE
 {
-    int   FCount, FCapacity;
-    int   FExtraLen, FRecordLen;
-    int   FDoDuplicate;
-    char* FList;
-public:
-    CStrMap( int extrabytes = sizeof( double ), int dup = 0 );
-    ~CStrMap( void );
-    void AddString( const char* str, void* data );
-    void AddStrLen( const char* str, size_t len, const void* data );
-    void TrimClear( int NewCount );
-    void SetCapacity( int NewCapacity );
-    int LenIndexOf( const char* str, size_t len, const void** data );
-    const void* DataAt( int index );
-    bool IsEmpty()
+    class MATHPARSERDLL_API CStrMap
     {
-        return FCount == 0;
-    }
-};
+        int   FCount, FCapacity;
+        int   FExtraLen, FRecordLen;
+        int   FDoDuplicate;
+        char* FList;
+    public:
+        CStrMap( int extrabytes = sizeof( double ), int dup = 0 );
+        ~CStrMap( void );
+        void AddString( const char* str, void* data );
+        void AddStrLen( const char* str, size_t len, const void* data );
+        void TrimClear( int NewCount );
+        void SetCapacity( int NewCapacity );
+        int LenIndexOf( const char* str, size_t len, const void** data );
+        const void* DataAt( int index );
+        bool IsEmpty()
+        {
+            return FCount == 0;
+        }
+    };
+    
+    // these must match StaticFuncMapDouble
+    #define FUNC_ROUND    13
+    #define FUNC_E        18
+    #define FUNC_PI        19
+    
+    class MATHPARSERDLL_API CStaticFuncMapDouble
+    {
+    public:
+        static int LenIndexOf( const char* str, size_t len, const void** data );
+    };
+    
+    class MATHPARSERDLL_API CStaticFuncMapInt64
+    {
+    public:
+        static int LenIndexOf( const char* str, size_t len, const void** data );
+    };
 
-// these must match StaticFuncMapDouble
-#define FUNC_ROUND    13
-#define FUNC_E        18
-#define FUNC_PI        19
-
-class MATHPARSERDLL_API CStaticFuncMapDouble
-{
-public:
-    static int LenIndexOf( const char* str, size_t len, const void** data );
-};
-
-class MATHPARSERDLL_API CStaticFuncMapInt64
-{
-public:
-    static int LenIndexOf( const char* str, size_t len, const void** data );
-};
+} /* GENAPI_NAMESPACE*/
 
 #endif //_STRMAP_H_

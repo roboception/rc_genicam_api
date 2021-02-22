@@ -14,13 +14,20 @@
 \file
 \brief    Implementation of CSymTable
 */
+
+#include "GenApi/GenApiNamespace.h"
+
+
 #if !defined(AFX_SYMTABLE_H__F8B4AD7F_07F9_4AB2_B206_04549837C7ED__INCLUDED_)
 #define AFX_SYMTABLE_H__F8B4AD7F_07F9_4AB2_B206_04549837C7ED__INCLUDED_
 
-class CSymTable
+namespace GENAPI_NAMESPACE
 {
-public:
-    static int FindSymbol( const char* str, int* nchars );
-};
+    class CSymTable
+    {
+    public:
+        static int FindSymbol( const char* str, int* nchars );
+    };
+}
 
 #endif // !defined(AFX_SYMTABLE_H__F8B4AD7F_07F9_4AB2_B206_04549837C7ED__INCLUDED_)

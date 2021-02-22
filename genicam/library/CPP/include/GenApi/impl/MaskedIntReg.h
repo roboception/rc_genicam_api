@@ -68,7 +68,7 @@ namespace GENAPI_NAMESPACE
         //-------------------------------------------------------------
 
         //! Retrieves the Length of the register [Bytes]
-        virtual int64_t InternalGetLength();
+        virtual int64_t InternalGetLength( bool Verify = false );
 
 
         //-------------------------------------------------------------
@@ -98,13 +98,13 @@ namespace GENAPI_NAMESPACE
         //-------------------------------------------------------------
         // Memeber variables
         //-------------------------------------------------------------
-        //! least siginificant bit of the integer with respect to the register
+        //! least significant bit of the integer with respect to the register
         uint32_t  m_LSB;
 
         //! the property belonging to m_LSB
         uint32_t  m_LSB_property;
 
-        //! most siginificant bit of the integer with respect to the register
+        //! most significant bit of the integer with respect to the register
         uint32_t  m_MSB;
 
         //! the property belonging to m_MSB

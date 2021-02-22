@@ -62,7 +62,7 @@ namespace GENICAM_NAMESPACE
 
 
         //! Retrieves (and if necessary create) a category by name
-		//! Stores logger which have been requested before in a map
+        //! Stores logger which have been requested before in a map
         static ILogger& GetLogger(const gcstring &LoggerName);
         static ILogger& GetLogger(const char* LoggerName);
 

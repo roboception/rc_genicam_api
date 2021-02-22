@@ -41,7 +41,7 @@
 namespace GENAPI_NAMESPACE
 {
 
-    interface GENAPI_DECL_ABSTRACT IPortWriteList
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortWriteList
     {
         //! Writes a chunk of bytes to the port
         virtual void Write(const void *pBuffer, int64_t Address, int64_t Length) = 0;
@@ -61,7 +61,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for replaying write commands on a port
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IPortReplay : virtual public IPort
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortReplay : virtual public IPort
     {
         //! sends the commands to the camera.
         /*! the default implementation just walks the list and issues each command
@@ -76,7 +76,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for recording write commands on a port
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IPortRecorder : public IPortReplay
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortRecorder : public IPortReplay
     {
         //! starts logging all WriteRegister commands to a list
         virtual void StartRecording( IPortWriteList *pPortRecorder ) = 0;

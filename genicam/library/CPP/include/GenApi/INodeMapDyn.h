@@ -50,7 +50,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface to access the node map
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT INodeMapDyn : virtual public INodeMap
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT INodeMapDyn : virtual public INodeMap
     {
         //! Deletes all Nodes from the map
         virtual void ClearAllNodes() = 0;

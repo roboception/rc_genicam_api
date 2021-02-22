@@ -37,7 +37,7 @@ namespace GENAPI_NAMESPACE
 {
 
     //! Interface of a "digit" of the "counter" formed by the selector set
-    interface GENAPI_DECL_ABSTRACT ISelectorDigit
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT ISelectorDigit
     {
         /*! \brief Sets digit to start value
             \return true if the resulting value is valid */

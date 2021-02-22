@@ -51,7 +51,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for string properties
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IString  : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IString  : virtual public IValue
     {
         //! Set node value
         /*!
@@ -78,7 +78,7 @@ namespace GENAPI_NAMESPACE
         virtual GENICAM_NAMESPACE::gcstring operator*() = 0;
 
         //! Retrieves the maximum length of the string in bytes
-        virtual int64_t GetMaxLength() = 0;
+        virtual int64_t GetMaxLength(bool Verify = false) = 0;
 
     };
     //*************************************************************
@@ -148,10 +148,10 @@ namespace GENAPI_NAMESPACE
         }
 
         //! Get max length of string
-        virtual int64_t GetMaxLength()
+        virtual int64_t GetMaxLength( bool Verify = false )
         {
             if(ref::m_Ptr)
-                return ref::m_Ptr->GetMaxLength();
+                return ref::m_Ptr->GetMaxLength( Verify );
             else
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
         }

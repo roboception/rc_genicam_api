@@ -30,7 +30,7 @@ namespace GENAPI_NAMESPACE
     * \brief Interface to manage user data stored in nodes or nodemaps.
     */
 
-    interface GENAPI_DECL_ABSTRACT IUserData
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IUserData
     {
         //! Returns the stored user defined data.
         virtual UserData_t GetUserData() const = 0;

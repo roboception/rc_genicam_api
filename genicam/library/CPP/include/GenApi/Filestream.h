@@ -84,7 +84,7 @@ namespace GENAPI_NAMESPACE
     \brief Adapter between the std::iostreambuf and the SFNC Features representing the device filesystem
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT IFileProtocolAdapter
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IFileProtocolAdapter
     {
         virtual bool attach(GENAPI_NAMESPACE::INodeMap * pInterface) = 0;
         virtual bool openFile(const char * pFileName, std::ios_base::openmode mode) = 0;

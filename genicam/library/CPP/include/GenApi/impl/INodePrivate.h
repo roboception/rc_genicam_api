@@ -51,8 +51,8 @@ namespace GENAPI_NAMESPACE
     // INodePrivate interface
     //*************************************************************
 
-    interface INodePrivate;
-    interface INodeMapPrivate;
+    GENICAM_INTERFACE INodePrivate;
+    GENICAM_INTERFACE INodeMapPrivate;
 
     //! a vector of node references using the INodePrivate interface
     typedef std::vector< INodePrivate* > NodePrivateVector_t;
@@ -61,7 +61,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface including the methods for node construction common to all nodes
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT INodePrivate : public INode
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT INodePrivate : public INode
     {
         /**** Methods to create nodes ****/
 

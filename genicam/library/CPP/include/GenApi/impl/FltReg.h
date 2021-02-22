@@ -61,7 +61,7 @@ namespace GENAPI_NAMESPACE
         //-------------------------------------------------------------
 
         //! Retrieves the Length of the register [Bytes]
-        virtual int64_t InternalGetLength();
+        virtual int64_t InternalGetLength(bool Verify = false);
 
         //-------------------------------------------------------------
         // IFloat implementation

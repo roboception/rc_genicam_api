@@ -49,7 +49,7 @@ namespace GENAPI_NAMESPACE
     \ingroup GenApi_PublicInterface
     */
     template< typename EnumT >
-    interface IEnumerationT  : public IEnumeration
+    GENICAM_INTERFACE IEnumerationT  : public IEnumeration
     {
         //! Set node value
         /*!

@@ -69,7 +69,7 @@ namespace GENAPI_NAMESPACE
         //! recursively explores the selectors and sub selectors of a node
         void ExploreSelector( 
             CNodePtr &ptrNode, //!> The node to explore
-            NodeList_t &SelectorNodes //!> ordered list of elector names (LSB first, MSB last)
+            NodeList_t &SelectorNodes //!> ordered list of selector names (LSB first, MSB last)
             );
 
         //! Creates the selector counter

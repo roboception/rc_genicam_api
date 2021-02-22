@@ -50,7 +50,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for float properties
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IFloat  : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IFloat  : virtual public IValue
     {
         //! Set node value
         /*!
@@ -117,8 +117,8 @@ namespace GENAPI_NAMESPACE
     // CFloatRef class
     //*************************************************************
 
-    interface IInteger;
-    interface IEnumeration;
+    GENICAM_INTERFACE IInteger;
+    GENICAM_INTERFACE IEnumeration;
 
 #ifndef DOXYGEN_IGNORE
 

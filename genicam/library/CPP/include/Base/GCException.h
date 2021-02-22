@@ -50,6 +50,7 @@
 #include <stdarg.h>
 #include <Base/GCTypes.h>
 #include <Base/GCString.h>
+#include <Base/GCCompatibility.h>
 
 #pragma pack(push, 8)
 

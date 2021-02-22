@@ -95,7 +95,7 @@ namespace GENAPI_NAMESPACE
         virtual GENICAM_NAMESPACE::gcstring InternalGetValue(bool Verify = false, bool IgnoreCache = false);
 
         //! Retrieves the maximum length of the string in bytes
-        virtual int64_t InternalGetMaxLength();
+        virtual int64_t InternalGetMaxLength( bool Verify = false );
         //\}
 
     public:

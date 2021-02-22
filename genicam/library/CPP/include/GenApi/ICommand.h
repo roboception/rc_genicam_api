@@ -48,7 +48,7 @@ namespace GENAPI_NAMESPACE
 
     //! Interface for command like  properties
     //! \ingroup GenApi_PublicInterface
-    interface GENAPI_DECL_ABSTRACT ICommand   : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT ICommand   : virtual public IValue
     {
     public:
 

@@ -53,7 +53,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for enumeration properties
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT IEnumeration  : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IEnumeration  : virtual public IValue
     {
 
         //! Get list of symbolic Values

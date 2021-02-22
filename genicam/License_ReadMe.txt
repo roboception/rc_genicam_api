@@ -60,7 +60,9 @@ xxhash      New BSD         https://code.google.com/p/xxhash/               GenA
 XSLTProc    MIT license     http://xmlsoft.org/XSLT/xsltproc2.html          GenApi Schema documentation
 XSDe        Proprietary     NA                                              XmlParser, FirmwareUpdate
 PCRE2       BSD license     http://www.pcre.org/                            FirmwareUpdate
-
+Expat       MIT license     https://libexpat.github.io/                     XmlParser, FirmwareUpdate
+GenX        GPL compatible  http://www.tbray.org/ongoing/genx               XmlParser, FirmwareUpdate
+regexp      GPL2            NA                                              XmlParser, FirmwareUpdate
 (*) When distributing subset of GenICam libraries, any unused 3rd party software packages and their
 license information may be omitted.
 
@@ -84,6 +86,9 @@ XSDe        Free                    NA
             Proprietary
             License
 PCRE2       pcre2_License.txt       http://www.pcre.org/licence.txt
+Expat       expat-COPYING.txt       https://github.com/libexpat/libexpat/blob/master/expat/COPYING
+GenX        genx-COPYING.txt        http://www.tbray.org/ongoing/genx/COPYING
+regexp      gpl-20.txt              https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 Last but not least GenICam redistributes the C/C++ runtime DLLs of the
 Microsoft Visual C++ compiler.

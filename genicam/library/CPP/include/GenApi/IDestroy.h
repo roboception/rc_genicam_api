@@ -31,7 +31,7 @@ namespace GENAPI_NAMESPACE
     * \brief Interface to destroy an object
     */
 
-    interface GENAPI_DECL_ABSTRACT IDestroy
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IDestroy
     {
         //! Makes the object to destro itself
         virtual void Destroy() = 0;

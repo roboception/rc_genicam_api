@@ -73,7 +73,7 @@ namespace GENAPI_NAMESPACE
         //-------------------------------------------------------------
 
         //! Retrieves the Length of the register [Bytes]
-        virtual int64_t InternalGetLength();
+        virtual int64_t InternalGetLength( bool Verify = false );
 
         //! pre-computes some masks
         void UpdateMasks() const;
@@ -157,7 +157,7 @@ namespace GENAPI_NAMESPACE
         //! endianess of the register
         EEndianess m_Endianess;
 
-        //! The bit indicating the sign of the number to be retrievend
+        //! The bit indicating the sign of the number to be retrieved
         mutable uint64_t m_SignBit;
 
         //! The bit to be set to -1 if the number is negative

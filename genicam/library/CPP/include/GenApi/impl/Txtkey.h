@@ -110,7 +110,7 @@ namespace GENAPI_NAMESPACE
         virtual GENICAM_NAMESPACE::gcstring InternalGetValue(bool Verify = false, bool IgnoreCache = false);
 
         //! Retrieves the maximum length of the string in bytes
-        virtual int64_t InternalGetMaxLength()
+        virtual int64_t InternalGetMaxLength(bool)
         {
             // assert(false);
             throw ACCESS_EXCEPTION_NODE("TxtKey : %s GetMaxLength failed. TxtKey is read only" );

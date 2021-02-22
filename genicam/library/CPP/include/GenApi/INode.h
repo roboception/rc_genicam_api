@@ -48,8 +48,8 @@
 namespace GENAPI_NAMESPACE
 {
 
-    interface INode;
-    interface INodeMap;
+    GENICAM_INTERFACE INode;
+    GENICAM_INTERFACE INodeMap;
 
     //! a list of node references
     typedef node_vector NodeList_t;
@@ -67,7 +67,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface common to all nodes
     \ingroup GenApi_PublicInterface
     */
-    interface GENAPI_DECL_ABSTRACT INode : virtual public IBase
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT INode : virtual public IBase
     {
         //! Get node name
         virtual GENICAM_NAMESPACE::gcstring GetName(bool FullQualified=false) const =  0;

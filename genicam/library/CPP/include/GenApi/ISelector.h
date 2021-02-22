@@ -43,7 +43,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for groups of features selected by a single one
     \ingroup GenApi_PublicImpl
     */
-    interface GENAPI_DECL_ABSTRACT ISelector : virtual public IBase
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT ISelector : virtual public IBase
     {
         //! true iff this feature selects a group of features
         virtual bool IsSelector() const = 0;

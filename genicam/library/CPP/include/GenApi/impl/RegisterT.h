@@ -3,23 +3,22 @@
 //  Section: Vision Components
 //  Project: GenApi
 //  Author:  Alexander Happe
-//  $Header$
 //
-//  License: This file is published under the license of the EMVA GenICam  Standard Group.
-//  A text file describing the legal terms is included in  your installation as 'GenICam_license.pdf'.
-//  If for some reason you are missing  this file please contact the EMVA or visit the website
+//  License: This file is published under the license of the EMVA GenICam Standard Group.
+//  A text file describing the legal terms is included in your installation as 'GenICam_license.pdf'.
+//  If for some reason you are missing this file please contact the EMVA or visit the website
 //  (http://www.genicam.org) for a full copy.
 //
 //  THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
 //  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 //  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD  GROUP
-//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL,
-//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT  LIMITED TO,
-//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  DATA, OR PROFITS;
-//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  THEORY OF LIABILITY,
-//  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)
-//  ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD GROUP
+//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+//  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 /*!
@@ -65,8 +64,10 @@ namespace GENAPI_NAMESPACE
                 AutoLock l(Base::GetLock());
                 typename Base::EntryMethodFinalizer E( this, meSet );
 
-                if( pBuffer )
+                // logging the set
+                if (Base::m_pValueLog && GENICAM_NAMESPACE::CLog::Exist( "" ))
                 {
+                    if (pBuffer)
                     {
                         static const char fmt[] =
                             "Set( %" FMT_I64 "d, 0x";
@@ -83,16 +84,16 @@ namespace GENAPI_NAMESPACE
                                                    "%02X", (unsigned int) pBuffer[i]);
 #pragma BullseyeCoverage off
                             #ifdef _MSC_VER
-								if (n < 0)
+                            if (n < 0)
                             #else
-								if (BufferLeft + n >= BufferLen)
+                            if (BufferLeft + n >= BufferLen)
                             #endif
                                 break;
 #pragma BullseyeCoverage on
                             BufferLeft += n;
                         }
-
-                        GCLOGINFOPUSH( Base::m_pValueLog, "%s )...", _pBuffer);
+                        Base::m_pValueLog->Log( GENICAM_NAMESPACE::ILogger::INFO, "%s)   ", _pBuffer );
+                        GENICAM_NAMESPACE::CLog::PushIndent();
                     }
                 }
 
@@ -103,11 +104,13 @@ namespace GENAPI_NAMESPACE
                     typename Base::PostSetValueFinalizer PostSetValueCaller(this, CallbacksToFire);  // dtor calls Base::PostSetValue
 
                     Base::PreSetValue(); // invalidates all nodes if this is the first call in a chain of SetValue like calls
-                    Base::InternalSet(pBuffer, Length);
+                    Base::InternalSet(pBuffer, Length, Verify);
 
                 }
-                if( Verify )
+                if (Verify)
+                {
                     Base::InternalCheckError();
+                }
 
                 GCLOGINFOPOP( Base::m_pValueLog, "...Set" );
 
@@ -142,52 +145,57 @@ namespace GENAPI_NAMESPACE
 
             Base::InternalGet(pBuffer, Length, Verify, IgnoreCache );
 
-            if( Verify )
-                Base::InternalCheckError();
-
-
-            static const char fmt[] =
-                "...Get( %" FMT_I64 "d ) = 0x";
-
-            static const int BufferLen(256);
-            char _pBuffer[256];
-            int BufferLeft(_snprintf(_pBuffer, BufferLen, fmt, Length));
-
-            /* MANTIS 0000062 */
-            for(int i = 0; i < Length; i++)
+            if (Verify)
             {
-                const int n = _snprintf(_pBuffer + BufferLeft,
-                                        BufferLen - BufferLeft,
-                                        "%02X", (unsigned int) pBuffer[i]);
+                Base::InternalCheckError();
+            }
+
+
+            if (Base::m_pValueLog && GENICAM_NAMESPACE::CLog::Exist(""))
+            {
+                static const char fmt[] =
+                    "...Get( %" FMT_I64 "d ) = 0x";
+
+                static const int BufferLen( 256 );
+                char _pBuffer[256];
+                int BufferLeft( _snprintf( _pBuffer, BufferLen, fmt, Length ) );
+
+                /* MANTIS 0000062 */
+                for (int i = 0; i < Length; i++)
+                {
+                    const int n = _snprintf( _pBuffer + BufferLeft,
+                                             BufferLen - BufferLeft,
+                                             "%02X", (unsigned int) pBuffer[i] );
 #pragma BullseyeCoverage off
-                #ifdef _MSC_VER
+#ifdef _MSC_VER
                     if (n < 0)
                         break;
-                #else
+#else
                     if (BufferLeft + n >= BufferLen)
                         break;
-                #endif
+#endif
 #pragma BullseyeCoverage on
-                BufferLeft += n;
+                    BufferLeft += n;
+                }
+                Base::m_pValueLog->Log( GENICAM_NAMESPACE::ILogger::INFO, "%s", _pBuffer );
+                GENICAM_NAMESPACE::CLog::PopIndent();
             }
-            GCLOGINFOPOP( Base::m_pValueLog, "%s", _pBuffer );
-            
         }
 
         //! Implementation of IRegister::GetLength()
-        virtual int64_t GetLength()
+        virtual int64_t GetLength( bool Verify = false )
         {
             AutoLock l(Base::GetLock());
 
-            return Base::InternalGetLength();
+            return Base::InternalGetLength(Verify);
         }
 
         //! Retrieves the Address of the register
-        virtual int64_t GetAddress()
+        virtual int64_t GetAddress( bool Verify = false )
         {
             AutoLock l(Base::GetLock());
 
-            return Base::InternalGetAddress(false,false);
+            return Base::InternalGetAddress(Verify,false);
         }
 
     };
