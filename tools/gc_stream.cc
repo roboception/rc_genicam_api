@@ -154,7 +154,7 @@ std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapR
     name << '_' << component;
   }
 
-  if (rcg::getBoolean(nodemap, "ChunkModeActive", false))
+  if (buffer->getContainsChunkdata())
   {
     name << getDigitalIO(nodemap);
   }
@@ -193,8 +193,7 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
   std::string dispname;
 
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part) &&
-      buffer->getPixelFormat(part) == Coord3D_C16 &&
-      rcg::getBoolean(nodemap, "ChunkModeActive", false))
+      buffer->getPixelFormat(part) == Coord3D_C16 && buffer->getContainsChunkdata())
   {
     // get necessary information from ChunkScan3d parameters
 
@@ -249,7 +248,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                     const std::string &component, const rcg::Buffer *buffer,
                     size_t height=0, bool dispinfo=false)
 {
-  if (rcg::getBoolean(nodemap, "ChunkModeActive", false))
+  if (buffer->getContainsChunkdata())
   {
     // prepare file name
 

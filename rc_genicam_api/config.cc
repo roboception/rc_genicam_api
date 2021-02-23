@@ -555,18 +555,29 @@ int64_t getInteger(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const ch
     {
       if (GenApi::IsReadable(node))
       {
-        GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
-
-        if (val != 0)
+        if (node->GetPrincipalInterfaceType() == GenApi::intfIEnumeration)
         {
-          ret=val->GetValue(false, igncache);
+          GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
+          ret=p->GetCurrentEntry(false, igncache)->GetValue();
 
-          if (vmin != 0) *vmin=val->GetMin();
-          if (vmax != 0) *vmax=val->GetMax();
+          if (vmin != 0) *vmin=ret;
+          if (vmax != 0) *vmax=ret;
         }
-        else if (exception)
+        else
         {
-          throw std::invalid_argument(std::string("Feature not integer: ")+name);
+          GenApi::IInteger *val=dynamic_cast<GenApi::IInteger *>(node);
+
+          if (val != 0)
+          {
+            ret=val->GetValue(false, igncache);
+
+            if (vmin != 0) *vmin=val->GetMin();
+            if (vmax != 0) *vmax=val->GetMax();
+          }
+          else if (exception)
+          {
+            throw std::invalid_argument(std::string("Feature not integer: ")+name);
+          }
         }
       }
       else if (exception)

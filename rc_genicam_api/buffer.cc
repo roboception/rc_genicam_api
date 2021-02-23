@@ -277,6 +277,11 @@ void *Buffer::getUserPtr() const
 
 uint64_t Buffer::getTimestamp() const
 {
+  if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+  {
+    return getInteger(nodemap, "ChunkTimestamp");
+  }
+
   return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
                                   GenTL::BUFFER_INFO_TIMESTAMP);
 }
@@ -334,6 +339,11 @@ size_t Buffer::getWidth(std::uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return getInteger(nodemap, "ChunkWidth");
+    }
+
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_WIDTH);
   }
 }
@@ -347,6 +357,11 @@ size_t Buffer::getHeight(std::uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return getInteger(nodemap, "ChunkHeight");
+    }
+
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_HEIGHT);
   }
 }
@@ -360,6 +375,11 @@ size_t Buffer::getXOffset(std::uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return getInteger(nodemap, "ChunkOffsetX");
+    }
+
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_XOFFSET);
   }
 }
@@ -373,6 +393,11 @@ size_t Buffer::getYOffset(std::uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return getInteger(nodemap, "ChunkOffsetY");
+    }
+
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_YOFFSET);
   }
 }
@@ -437,6 +462,11 @@ bool Buffer::getImagePresent(uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return true;
+    }
+
     return getBufferBool(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_IMAGEPRESENT);
   }
 }
@@ -456,6 +486,11 @@ uint64_t Buffer::getPixelFormat(uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return getInteger(nodemap, "ChunkPixelFormat");
+    }
+
     return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
                                     GenTL::BUFFER_INFO_PIXELFORMAT);
   }
@@ -497,6 +532,11 @@ size_t Buffer::getDeliveredImageHeight(uint32_t part) const
   }
   else
   {
+    if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
+    {
+      return getInteger(nodemap, "ChunkHeight");
+    }
+
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
                                   GenTL::BUFFER_INFO_DELIVERED_IMAGEHEIGHT);
   }
@@ -586,6 +626,11 @@ bool Buffer::getDataLargerThanBuffer() const
 
 bool Buffer::getContainsChunkdata() const
 {
+  if (payload_type == PAYLOAD_TYPE_CHUNK_DATA)
+  {
+    return true;
+  }
+
   return getBufferBool(gentl, parent->getHandle(), buffer,
                        GenTL::BUFFER_INFO_CONTAINS_CHUNKDATA);
 }
