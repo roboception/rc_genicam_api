@@ -270,6 +270,9 @@ void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const cha
                   const char *value, bool igncache=false);
 
 /**
+  NOTE: This function is deprecated. Instead, enable chunks with
+  ChunkModeActive=true and call Stream::attachBuffers(true).
+
   Sets ChunkModeActive to 1, creates a chunk adapter for the specified
   transport layer and attaches it to the given nodemap.
 

@@ -118,11 +118,6 @@ int main(int argc, char *argv[])
       dev->open(rcg::Device::CONTROL);
       std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
-      // get chunk adapter (this switches chunk mode on if possible and
-      // returns a null pointer if this is not possible)
-
-      std::shared_ptr<GenApi::CChunkAdapter> chunkadapter=rcg::getChunkAdapter(nodemap, dev->getTLType());
-
       // get focal length, baseline and disparity scale factor
 
       double f=rcg::getFloat(nodemap, "FocalLengthFactor", 0, 0, false);
@@ -228,15 +223,6 @@ int main(int argc, char *argv[])
 
             if (!buffer->getIsIncomplete())
             {
-              // attach buffer to nodemap for accessing chunk data if possible
-
-              if (chunkadapter)
-              {
-                chunkadapter->AttachBuffer(
-                  reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
-                                                   static_cast<int64_t>(buffer->getSizeFilled()));
-              }
-
               // go through all parts in case of multi-part buffer
 
               size_t partn=buffer->getNumberOfParts();
@@ -312,10 +298,6 @@ int main(int argc, char *argv[])
                   }
                 }
               }
-
-              // detach buffer from nodemap
-
-              if (chunkadapter) chunkadapter->DetachBuffer();
             }
           }
           else

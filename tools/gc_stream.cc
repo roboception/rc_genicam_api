@@ -137,7 +137,6 @@ std::string getDigitalIO(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap)
 */
 
 std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                        const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                         const std::string &component, const rcg::Buffer *buffer, uint32_t part,
                         size_t yoffset=0, size_t height=0)
 {
@@ -155,7 +154,7 @@ std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapR
     name << '_' << component;
   }
 
-  if (chunkadapter)
+  if (rcg::getBoolean(nodemap, "ChunkModeActive", false))
   {
     name << getDigitalIO(nodemap);
   }
@@ -189,13 +188,13 @@ std::string storeBuffer(rcg::ImgFmt fmt, const std::shared_ptr<GenApi::CNodeMapR
 */
 
 std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                                   const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                                    const rcg::Buffer *buffer, uint32_t part)
 {
   std::string dispname;
 
   if (!buffer->getIsIncomplete() && buffer->getImagePresent(part) &&
-      buffer->getPixelFormat(part) == Coord3D_C16 && chunkadapter)
+      buffer->getPixelFormat(part) == Coord3D_C16 &&
+      rcg::getBoolean(nodemap, "ChunkModeActive", false))
   {
     // get necessary information from ChunkScan3d parameters
 
@@ -247,11 +246,10 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
 */
 
 void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                    const std::shared_ptr<GenApi::CChunkAdapter> &chunkadapter,
                     const std::string &component, const rcg::Buffer *buffer,
                     size_t height=0, bool dispinfo=false)
 {
-  if (chunkadapter)
+  if (rcg::getBoolean(nodemap, "ChunkModeActive", false))
   {
     // prepare file name
 
@@ -451,10 +449,9 @@ int main(int argc, char *argv[])
         dev->open(rcg::Device::CONTROL);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
-        // get chunk adapter (this switches chunk mode on if possible and
-        // returns a null pointer if this is not possible)
+        // try to enable chunks by default (can be disabed by the user)
 
-        std::shared_ptr<GenApi::CChunkAdapter> chunkadapter=rcg::getChunkAdapter(nodemap, dev->getTLType());
+        rcg::setBoolean(nodemap, "ChunkModeActive", true);
 
         // set values as given on the command line
 
@@ -482,15 +479,6 @@ int main(int argc, char *argv[])
             if (value.size() > 0)
             {
               rcg::setString(nodemap, key.c_str(), value.c_str(), true);
-
-              // remove chunk adapter, if user explicitely requested to turn
-              // off chunk mode
-
-              if (key == "ChunkModeActive" && (value == "0" || value == "false" ||
-                  value == "False" || value == "FALSE"))
-              {
-                chunkadapter.reset();
-              }
             }
             else
             {
@@ -556,6 +544,7 @@ int main(int argc, char *argv[])
           // opening first stream
 
           stream[0]->open();
+          stream[0]->attachBuffers(true);
           stream[0]->startStreaming();
 
           std::cout << "Package size: " << rcg::getString(nodemap, "GevSCPSPacketSize") << std::endl;
@@ -585,15 +574,6 @@ int main(int argc, char *argv[])
 
                 if (!buffer->getIsIncomplete())
                 {
-                  // attach buffer to nodemap for accessing chunk data if possible
-
-                  if (chunkadapter)
-                  {
-                    chunkadapter->AttachBuffer(
-                      reinterpret_cast<std::uint8_t *>(buffer->getGlobalBase()),
-                        static_cast<int64_t>(buffer->getSizeFilled()));
-                  }
-
                   // store images in all parts
 
                   if (store)
@@ -613,12 +593,12 @@ int main(int argc, char *argv[])
 
                         if (component == "Disparity" && fmt == rcg::PNM)
                         {
-                          name=storeBufferAsDisparity(nodemap, chunkadapter, buffer, part);
+                          name=storeBufferAsDisparity(nodemap, buffer, part);
 
                           if (name.size() != 0)
                           {
                             std::cout << "Image '" << name << "' stored" << std::endl;
-                            storeParameter(nodemap, chunkadapter, component, buffer);
+                            storeParameter(nodemap, component, buffer);
                           }
                         }
 
@@ -632,14 +612,14 @@ int main(int argc, char *argv[])
                             // Roboceptions rc_visard camera
 
                             size_t h2=buffer->getHeight(part)/2;
-                            name=storeBuffer(fmt, nodemap, chunkadapter, "Intensity", buffer, part, 0, h2);
+                            name=storeBuffer(fmt, nodemap, "Intensity", buffer, part, 0, h2);
 
                             if (name.size() > 0)
                             {
                               std::cout << "Image '" << name << "' stored" << std::endl;
                             }
 
-                            name=storeBuffer(fmt, nodemap, chunkadapter, "IntensityRight", buffer, part, h2, h2);
+                            name=storeBuffer(fmt, nodemap, "IntensityRight", buffer, part, h2, h2);
 
                             if (name.size() > 0)
                             {
@@ -648,7 +628,7 @@ int main(int argc, char *argv[])
                           }
                           else
                           {
-                            name=storeBuffer(fmt, nodemap, chunkadapter, component, buffer, part);
+                            name=storeBuffer(fmt, nodemap, component, buffer, part);
 
                             if (name.size() > 0)
                             {
@@ -662,16 +642,16 @@ int main(int argc, char *argv[])
 
                           if (component == "Intensity")
                           {
-                            storeParameter(nodemap, chunkadapter, component, buffer);
+                            storeParameter(nodemap, component, buffer);
                           }
                           else if (component == "Disparity")
                           {
-                            storeParameter(nodemap, chunkadapter, component, buffer, 0, true);
+                            storeParameter(nodemap, component, buffer, 0, true);
                           }
                           else if (component == "IntensityCombined")
                           {
                             size_t h2=buffer->getHeight(part)/2;
-                            storeParameter(nodemap, chunkadapter, "Intensity", buffer, h2, false);
+                            storeParameter(nodemap, "Intensity", buffer, h2, false);
                           }
                         }
 
@@ -702,10 +682,6 @@ int main(int argc, char *argv[])
                       static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(current.time_since_epoch()).count())-
                       static_cast<double>(buffer->getTimestampNS());
                   }
-
-                  // detach buffer from nodemap
-
-                  if (chunkadapter) chunkadapter->DetachBuffer();
                 }
                 else
                 {

@@ -34,6 +34,7 @@
  */
 
 #include "stream.h"
+#include "config.h"
 
 #include "gentl_wrapper.h"
 #include "exception.h"
@@ -127,8 +128,26 @@ void Stream::close()
     gentl->DSClose(stream);
     stream=0;
 
+    buffer.setNodemap(0, "");
+
     nodemap=0;
     cport=0;
+  }
+}
+
+void Stream::attachBuffers(bool enable)
+{
+  if (enable)
+  {
+    if (parent->getHandle() != 0)
+    {
+      std::shared_ptr<GenApi::CNodeMapRef> rnodemap=parent->getRemoteNodeMap();
+      buffer.setNodemap(rnodemap, parent->getTLType());
+    }
+  }
+  else
+  {
+    buffer.setNodemap(0, "");
   }
 }
 

@@ -35,9 +35,14 @@
 
 #include "buffer.h"
 #include "stream.h"
+#include "config.h"
 
 #include "gentl_wrapper.h"
 #include "exception.h"
+
+#include <GenApi/ChunkAdapterGEV.h>
+#include <GenApi/ChunkAdapterU3V.h>
+#include <GenApi/ChunkAdapterGeneric.h>
 
 namespace rcg
 {
@@ -127,15 +132,67 @@ Buffer::Buffer(const std::shared_ptr<const GenTLWrapper> &_gentl, Stream *_paren
   multipart=false;
 }
 
+Buffer::~Buffer()
+{
+  if (chunkadapter)
+  {
+    chunkadapter->DetachBuffer();
+  }
+}
+
+void Buffer::setNodemap(const std::shared_ptr<GenApi::CNodeMapRef> _nodemap, const std::string &tltype)
+{
+  nodemap=_nodemap;
+  chunkadapter.reset();
+
+  if (nodemap != 0)
+  {
+    if (getBoolean(nodemap, "ChunkModeActive", false))
+    {
+      if (tltype == "GEV")
+      {
+        chunkadapter=std::shared_ptr<GenApi::CChunkAdapter>(new GenApi::CChunkAdapterGEV(nodemap->_Ptr));
+      }
+      else if (tltype == "U3V")
+      {
+        chunkadapter=std::shared_ptr<GenApi::CChunkAdapter>(new GenApi::CChunkAdapterU3V(nodemap->_Ptr));
+      }
+      else
+      {
+        chunkadapter=std::shared_ptr<GenApi::CChunkAdapter>(new GenApi::CChunkAdapterGeneric(nodemap->_Ptr));
+      }
+    }
+  }
+}
+
 void Buffer::setHandle(void *handle)
 {
   buffer=handle;
 
+  payload_type=PAYLOAD_TYPE_UNKNOWN;
   multipart=false;
+
   if (buffer != 0)
   {
+    payload_type=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
+                                        GenTL::BUFFER_INFO_PAYLOADTYPE);
+
     multipart=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
                                      GenTL::BUFFER_INFO_PAYLOADTYPE) == PAYLOAD_TYPE_MULTI_PART;
+
+    if (chunkadapter)
+    {
+      chunkadapter->AttachBuffer(reinterpret_cast<std::uint8_t *>(
+        getBufferValue<void *>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_BASE)),
+        static_cast<int64_t>(getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_SIZE_FILLED)));
+    }
+  }
+  else
+  {
+    if (chunkadapter)
+    {
+      chunkadapter->DetachBuffer();
+    }
   }
 }
 

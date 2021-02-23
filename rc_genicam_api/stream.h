@@ -97,6 +97,17 @@ class Stream : public std::enable_shared_from_this<Stream>
     void close();
 
     /**
+      Enabling or disabling attaching the grabbed buffer to the remote device
+      nodemap. This only has an effect if chunks are enabled (i.e.
+      ChunkModeActive=true).
+
+      @param enable Enables or disables attaching grabbed buffers to the
+                    nodemap.
+    */
+
+    void attachBuffers(bool enable);
+
+    /**
       Allocates buffers and registers internal events if necessary and starts
       streaming.
 
