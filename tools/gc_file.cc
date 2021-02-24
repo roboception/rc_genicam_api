@@ -104,39 +104,49 @@ int main(int argc, char *argv[])
               if (op == "-w")
               {
                 std::ifstream in(file);
+                std::ostringstream buffer;
+                buffer << in.rdbuf();
+                std::string data=buffer.str();
 
-                GenApi::ODevFileStream df;
-                df.open(nodemap->_Ptr, devfile.c_str());
-                if (!df.fail())
+                std::cout << "Input file length: " << data.size() << std::endl;
+
+                GenApi::FileProtocolAdapter rf;
+                rf.attach(nodemap->_Ptr);
+
+                if (rf.openFile(devfile.c_str(), std::ios::out))
                 {
-                  df << in.rdbuf();
-                }
+                  size_t n=rf.write(data.c_str(), 0, data.size(), devfile.c_str());
 
-                df.close();
-                in.close();
+                  std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
+
+                  if (n != data.size())
+                  {
+                    std::cerr << "Error: Can only write " << n << " of " << data.size() << " bytes" << std::endl;
+                  }
+
+                  rf.closeFile(devfile.c_str());
+                }
+                else
+                {
+                  std::cerr << "ERROR: Failed to open remote file!" << std::endl;
+                }
               }
               else if (op == "-r" || op == "")
               {
-                // get file size
-
-                rcg::setEnum(nodemap, "FileSelector", devfile.c_str(), true);
-                rcg::setEnum(nodemap, "FileOperationSelector", "Open", true);
-                rcg::setEnum(nodemap, "FileOpenMode", "Read", true);
-                rcg::callCommand(nodemap, "FileOperationExecute", true);
-                size_t n=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
-                rcg::setEnum(nodemap, "FileOperationSelector", "Close", true);
-                rcg::callCommand(nodemap, "FileOperationExecute", true);
-
                 // load file completely into memory
-
-                std::vector<char> buffer(n);
 
                 GenApi::FileProtocolAdapter rf;
                 rf.attach(nodemap->_Ptr);
 
                 if (rf.openFile(devfile.c_str(), std::ios::in))
                 {
+                  size_t n=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
+                  std::cout << "File size: " << n << std::endl;
+                  std::vector<char> buffer(n);
+
                   n=rf.read(buffer.data(), 0, buffer.size(), devfile.c_str());
+
+                  std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
 
                   if (n == buffer.size())
                   {
@@ -159,10 +169,12 @@ int main(int argc, char *argv[])
                   {
                     std::cerr << "Error: Can only read " << n << " of " << buffer.size() << " bytes" << std::endl;
                   }
+
+                  rf.closeFile(devfile.c_str());
                 }
                 else
                 {
-                  std::cerr << "Cannot open remote file: " << devfile << std::endl;
+                  std::cerr << "Error: Cannot open remote file: " << devfile << std::endl;
                 }
               }
               else
