@@ -9,51 +9,6 @@ The API is based on C++ 11 and can be compiled under Linux and Windows.
 
 This package also provides some tools that can be called from the command line
 for discovering cameras, changing their configuration and streaming images.
-Although the tools are meant to be useful when working in a shell or in a
-script, their main purpose is to serve as example on how to use the API for
-reading and setting parameters, streaming and synchronizing images.
-
-API changes in version 2.0.0
-----------------------------
-
-Version 2.0.0 introduced some API changes that require minor changes of
-programs that use the classes Buffer, Image and ImageList.
-
-An object of class Buffer can now represents a single buffer as well as a
-multipart buffer, depending on the availability of multipart support in the
-used GenTL producer and the GigE vision device. Multipart buffers can contain
-more than one image. For simplicity of the interface, non-multipart buffers are
-now treated like multipart buffers with just one image.
-
-For writing code that is able to support multipart, after grabbing the buffer,
-the number of parts must be requested with the method
-Buffer::getNumberOfParts() and a loop must be added to cycle over all parts.
-All methods that access image specific data have been extended by a second
-parameter for providing the 0 based part index. The following existing
-methods have been changed:
-
-- void    *Buffer::getBase(std::uint32_t part) const;
-- size_t   Buffer::getSize(std::uint32_t part) const;
-- size_t   Buffer::getWidth(std::uint32_t part) const;
-- size_t   Buffer::getHeight(std::uint32_t part) const;
-- size_t   Buffer::getXOffset(std::uint32_t part) const;
-- size_t   Buffer::getYOffset(std::uint32_t part) const;
-- size_t   Buffer::getXPadding(std::uint32_t part) const;
-- bool     Buffer::getImagePresent(std::uint32_t part) const;
-- uint64_t Buffer::getPixelFormat(std::uint32_t part) const;
-- uint64_t Buffer::getPixelFormatNamespace(std::uint32_t part) const;
-- size_t   Buffer::getDeliveredImageHeight(std::uint32_t part) const;
--          Image::Image(const Buffer *buffer, std::uint32_t part);
-- void     ImageList::add(const Buffer *buffer, size_t part);
-
-Another important change is to use the new method Buffer::getGlobalBase() for
-getting the address used to connect a buffer with the nodemap for accessing
-chunk parameters instead of Buffer::getBase(). Other, new methods include:
-
-- void    *Buffer::getGlobalBase() const;
-- size_t   Buffer::getGlobalSize() const;
-- size_t   Buffer::getPartDataType(uint32_t part) const;
-- uint64_t Buffer::getPartSourceID(std::uint32_t part) const;
 
 Compiling and Installing
 ------------------------
@@ -142,7 +97,7 @@ gc_info -h | -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] 
 
 Provides information about GenICam transport layers, interfaces and devices.
 
-Options: 
+Options:
 -h   Prints help information and exits
 -l   List all all available devices on all interfaces
 -o   Filename to store XML description from specified device
@@ -245,6 +200,24 @@ Options:
 Parameters:
 <interface-id> Optional GenICam ID of interface for connecting to the device
 <device-id>    GenICam device ID, serial number or user defined name of device
+```
+
+### gc_file
+
+This tool can be used to upload and download a file into the persistent user
+space of an industrial camera.
+
+```
+tools/gc_file -h | [<interface-id>:]<device-id> -f | (<device-file> [-w|-r <file>])
+
+Downloading or uploading a file via GenICam.
+
+-h            Prints help information and exits
+-f            Lists names of files on the device
+-w <file>     Writes the given local file into the selected file on the device
+-r <file>     Reads the selected file on the device and stores it as local file
+
+The selected file is printed on std out if none of -f, -w and -r are given.
 ```
 
 Device ID
