@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
               }
               else if (p == "-t") // switch precision time protocol on or off
               {
-                rcg::setString(nodemap, "GevIEEE1588", argv[i++], true);
+                rcg::setString(nodemap, "PtpEnable", argv[i++], true);
               }
               else if (p == "-i") // set persistent IP address
               {
@@ -214,8 +214,9 @@ int main(int argc, char *argv[])
             std::cout << "Link local on/off:        " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
             std::cout << std::endl;
 
-            std::cout << "PTP:                      " << rcg::getString(nodemap, "GevIEEE1588") << std::endl;
-            std::cout << "PTP status:               " << rcg::getString(nodemap, "GevIEEE1588Status") << std::endl;
+            std::cout << "PTP:                      " << rcg::getString(nodemap, "PtpEnable") << std::endl;
+            std::cout << "PTP status:               " << rcg::getString(nodemap, "PtpStatus") << std::endl;
+            std::cout << "PTP offset:               " << rcg::getInteger(nodemap, "PtpOffsetFromMaster") << " ns" << std::endl;
           }
 
           dev->close();
