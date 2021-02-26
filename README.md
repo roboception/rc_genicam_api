@@ -10,6 +10,8 @@ The API is based on C++ 11 and can be compiled under Linux and Windows.
 This package also provides some tools that can be called from the command line
 for discovering cameras, changing their configuration and streaming images.
 
+**Prebuilt binaries can be downloaded on the [releases](https://github.com/roboception/rc_genicam_api/releases) page.**
+
 Contents
 --------
 
