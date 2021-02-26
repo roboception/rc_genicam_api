@@ -13,20 +13,27 @@ for discovering cameras, changing their configuration and streaming images.
 Contents
 --------
 
-  1. [Minimum Requirements](#minimum-requirements)
-  2. [Compiling and Installing](#compiling-and-installing)
-  3. [Description of Tools](#description-of-tools)
-  4. [Definition of Device ID](#definition-of-device-id)
-  5. [Finding the Transport Layer](#finding-the-transport-layer)
-  6. [Network Optimization under Linux](#network-optimization-under-linux)
+- [Minimum Requirements](#minimum-requirements)
+- [Compiling and Installing](#compiling-and-installing)
+  - [Linux](#linux)
+  - [Windows](#windows-and-visual-studio)
+- [Description of Tools](#description-of-tools)
+  - [gc_info](#gc_info)
+  - [gc_config](#gc_config)
+  - [gc_stream](#gc_stream)
+  - [gc_pointcloud](#gc_pointcloud)
+  - [gc_file](#gc_file)
+- [Definition of Device ID](#definition-of-device-id)
+- [Finding the Transport Layer](#finding-the-transport-layer)
+- [Network Optimization under Linux](#network-optimization-under-linux)
 
 Minimum Requirements
 --------------------
 
-  * Linux x64 / i86: gcc >= 4.8
-  * ARMhf: gcc >= 4.9.4
-  * Linux AArch64: gcc >= 5.4
-  * Windows 10: Visual Studio >= VC140
+- Linux x64 / i86: gcc >= 4.8
+- ARMhf: gcc >= 4.9.4
+- Linux AArch64: gcc >= 5.4
+- Windows 10: Visual Studio >= VC140
 
 Compiling and Installing
 ------------------------
@@ -172,8 +179,8 @@ images:
 gc_stream <ID> ComponentSelector=Intensity ComponentEnable=1 ComponentSelector=Disparity ComponentEnable=0 n=10
 ```
 
-NOTE: Many image viewers can display PGM and PPM format. The sv tool of cvkit
-(https://github.com/roboception/cvkit) can also be used.
+NOTE: Many image viewers can display PGM and PPM format. The sv tool of
+[cvkit](https://github.com/roboception/cvkit) can also be used.
 
 ```
 gc_stream -h | [-f <fmt>] [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ...
@@ -201,7 +208,7 @@ This tool demonstrates how to synchronize different images according to
 their timestamps.
 
 NOTE: PLY is a standard format for scanned 3D data that can be read by many
-programs. The plyv tool of cvkit (https://github.com/roboception/cvkit) can
+programs. The plyv tool of [cvkit](https://github.com/roboception/cvkit) can
 also be used for visualization.
 
 ```
