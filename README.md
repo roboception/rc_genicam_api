@@ -10,8 +10,26 @@ The API is based on C++ 11 and can be compiled under Linux and Windows.
 This package also provides some tools that can be called from the command line
 for discovering cameras, changing their configuration and streaming images.
 
-Compiling and Installing
-------------------------
+Contents
+--------
+
+  1. Minimum Requirements
+  2. Compiling and Installing
+  3. Description of Tools
+  4. Definition of Device ID
+  5. Finding the Transport Layer
+  6. Network Optimization under Linux
+
+1. Minimum Requirements
+-----------------------
+
+  * Linux x64 / i86: gcc >= 4.8
+  * ARMhf: gcc >= 4.9.4
+  * Linux AArch64: gcc >= 5.4
+  * Windows 10: Visual Studio >= VC140
+
+2. Compiling and Installing
+---------------------------
 
 ### Linux
 
@@ -74,8 +92,8 @@ NOTE: For using the libraries in own projects, define the symbol
 `GENICAM_NO_AUTO_IMPLIB` in your project file to avoid linker problems with the
 GenICam libraries.
 
-Tools
------
+3. Description of Tools
+-----------------------
 
 The tools do not offer a graphical user interface. They are meant to be called
 from a shell (e.g. Power Shell under Windows) or script and controlled by
@@ -220,8 +238,8 @@ Downloading or uploading a file via GenICam.
 The selected file is printed on std out if none of -f, -w and -r are given.
 ```
 
-Device ID
----------
+4. Definition of Device ID
+--------------------------
 
 There are multiple ways of specifying an ID to identify a device.
 
@@ -266,8 +284,8 @@ which triggers looking on all interfaces.
 If the given ID does not contain a colon, the ID is interpreted as the
 device ID itself and is sought throughout all interfaces as well.
 
-Transport Layer
----------------
+5. Finding the Transport Layer
+------------------------------
 
 The communication to the device is done through a so called transport layer
 (i.e. GenTL producer version 1.5 or higher). This package provides and installs
@@ -296,8 +314,8 @@ directory of the executable is also added to the environment variable. Thus,
 the install directory can be moved, as long as the cti file stays in the same
 directory as the executable.
 
-Network Optimization under Linux
---------------------------------
+6. Network Optimization under Linux
+-----------------------------------
 
 When images are received at a lower rate than set/exepected the most
 likely problem is that this (user space) library cannot read the many UDP
