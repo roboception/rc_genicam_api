@@ -13,23 +13,23 @@ for discovering cameras, changing their configuration and streaming images.
 Contents
 --------
 
-  1. Minimum Requirements
-  2. Compiling and Installing
-  3. Description of Tools
-  4. Definition of Device ID
-  5. Finding the Transport Layer
-  6. Network Optimization under Linux
+  1. [Minimum Requirements](#minimum-requirements)
+  2. [Compiling and Installing](#compiling-and-installing)
+  3. [Description of Tools](#description-of-tools)
+  4. [Definition of Device ID](#definition-of-device-id)
+  5. [Finding the Transport Layer](#finding-the-transport-layer)
+  6. [Network Optimization under Linux](#network-optimization-under-linux)
 
-1. Minimum Requirements
------------------------
+Minimum Requirements
+--------------------
 
   * Linux x64 / i86: gcc >= 4.8
   * ARMhf: gcc >= 4.9.4
   * Linux AArch64: gcc >= 5.4
   * Windows 10: Visual Studio >= VC140
 
-2. Compiling and Installing
----------------------------
+Compiling and Installing
+------------------------
 
 ### Linux
 
@@ -92,8 +92,8 @@ NOTE: For using the libraries in own projects, define the symbol
 `GENICAM_NO_AUTO_IMPLIB` in your project file to avoid linker problems with the
 GenICam libraries.
 
-3. Description of Tools
------------------------
+Description of Tools
+--------------------
 
 The tools do not offer a graphical user interface. They are meant to be called
 from a shell (e.g. Power Shell under Windows) or script and controlled by
@@ -238,8 +238,8 @@ Downloading or uploading a file via GenICam.
 The selected file is printed on std out if none of -f, -w and -r are given.
 ```
 
-4. Definition of Device ID
---------------------------
+Definition of Device ID
+-----------------------
 
 There are multiple ways of specifying an ID to identify a device.
 
@@ -284,8 +284,8 @@ which triggers looking on all interfaces.
 If the given ID does not contain a colon, the ID is interpreted as the
 device ID itself and is sought throughout all interfaces as well.
 
-5. Finding the Transport Layer
-------------------------------
+Finding the Transport Layer
+---------------------------
 
 The communication to the device is done through a so called transport layer
 (i.e. GenTL producer version 1.5 or higher). This package provides and installs
@@ -314,8 +314,8 @@ directory of the executable is also added to the environment variable. Thus,
 the install directory can be moved, as long as the cti file stays in the same
 directory as the executable.
 
-6. Network Optimization under Linux
------------------------------------
+Network Optimization under Linux
+--------------------------------
 
 When images are received at a lower rate than set/exepected the most
 likely problem is that this (user space) library cannot read the many UDP
