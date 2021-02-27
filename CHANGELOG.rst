@@ -1,3 +1,17 @@
+2.5.0 (2021-02-26)
+------------------
+
+- Upgrading GenICam reference implementation to version 3.3
+- Added support for storing images of format RGB8 and BayerXX8
+- Increasing discover timeout from 100 ms to 1 s, which is necessary for some cameras
+- Resetting chunk adapter in gc_stream if user explicitely disables chunk data
+- Added tool gc_file for reading / writing user data from / to a GenICam device
+- Integrated attaching buffers to nodemap into stream and buffer classes
+- Added support for handling payload type chunk data for supporting Basler ace cameras
+- Updated handling of PTP in gc_config tool using the new feature names
+- Correct exception message if png can't be stored
+- Rename adaptive_out1_reduction to out1_reduction in stored parameter file
+
 2.4.4 (2020-10-23)
 ------------------
 
