@@ -116,7 +116,7 @@ class IOException : public std::exception
     std::string msg;
 };
 
-std::string storeImagePNM(const std::string &name, const rcg::Image &image, size_t yoffset,
+std::string storeImagePNM(const std::string &name, const Image &image, size_t yoffset,
   size_t height)
 {
   size_t width=image.getWidth();
@@ -229,7 +229,7 @@ std::string storeImagePNM(const std::string &name, const rcg::Image &image, size
           for (size_t i=0; i<width; i+=4)
           {
             uint8_t rgb[12];
-            rcg::convYCbCr411toQuadRGB(rgb, p, static_cast<int>(i));
+            convYCbCr411toQuadRGB(rgb, p, static_cast<int>(i));
 
             for (int j=0; j<12; j++)
             {
@@ -296,7 +296,7 @@ std::string storeImagePNM(const std::string &name, const rcg::Image &image, size
 
 #ifdef INCLUDE_PNG
 
-std::string storeImagePNG(const std::string &name, const rcg::Image &image, size_t yoffset,
+std::string storeImagePNG(const std::string &name, const Image &image, size_t yoffset,
   size_t height)
 {
   size_t width=image.getWidth();
@@ -441,7 +441,7 @@ std::string storeImagePNG(const std::string &name, const rcg::Image &image, size
         {
           for (size_t i=0; i<width; i+=4)
           {
-            rcg::convYCbCr411toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+            convYCbCr411toQuadRGB(tmp+3*i, p, static_cast<int>(i));
           }
 
           png_write_row(png, tmp);
@@ -525,7 +525,7 @@ std::string storeImagePNG(const std::string &name, const rcg::Image &image, size
 
 }
 
-std::string storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
+std::string storeImage(const std::string &name, ImgFmt fmt, const Image &image,
   size_t yoffset, size_t height)
 {
   std::string ret;
@@ -549,7 +549,7 @@ std::string storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &im
   return ret;
 }
 
-std::string storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image, int inv,
+std::string storeImageAsDisparityPFM(const std::string &name, const Image &image, int inv,
   float scale, float offset)
 {
   if (image.getPixelFormat() != Coord3D_C16)

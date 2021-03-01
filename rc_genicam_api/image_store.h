@@ -65,7 +65,7 @@ std::string ensureNewFileName(std::string name);
   @param height  Number of image rows to be stored. 0 means all rows.
 */
 
-std::string storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &image,
+std::string storeImage(const std::string &name, ImgFmt fmt, const Image &image,
   size_t yoffset=0, size_t height=0);
 
 /**
@@ -81,7 +81,7 @@ std::string storeImage(const std::string &name, ImgFmt fmt, const rcg::Image &im
   @param offset Offset for valid values.
 */
 
-std::string storeImageAsDisparityPFM(const std::string &name, const rcg::Image &image,
+std::string storeImageAsDisparityPFM(const std::string &name, const Image &image,
   int inv, float scale, float offset);
 
 }

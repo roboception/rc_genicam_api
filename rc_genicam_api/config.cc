@@ -878,7 +878,7 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
 void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                   const char *value, bool igncache)
 {
-  std::string cvalue=rcg::getString(nodemap, name, true, igncache);
+  std::string cvalue=getString(nodemap, name, true, igncache);
 
   if (cvalue != "" && cvalue != value)
   {
@@ -913,7 +913,7 @@ std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<Gen
 }
 
 std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                              const rcg::Buffer *buffer, uint32_t ipart)
+                              const Buffer *buffer, uint32_t ipart)
 {
   std::string component;
 

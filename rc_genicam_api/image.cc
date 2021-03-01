@@ -129,7 +129,7 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
   }
 }
 
-void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
+void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
               uint32_t ds, uint32_t i, uint32_t k)
 {
   if (ds < 1)
@@ -173,7 +173,7 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
       for (uint32_t ii=0; ii<ds; ii++)
       {
         uint8_t v[3];
-        rcg::convYCbCr411toRGB(v, p, static_cast<int>(i+ii));
+        convYCbCr411toRGB(v, p, static_cast<int>(i+ii));
 
         r+=v[0];
         g+=v[1];
@@ -415,7 +415,7 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
             if (rgb_out)
             {
               uint8_t rgb[12];
-              rcg::convYCbCr411toQuadRGB(rgb, raw, static_cast<int>(i));
+              convYCbCr411toQuadRGB(rgb, raw, static_cast<int>(i));
 
               for (int j=0; j<12; j++)
               {

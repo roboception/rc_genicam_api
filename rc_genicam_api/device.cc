@@ -438,19 +438,19 @@ std::vector<std::shared_ptr<Device> > getDevices()
 {
   std::vector<std::shared_ptr<Device> > ret;
 
-  std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
+  std::vector<std::shared_ptr<System> > system=System::getSystems();
 
   for (size_t i=0; i<system.size(); i++)
   {
     system[i]->open();
 
-    std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
+    std::vector<std::shared_ptr<Interface> > interf=system[i]->getInterfaces();
 
     for (size_t k=0; k<interf.size(); k++)
     {
       interf[k]->open();
 
-      std::vector<std::shared_ptr<rcg::Device> > device=interf[k]->getDevices();
+      std::vector<std::shared_ptr<Device> > device=interf[k]->getDevices();
 
       for (size_t j=0; j<device.size(); j++)
       {
@@ -487,7 +487,7 @@ std::shared_ptr<Device> getDevice(const char *id)
 
     // go through all systems
 
-    std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
+    std::vector<std::shared_ptr<System> > system=System::getSystems();
 
     for (size_t i=0; i<system.size(); i++)
     {
@@ -495,7 +495,7 @@ std::shared_ptr<Device> getDevice(const char *id)
 
       // get all interfaces
 
-      std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
+      std::vector<std::shared_ptr<Interface> > interf=system[i]->getInterfaces();
 
       if (interfid.size() > 0)
       {

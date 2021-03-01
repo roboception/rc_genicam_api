@@ -140,7 +140,7 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i);
   @param i, k Pixel location in downscaled coordinates.
 */
 
-void getColor(uint8_t rgb[3], const std::shared_ptr<const rcg::Image> &img,
+void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
               uint32_t ds, uint32_t i, uint32_t k);
 
 /**
