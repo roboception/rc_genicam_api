@@ -9,7 +9,7 @@
 #define @PROJECT_NAME_UPPER@_VERSION_MINOR @PACKAGE_VERSION_MINOR@
 #define @PROJECT_NAME_UPPER@_VERSION_PATCH @PACKAGE_VERSION_PATCH@
 /// package version as string, possibly with git commit: v1.2.3+4+g56789abc
-#define @PROJECT_NAME_UPPER@_PACKAGE_VERSION "@PACKAGE_VERSION@"
+#define @PROJECT_NAME_UPPER@_PACKAGE_VERSION "@RC_PACKAGE_VERSION@"
 
 ///runtime versions, where the above values are linked into a lib and therefore reflect the version
 ///of the library itself (not the version of the header at compile time of the user code)
