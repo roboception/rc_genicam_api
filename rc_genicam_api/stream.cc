@@ -477,7 +477,7 @@ std::string Stream::getTLType()
 
   if (stream != 0)
   {
-    if (gentl->DSGetInfo(stream, GenTL::STREAM_INFO_TLTYPE, &type, &ret, &size) ==
+    if (gentl->DSGetInfo(stream, GenTL::STREAM_INFO_TLTYPE, &type, tmp, &size) ==
         GenTL::GC_ERR_SUCCESS)
     {
       if (type == GenTL::INFO_DATATYPE_STRING)
