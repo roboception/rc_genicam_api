@@ -226,7 +226,7 @@ std::string storeBufferAsDisparity(const std::shared_ptr<GenApi::CNodeMapRef> &n
     // store image
 
     rcg::Image image(buffer, part);
-    dispname=storeImageAsDisparityPFM(name.str(), image, inv, scale, offset);
+    dispname=storeImageAsDisparityPFM(name.str(), image, inv, static_cast<float>(scale), static_cast<float>(offset));
   }
   else if (buffer->getIsIncomplete())
   {
@@ -273,7 +273,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
     rcg::setString(nodemap, "ChunkComponentSelector", component.c_str());
 
-    int width=rcg::getInteger(nodemap, "ChunkWidth");
+    int width=static_cast<int>(rcg::getInteger(nodemap, "ChunkWidth"));
     if (height == 0) height=rcg::getInteger(nodemap, "ChunkHeight");
     double f=rcg::getFloat(nodemap, "ChunkScan3dFocalLength");
     double t=rcg::getFloat(nodemap, "ChunkScan3dBaseline");
@@ -313,7 +313,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
       try
       {
-        float v=rcg::getFloat(nodemap, "ChunkRcNoise", 0, 0, true);
+        float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcNoise", 0, 0, true));
         out << "camera.noise=" << v << std::endl;
       }
       catch (const std::exception &)
@@ -321,7 +321,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
       try
       {
-        float v=rcg::getFloat(nodemap, "ChunkRcBrightness", 0, 0, true);
+        float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcBrightness", 0, 0, true));
         out << "camera.brightness=" << v << std::endl;
       }
       catch (const std::exception &)
@@ -329,7 +329,7 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
       try
       {
-        float v=rcg::getFloat(nodemap, "ChunkRcOut1Reduction", 0, 0, true);
+        float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcOut1Reduction", 0, 0, true));
         out << "camera.out1_reduction=" << v << std::endl;
       }
       catch (const std::exception &)
