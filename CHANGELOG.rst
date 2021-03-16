@@ -1,3 +1,11 @@
+2.5.1 (2021-03-16)
+------------------
+
+- Fixed compile problems under Windows
+- Fixed using wrong pointer in method Stream::getTLType()
+- Readme: Add link to release page
+- Removing redundent specification of namespace in some source files
+
 2.5.0 (2021-02-26)
 ------------------
 
