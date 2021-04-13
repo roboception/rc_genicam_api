@@ -200,6 +200,11 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
 
       if (xml != 0)
       {
+        if (xml[0] == '\0')
+        {
+          xml=name.c_str();
+        }
+
         std::ofstream out(xml, std::ios::binary);
 
         out.rdbuf()->sputn(buffer.get(), static_cast<std::streamsize>(length));

@@ -372,6 +372,11 @@ int main(int argc, char *argv[])
         {
           k++;
           xml=argv[k++];
+
+          if (std::string(xml) == ".")
+          {
+            xml="";
+          }
         }
 
         if (k < argc)
@@ -510,14 +515,14 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -h | -l | ([-o <xml-output-file>] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -h | -l | ([-o <xml-output-file>|.] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Provides information about GenICam transport layers, interfaces and devices." << std::endl;
       std::cout << std::endl;
       std::cout << "Options: " << std::endl;
       std::cout << "-h   Prints help information and exits" << std::endl;
       std::cout << "-l   List all all available devices on all interfaces" << std::endl;
-      std::cout << "-o   Filename to store XML description from specified device" << std::endl;
+      std::cout << "-o   Store XML description from specified device" << std::endl;
       std::cout << std::endl;
       std::cout << "Parameters:" << std::endl;
       std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;

@@ -233,7 +233,8 @@ class Device : public std::enable_shared_from_this<Device>
       NOTE: open() must be called before calling this method. The returned
       pointer remains valid until close() of this object is called.
 
-      @param xml Path and name for storing the received XML file or 0 if xml
+      @param xml Path and name for storing the received XML file. An empty
+                 string for using the filename on the device or 0 if xml
                  file should not be stored.
       @return    Node map of this object.
     */
