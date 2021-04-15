@@ -62,14 +62,30 @@ class System : public std::enable_shared_from_this<System>
     ~System();
 
     /**
-      Returns a list of systems (i.e. transport layers) that is currently
-      available. For discovering available transport layers, the environment
-      variable GENICAM_GENTL32_PATH or GENICAM_GENTL64_PATH (depending on the
-      compilation with 32 or 64 bit) is used. In case the environment variable
-      is not set or is empty, a default path is used, which points to the
-      GenTL layer that is bundled with rc_genicam_api.
+      Returns a list of systems (i.e. producers or transport layers) that is
+      currently available in the directories given by path. In case of an empty
+      path, a default path is used, which points to the GenTL layer that is
+      bundled with rc_genicam_api.
 
       NOTE: This is the only method that can instantiate System objects.
+
+      @param path   List of GenTL producers with absolute path or directories
+                    with producers (i.e. with suffix .cti). The files or
+                    directories are separated by ';' under Windows or ':' under
+                    Linux. The parameter can be 0 or "" for using the install
+                    directory of the GenTL producers that are included in the
+                    rc_genicam_api.
+      @param ignore Name of producer (i.e. file name without path) that is
+                    ignored. This parameter can be 0.
+      @return       List of all available transport layers.
+    */
+
+    static std::vector<std::shared_ptr<System> > getSystems(const char *path, const char *ignore);
+
+    /**
+      This function calls the getSystems() with the default GenICam path that
+      is defined by the environment variable GENICAM_GENTL32_PATH or
+      GENICAM_GENTL64_PATH (depending on the compilation with 32 or 64 bit).
 
       @return List of all available transport layers.
     */

@@ -113,29 +113,24 @@ static std::string getPathToThisDll()
 
 }
 
-std::vector<std::shared_ptr<System> > System::getSystems()
+std::vector<std::shared_ptr<System> > System::getSystems(const char *_path, const char *_ignore)
 {
   std::lock_guard<std::mutex> lock(system_mtx);
   std::vector<std::shared_ptr<System> > ret;
 
   // get list of all available transport layer libraries
 
-  const char *env=0;
-  if (sizeof(size_t) == 8)
-  {
-    env="GENICAM_GENTL64_PATH";
-  }
-  else
-  {
-    env="GENICAM_GENTL32_PATH";
-  }
-
   std::string path;
+  std::string ignore;
 
-  const char *envpath=std::getenv(env);
-  if (envpath != 0)
+  if (_path != 0)
   {
-    path=envpath;
+    path=_path;
+  }
+
+  if (_ignore != 0)
+  {
+    ignore=_ignore;
   }
 
   if (path.size() == 0)
@@ -178,6 +173,16 @@ std::vector<std::shared_ptr<System> > System::getSystems()
   {
     int k=find(slist, name[i]);
 
+    if (ignore.size() > 0)
+    {
+      // skipping if name equals ignore
+
+      if (name[i].size() >= ignore.size() && name[i].substr(name[i].size()-ignore.size()) == ignore)
+      {
+        continue;
+      }
+    }
+
     if (k >= 0)
     {
       ret.push_back(slist[static_cast<size_t>(k)]);
@@ -208,6 +213,23 @@ std::vector<std::shared_ptr<System> > System::getSystems()
   }
 
   return ret;
+}
+
+std::vector<std::shared_ptr<System> > System::getSystems()
+{
+  // get list of all available transport layer libraries
+
+  const char *env=0;
+  if (sizeof(size_t) == 8)
+  {
+    env="GENICAM_GENTL64_PATH";
+  }
+  else
+  {
+    env="GENICAM_GENTL32_PATH";
+  }
+
+  return getSystems(std::getenv(env), 0);
 }
 
 void System::clearSystems()
