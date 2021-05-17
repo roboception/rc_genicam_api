@@ -60,7 +60,10 @@ template<class T> inline T getBufferValue(const std::shared_ptr<const GenTLWrapp
 
   if (stream != 0 && buffer != 0)
   {
-    gentl->DSGetBufferInfo(stream, buffer, cmd, &type, &ret, &size);
+    if (gentl->DSGetBufferInfo(stream, buffer, cmd, &type, &ret, &size) != GenTL::GC_ERR_SUCCESS)
+    {
+      ret=0;
+    }
   }
 
   return ret;
