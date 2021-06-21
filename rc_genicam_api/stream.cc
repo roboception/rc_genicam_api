@@ -318,6 +318,24 @@ void Stream::stopStreaming()
   }
 }
 
+int Stream::getAvailableBufferCount()
+{
+  size_t ret=0;
+
+  GenTL::INFO_DATATYPE type;
+  size_t size=sizeof(ret);
+
+  if (bn > 0 && event != 0)
+  {
+    if (gentl->EventGetInfo(event, GenTL::EVENT_NUM_IN_QUEUE, &type, &ret, &size) != GenTL::GC_ERR_SUCCESS)
+    {
+      ret=0;
+    }
+  }
+
+  return static_cast<int>(ret);
+}
+
 const Buffer *Stream::grab(int64_t _timeout)
 {
   std::lock_guard<std::recursive_mutex> lock(mtx);
@@ -330,7 +348,7 @@ const Buffer *Stream::grab(int64_t _timeout)
 
   // check that streaming had been started
 
-  if (bn == 0 && event == 0)
+  if (bn == 0 || event == 0)
   {
     throw GenTLException("Streaming::grab(): Streaming not started");
   }

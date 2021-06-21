@@ -123,6 +123,14 @@ class Stream : public std::enable_shared_from_this<Stream>
     void stopStreaming();
 
     /**
+      Returns the number ob buffers that are currently available for grabbing.
+
+      @return Number of buffers, available for immediate grabbing.
+    */
+
+    int getAvailableBufferCount();
+
+    /**
       Wait for the next image or data and return it in a buffer object. The
       buffer is valid until the next call to grab.
 
