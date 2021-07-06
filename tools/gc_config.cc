@@ -120,6 +120,9 @@ int main(int argc, char *argv[])
 
           std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
+          // default interface is 0 (allowed to fail)
+          rcg::setInteger(nodemap, "GevInterfaceSelector", 0);
+
           while (i < argc)
           {
             std::string p=argv[i++];
@@ -135,6 +138,10 @@ int main(int argc, char *argv[])
               if (p == "-n") // change user defined device name
               {
                 rcg::setString(nodemap, "DeviceUserID", argv[i++], true);
+              }
+              else if (p == "-f") // switch to specified interface
+              {
+                rcg::setString(nodemap, "GevInterfaceSelector", argv[i++], true);
               }
               else if (p == "-d") // switch dhcp on or off
               {
@@ -193,30 +200,64 @@ int main(int argc, char *argv[])
           }
           else if (showsummary)
           {
-            std::cout << "ID:                       " << dev->getParent()->getID() << ":"
-                                                      << rcg::getString(nodemap, "DeviceID") << std::endl;
-            std::cout << "GenTL ID:                 " << dev->getID() << std::endl;
-            std::cout << "Serial number:            " << rcg::getString(nodemap, "DeviceID") << std::endl;
-            std::cout << "User defined ID:          " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
-            std::cout << "MAC Address:              " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
+            std::cout << "ID:                         " << dev->getParent()->getID() << ":"
+                                                        << rcg::getString(nodemap, "DeviceID") << std::endl;
+            std::cout << "GenTL ID:                   " << dev->getID() << std::endl;
+            std::cout << "Serial number:              " << rcg::getString(nodemap, "DeviceID") << std::endl;
+            std::cout << "User defined ID:            " << rcg::getString(nodemap, "DeviceUserID") << std::endl;
             std::cout << std::endl;
 
-            std::cout << "Current IP:               " << rcg::getString(nodemap, "GevCurrentIPAddress") << std::endl;
-            std::cout << "Current subnet mask:      " << rcg::getString(nodemap, "GevCurrentSubnetMask") << std::endl;
-            std::cout << "Current gateway:          " << rcg::getString(nodemap, "GevCurrentDefaultGateway") << std::endl;
-            std::cout << std::endl;
+            int64_t n=0;
+            rcg::getInteger(nodemap, "GevInterfaceSelector", 0, &n);
 
-            std::cout << "Persistent IP on/off:     " << rcg::getString(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
-            std::cout << "  Persistent IP:          " << rcg::getString(nodemap, "GevPersistentIPAddress") << std::endl;
-            std::cout << "  Persistent subnet mask: " << rcg::getString(nodemap, "GevPersistentSubnetMask") << std::endl;
-            std::cout << "  Persistent gateway:     " << rcg::getString(nodemap, "GevPersistentDefaultGateway") << std::endl;
-            std::cout << "DHCP on/off:              " << rcg::getString(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
-            std::cout << "Link local on/off:        " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
-            std::cout << std::endl;
+            try
+            {
+              // just test if GEV interface parameters are available
+              rcg::getString(nodemap, "GevCurrentIPAddress", true);
 
-            std::cout << "PTP:                      " << rcg::getString(nodemap, "PtpEnable") << std::endl;
-            std::cout << "PTP status:               " << rcg::getString(nodemap, "PtpStatus") << std::endl;
-            std::cout << "PTP offset:               " << rcg::getInteger(nodemap, "PtpOffsetFromMaster") << " ns" << std::endl;
+              for (int64_t i=0; i<=n; i++)
+              {
+                rcg::setInteger(nodemap, "GevInterfaceSelector", i);
+
+                std::cout << "Interface " << i << ":" << std::endl;
+
+                std::cout << "  MAC Address:              " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
+                std::cout << std::endl;
+
+                std::cout << "  Current IP:               " << rcg::getString(nodemap, "GevCurrentIPAddress") << std::endl;
+                std::cout << "  Current subnet mask:      " << rcg::getString(nodemap, "GevCurrentSubnetMask") << std::endl;
+                std::cout << "  Current gateway:          " << rcg::getString(nodemap, "GevCurrentDefaultGateway") << std::endl;
+                std::cout << std::endl;
+
+                std::cout << "  Persistent IP on/off:     " << rcg::getString(nodemap, "GevCurrentIPConfigurationPersistentIP") << std::endl;
+                std::cout << "    Persistent IP:          " << rcg::getString(nodemap, "GevPersistentIPAddress") << std::endl;
+                std::cout << "    Persistent subnet mask: " << rcg::getString(nodemap, "GevPersistentSubnetMask") << std::endl;
+                std::cout << "    Persistent gateway:     " << rcg::getString(nodemap, "GevPersistentDefaultGateway") << std::endl;
+                std::cout << "  DHCP on/off:              " << rcg::getString(nodemap, "GevCurrentIPConfigurationDHCP") << std::endl;
+                std::cout << "  Link local on/off:        " << rcg::getString(nodemap, "GevCurrentIPConfigurationLLA") << std::endl;
+                std::cout << std::endl;
+              }
+            }
+            catch (const std::exception &)
+            {
+              std::cout << "Gev interface parameters are not available" << std::endl;
+              std::cout << std::endl;
+            }
+
+            try
+            {
+              // just test if Ptp parameters are available
+              rcg::getString(nodemap, "PtpEnable", true);
+
+              std::cout << "PTP:                        " << rcg::getString(nodemap, "PtpEnable") << std::endl;
+              std::cout << "PTP status:                 " << rcg::getString(nodemap, "PtpStatus") << std::endl;
+              std::cout << "PTP offset:                 " << rcg::getInteger(nodemap, "PtpOffsetFromMaster") << " ns" << std::endl;
+            }
+            catch (const std::exception &)
+            {
+              std::cout << "Ptp parameters are not available" << std::endl;
+              std::cout << std::endl;
+            }
           }
 
           dev->close();
@@ -243,6 +284,7 @@ int main(int argc, char *argv[])
       std::cout << std::endl;
       std::cout << "Options:" << std::endl;
       std::cout << "-n <id>        Set user defined id" << std::endl;
+      std::cout << "-f <n>         Apply all further IP settings to interface with specified number. Default: 0" << std::endl;
       std::cout << "-d 1|0         Switch DHCP on or off" << std::endl;
       std::cout << "-p 1|0         Switch persistent IP on or off" << std::endl;
       std::cout << "-t 1|0         Switch precision time protocol (ptp) on or off" << std::endl;
