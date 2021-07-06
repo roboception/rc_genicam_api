@@ -106,7 +106,7 @@ std::string formatValue(GenApi::IInteger *node, int64_t value)
        break;
 
     case GenApi::MACAddress:
-       out << std::hex << ((value>>32)&0xff) << ':' << ((value>>30)&0xff) << ':'
+       out << std::hex << ((value>>40)&0xff) << ':' << ((value>>32)&0xff) << ':'
                        << ((value>>24)&0xff) << ':' << ((value>>16)&0xff) << ':'
                        << ((value>>8)&0xff) << ':' << (value&0xff);
        break;
