@@ -1,3 +1,14 @@
+2.5.2 (2021-07-06)
+------------------
+
+- Added possibility for configuration of multiple Gev interfaces in gc_config
+- Fixed printing of Mac address in gc_info
+- Added method to stream object for checking the number of buffers available for grabbing
+- Treating missing parameters in Buffer as 0
+- Changed way how to define different path for locating producers
+- Added possibility to discover producers in non-default locations and ignoring a specific producer
+- Added possibility to store xml file with gc_info with original name
+
 2.5.1 (2021-03-16)
 ------------------
 
