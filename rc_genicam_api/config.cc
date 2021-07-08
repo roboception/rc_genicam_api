@@ -308,7 +308,14 @@ bool setEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *na
 
         if (val != 0)
         {
-          GenApi::IEnumEntry *entry=val->GetEntryByName(value);
+          GenApi::IEnumEntry *entry=0;
+
+          try
+          {
+            entry=val->GetEntryByName(value);
+          }
+          catch (const GENICAM_NAMESPACE::GenericException &)
+          { }
 
           if (entry != 0)
           {
@@ -444,7 +451,14 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
           case GenApi::intfIEnumeration:
             {
               GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
-              GenApi::IEnumEntry *entry=p->GetEntryByName(value);
+              GenApi::IEnumEntry *entry=0;
+
+              try
+              {
+                entry=p->GetEntryByName(value);
+              }
+              catch (const GENICAM_NAMESPACE::GenericException &)
+              { }
 
               if (entry != 0)
               {
