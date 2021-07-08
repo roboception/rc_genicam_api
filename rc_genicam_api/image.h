@@ -129,8 +129,8 @@ void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i);
 void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i);
 
 /**
-  Expects an image in Mono8 or YCbCr411_8 format and returns the color as RGB
-  value at the given pixel location. The downscale factor ds can be greater
+  Expects an image in Mono8, RGB8 or YCbCr411_8 format and returns the color as
+  RGB value at the given pixel location. The downscale factor ds can be greater
   than one. In this case, the given pixel location refers to the downscaled
   image and the returned color is averaged over ds x ds pixels.
 

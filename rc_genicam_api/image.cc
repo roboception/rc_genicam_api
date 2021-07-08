@@ -158,6 +158,34 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
 
     rgb[2]=rgb[1]=rgb[0]=static_cast<uint8_t>(g/n);
   }
+  else if (img->getPixelFormat() == RGB8) // convert from RGB8
+  {
+    size_t lstep=3*img->getWidth()+img->getXPadding();
+    const uint8_t *p=img->getPixels()+k*lstep+3*i;
+
+    uint32_t r=0;
+    uint32_t g=0;
+    uint32_t b=0;
+    uint32_t n=0;
+
+    for (uint32_t kk=0; kk<ds; kk++)
+    {
+      const uint8_t *pp=p;
+      for (uint32_t ii=0; ii<ds; ii++)
+      {
+        r+=*pp++;
+        g+=*pp++;
+        b+=*pp++;
+        n++;
+      }
+
+      p+=lstep;
+    }
+
+    rgb[0]=static_cast<uint8_t>(r/n);
+    rgb[1]=static_cast<uint8_t>(g/n);
+    rgb[2]=static_cast<uint8_t>(b/n);
+  }
   else if (img->getPixelFormat() == YCbCr411_8) // convert from YUV
   {
     size_t lstep=(img->getWidth()>>2)*6+img->getXPadding();
