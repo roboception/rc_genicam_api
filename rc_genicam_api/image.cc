@@ -453,10 +453,11 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
 
             if (mono_out)
             {
-              *mono_out++ = raw[0];
-              *mono_out++ = raw[1];
-              *mono_out++ = raw[3];
-              *mono_out++ = raw[4];
+              size_t j=(i>>2)*6;
+              *mono_out++ = raw[j];
+              *mono_out++ = raw[j+1];
+              *mono_out++ = raw[j+3];
+              *mono_out++ = raw[j+4];
             }
           }
 
