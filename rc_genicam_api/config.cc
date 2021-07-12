@@ -385,7 +385,7 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
               }
               else
               {
-                p->SetValue(std::stoi(v));
+                p->SetValue(static_cast<bool>(std::stoi(v)));
               }
             }
             break;
