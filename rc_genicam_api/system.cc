@@ -137,14 +137,41 @@ bool System::setSystemsPath(const char *path, const char *ignore)
         if (p != 0) *p='\0';
 
         path_to_exe=procpath;
-        system_path+=";" + path_to_exe;
+		
+		if (system_path.size() > 0) system_path+=";";
+		
+        system_path += path_to_exe;
       }
+
+      // another fallback is the path to the current library
 
       const auto path_to_this_dll = getPathToThisDll();
       if (!path_to_this_dll.empty() && path_to_this_dll != path_to_exe)
       {
-        system_path += ";" + path_to_this_dll;
+		if (system_path.size() > 0) system_path+=";";
+		
+        system_path += path_to_this_dll;
       }
+	  
+	  // and possible sub-directories of the library
+	  
+	  HANDLE file_handle;
+	  WIN32_FIND_DATA file_info;
+	  
+	  file_handle=FindFirstFileA((path_to_this_dll+"\\*").c_str(), &file_info);
+	  if (file_handle != INVALID_HANDLE_VALUE)
+	  {
+		do
+		{
+  		  if ((file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 && file_info.cFileName[0] != '.' )
+		  {
+			system_path += ";" + path_to_this_dll + "\\" + file_info.cFileName;
+		  }
+		}
+		while (FindNextFileA(file_handle, &file_info));
+		
+		FindClose(file_handle);
+	  }
 #else
       // otherwise, use the absolute install path to the default transport layer
 
