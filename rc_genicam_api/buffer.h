@@ -378,6 +378,24 @@ class Buffer
     uint64_t getPartSourceID(std::uint32_t part) const;
 
     /**
+      Returns the region id of the specified part.
+
+      @param part Part index, which is ignored if the buffer is not multi-part.
+      @return     Region id of part or 0 if the buffer is not multi-part.
+    */
+
+    uint64_t getPartRegionID(std::uint32_t part) const;
+
+    /**
+      Returns the data purpose id of the specified part.
+
+      @param part Part index, which is ignored if the buffer is not multi-part.
+      @return     Data purpose id of part or 0 if the buffer is not multi-part.
+    */
+
+    uint64_t getPartDataPurposeID(std::uint32_t part) const;
+
+    /**
       Returns the number of lines that are delivered in this buffer. For areea
       cameras, this is typically the same as the specified image height. For
       linescan cameras it can be less.

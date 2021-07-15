@@ -526,6 +526,32 @@ uint64_t Buffer::getPartSourceID(std::uint32_t part) const
   }
 }
 
+uint64_t Buffer::getPartRegionID(std::uint32_t part) const
+{
+  if (multipart)
+  {
+    return getBufferPartValue<uint64_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_REGION_ID);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+uint64_t Buffer::getPartDataPurposeID(std::uint32_t part) const
+{
+  if (multipart)
+  {
+    return getBufferPartValue<uint64_t>(gentl, parent->getHandle(), buffer, part,
+                                      GenTL::BUFFER_PART_INFO_DATA_PURPOSE_ID);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 size_t Buffer::getDeliveredImageHeight(uint32_t part) const
 {
   if (multipart)

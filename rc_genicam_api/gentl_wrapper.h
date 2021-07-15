@@ -36,7 +36,7 @@
 #ifndef RC_GENICAM_API_GENTL_WRAPPER
 #define RC_GENICAM_API_GENTL_WRAPPER
 
-#include <GenTL/GenTL_v1_5.h>
+#include <GenTL/GenTL_v1_6.h>
 
 #include <string>
 #include <vector>

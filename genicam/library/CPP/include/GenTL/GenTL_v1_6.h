@@ -1,5 +1,5 @@
 /****************************************************************************
-(c) 2004-2015 by GenICam GenTL Subcommittee
+(c) 2004-2019 by GenICam GenTL Subcommittee
 
 License: This file is published under the license of the EMVA GenICam Standard Group.
 A text file describing the legal terms is included in your installation as 'license.txt'.
@@ -22,9 +22,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /*  \file     GenTL.h
  *  \brief    GenICam Transport Layer Client Interface
- *  \version  1.5
+ *  \version  1.6
  *  \author   GenTL Subcommittee
- *  \date     2015
+ *  \date     2019
  *
  *  \par Version history
  *  \li Version 0.1.0   First official version from the meeting in Pilsen
@@ -75,6 +75,9 @@ POSSIBILITY OF SUCH DAMAGE.
  *  \li Version 1.5    GenTL Subcommittee
  *                      - Changed namespace to GenTL
  *                      - Changes for GenTL 1.5, Please refer to the GenTL spec 
+ *                        for a list of changes. 
+ *  \li Version 1.6    GenTL Subcommittee
+ *                      - Changes for GenTL 1.6, Please refer to the GenTL spec 
  *                        for a list of changes. 
  */
 
@@ -175,6 +178,7 @@ extern "C" {
       GC_ERR_RESOURCE_EXHAUSTED  = -1020, /* GenTL v1.4 */
       GC_ERR_OUT_OF_MEMORY       = -1021, /* GenTL v1.4 */
       GC_ERR_BUSY                = -1022, /* GenTL v1.5 */
+      GC_ERR_AMBIGUOUS           = -1023, /* GenTL v1.6 */
 
       GC_ERR_CUSTOM_ID           = -10000
     };
@@ -183,7 +187,7 @@ extern "C" {
 #   ifndef GC_GENTL_HEADER_VERSION
 
 #     define GenTLMajorVersion       1 /* defines the major version of the GenICam GenTL standard version this header is based on */
-#     define GenTLMinorVersion       5 /* defines the minor version of the GenICam GenTL standard version this header is based on */
+#     define GenTLMinorVersion       6 /* defines the minor version of the GenICam GenTL standard version this header is based on */
 #     define GenTLSubMinorVersion    0 /* defines the sub minor version of the GenICam GenTL standard version this header is based on */
 
 #     define GC_GENTL_HEADER_VERSION_CODE(major,minor,subminor) (((major)<<24)+((minor)<<16)+(subminor))
@@ -217,19 +221,18 @@ extern "C" {
     /* Handles */
     typedef void *  TL_HANDLE;         /* Transport Layer handle, obtained through the TLOpen */
     typedef void *  IF_HANDLE;         /* Interface handle, obtained through ::TLOpenInterface */
-    typedef void *  DEV_HANDLE;        /* Device Handle, obtained through the ::IFOpenDevice */
-    typedef void *  DS_HANDLE;         /* Handle to an image stream object, obtained through DevOpenDataStream */
+    typedef void *  DEV_HANDLE;        /* Device handle, obtained through the ::IFOpenDevice */
+    typedef void *  DS_HANDLE;         /* Handle to an data stream object, obtained through DevOpenDataStream */
     typedef void *  PORT_HANDLE;       /* A Port handle is used to access the register space of a port */
                     /*  a PORT_HANDLE can be one of the following TL_HANDLE, IF_HANDLE, */
                     /*  DEV_HANDLE, handle to a device port, obtained through ::DevGetPort, */
                     /*  DS_HANDLE, BUFFER_HANDLE */
 
-    typedef void *  BUFFER_HANDLE;     /* BufferHandle, obtained through the ::DSAnnounceBuffer function */
+    typedef void *  BUFFER_HANDLE;     /* Buffer handle, obtained through the ::DSAnnounceBuffer or related function */
     typedef void *  EVENTSRC_HANDLE;   /* A Event source handle is used to register a OS Event and to retrieve a GenTL event handle */
                     /* a EVENTSRC_HANDLE can be on of the following TL_HANDLE, */
-                    /* IF_HANDLE, DEV_HANDLE, A handle to a device port, obtained through ::DevGetPort */
-                    /* DS_HANDLE, BUFFER_HANDLE */
-    typedef void *  EVENT_HANDLE;      /* Event Handle */
+                    /* IF_HANDLE, DEV_HANDLE, DS_HANDLE, BUFFER_HANDLE */
+    typedef void *  EVENT_HANDLE;      /* Event handle, obtained through the ::GCRegisterEvent */
 
 #   define GENTL_INVALID_HANDLE  NULL                /* Invalid handle value, V1.4 */ 
 #   define GENTL_INFINITE        0xFFFFFFFFFFFFFFFFULL  /* Infinite value to be used in various function calls, V1.4 */
@@ -265,7 +268,7 @@ extern "C" {
     };
     typedef int32_t TL_CHAR_ENCODING;       /* GenTL v1.4 */
 
-    /* System module information commands for the GenICam::TL::Client::TLGetInfo and GenICam::TL::Client::GCGetInfo functions. */
+    /* System module information commands for the GenTL::TLGetInfo and GenTL::GCGetInfo functions. */
     enum  TL_INFO_CMD_LIST
     {
       TL_INFO_ID              = 0,    /* STRING    Transport layer ID. */
@@ -283,18 +286,17 @@ extern "C" {
     };
     typedef int32_t TL_INFO_CMD;
 
-    /* This enumeration defines commands to retrieve information with the GenICam::TL::Client::IFGetInfo function from the Interface module. */
+    /* This enumeration defines commands to retrieve information with the GenTL::IFGetInfo function from the Interface module. */
     enum INTERFACE_INFO_CMD_LIST
     {
       INTERFACE_INFO_ID              = 0,     /* STRING     Unique ID of the interface. */
       INTERFACE_INFO_DISPLAYNAME     = 1,     /* STRING     User readable name of the interface. */
       INTERFACE_INFO_TLTYPE          = 2,     /* STRING     Transport layer technology that is supported. */
-
       INTERFACE_INFO_CUSTOM_ID       = 1000   /* Starting value for GenTL Producer custom IDs. */
     };
     typedef int32_t INTERFACE_INFO_CMD;
 
-    /* This enumeration defines flags of how a device is to be opened with the GenICam::TL::Client::IFOpenDevice function. */
+    /* This enumeration defines flags of how a device is to be opened with the GenTL::IFOpenDevice function. */
     enum DEVICE_ACCESS_FLAGS_LIST
     {
       DEVICE_ACCESS_UNKNOWN   = 0,         /* Not used in a command. Can be used to initialize a variable to query that information. */
@@ -307,7 +309,7 @@ extern "C" {
     };
     typedef int32_t DEVICE_ACCESS_FLAGS;
 
-    /* This enumeration defines values for the accessibility of the device to be returned in the GenICam::TL::Client::DevGetInfo function on a device handle. */
+    /* This enumeration defines values for the accessibility of the device to be returned in the GenTL::DevGetInfo function on a device handle. */
     enum DEVICE_ACCESS_STATUS_LIST
     {
       DEVICE_ACCESS_STATUS_UNKNOWN        = 0, /* The device accessibility is not known. */
@@ -322,7 +324,7 @@ extern "C" {
     };
     typedef int32_t DEVICE_ACCESS_STATUS;
 
-    /* This enumeration defines commands to retrieve information with the GenICam::TL::Client::DevGetInfo function on a device handle. */
+    /* This enumeration defines commands to retrieve information with the GenTL::DevGetInfo function on a device handle. */
     enum DEVICE_INFO_CMD_LIST
     {
       DEVICE_INFO_ID                  = 0,    /* STRING     Unique ID of the device. */
@@ -340,7 +342,7 @@ extern "C" {
     };
     typedef int32_t DEVICE_INFO_CMD;
 
-    /* This enumeration defines special stop flags for the acquisition engine. The function used is GenICam::TL::Client::DSStopAcquisition. */
+    /* This enumeration defines special stop flags for the acquisition engine. The function used is GenTL::DSStopAcquisition. */
     enum ACQ_STOP_FLAGS_LIST
     {
       ACQ_STOP_FLAGS_DEFAULT    = 0,         /* Stop the acquisition engine when the currently running tasks like filling a buffer are completed (default behavior). */
@@ -350,7 +352,7 @@ extern "C" {
     };
     typedef int32_t ACQ_STOP_FLAGS;
 
-    /* This enumeration defines special start flags for the acquisition engine. The function used is GenICam::TL::Client::DSStartAcquisition. */
+    /* This enumeration defines special start flags for the acquisition engine. The function used is GenTL::DSStartAcquisition. */
     enum ACQ_START_FLAGS_LIST
     {
       ACQ_START_FLAGS_DEFAULT     = 0,      /* Default behavior. */
@@ -359,7 +361,7 @@ extern "C" {
     };
     typedef int32_t ACQ_START_FLAGS;
 
-    /* This enumeration commands from which to which queue/pool buffers are flushed with the GenICam::TL::Client::DSFlushQueue function. */
+    /* This enumeration commands from which to which queue/pool buffers are flushed with the GenTL::DSFlushQueue function. */
     enum ACQ_QUEUE_TYPE_LIST
     {
       ACQ_QUEUE_INPUT_TO_OUTPUT           = 0,    /* Flushes the input pool to the output queue and if necessary adds entries in the New Buffer event data queue. */
@@ -372,7 +374,7 @@ extern "C" {
     };
     typedef int32_t ACQ_QUEUE_TYPE;
 
-    /* This enumeration defines commands to retrieve information with the GenICam::TL::Client::DSGetInfo function on a data stream handle */
+    /* This enumeration defines commands to retrieve information with the GenTL::DSGetInfo function on a data stream handle */
     enum STREAM_INFO_CMD_LIST
     {
       STREAM_INFO_ID                         =  0,   /* STRING     Unique ID of the data stream. */
@@ -389,12 +391,14 @@ extern "C" {
       STREAM_INFO_NUM_CHUNKS_MAX             = 11,   /* SIZET      Max number of chunks in a buffer, if known. GenTL v1.3 */
       STREAM_INFO_BUF_ANNOUNCE_MIN           = 12,   /* SIZET      Min number of buffers to announce before acq can start, if known. GenTL v1.3 */
       STREAM_INFO_BUF_ALIGNMENT              = 13,   /* SIZET      Buffer alignment in bytes. GenTL v1.3 */
+      STREAM_INFO_FLOW_TABLE                 = 14,   /* BUFFER     Flow mapping table in GenDC format. GenTL v1.6 */
+      STREAM_INFO_GENDC_PREFETCH_DESCRIPTOR  = 15,   /* BUFFER     Prefetch version of GenDC descriptor. GenTL v1.6 */
 
       STREAM_INFO_CUSTOM_ID                  = 1000  /* Starting value for GenTL Producer custom IDs. */
     };
     typedef int32_t STREAM_INFO_CMD;
 
-    /* This enumeration defines commands to retrieve information with the GenICam::TL::Client::DSGetBufferInfo function on a buffer handle. */
+    /* This enumeration defines commands to retrieve information with the GenTL::DSGetBufferInfo function on a buffer handle. */
     enum  BUFFER_INFO_CMD_LIST
     {
       BUFFER_INFO_BASE                            = 0,  /* PTR        Base address of the buffer memory. */
@@ -428,13 +432,14 @@ extern "C" {
       BUFFER_INFO_TIMESTAMP_NS                    = 28, /* UINT64     GenTL v1.4 */
       BUFFER_INFO_DATA_LARGER_THAN_BUFFER         = 29, /* BOOL8      GenTL v1.4 */
       BUFFER_INFO_CONTAINS_CHUNKDATA              = 30, /* BOOL8      GenTL v1.4 */
+      BUFFER_INFO_IS_COMPOSITE                    = 31, /* BOOL8      GenTL v1.6 */
 
       BUFFER_INFO_CUSTOM_ID                       = 1000 /* Starting value for GenTL Producer custom IDs. */
     };
     typedef int32_t BUFFER_INFO_CMD;
 
     /* This enumeration defines commands to retrieve information about individual data parts in a multi-part buffer
-     using the GenICam::TL::Client::DSGetBufferPartInfo function. Introduced in GenTL v1.5. */
+     using the GenTL::DSGetBufferPartInfo function. Introduced in GenTL v1.5. */
     enum  BUFFER_PART_INFO_CMD_LIST
     {
       BUFFER_PART_INFO_BASE                       = 0,  /* PTR        Base address of the buffer part memory. */
@@ -449,6 +454,8 @@ extern "C" {
       BUFFER_PART_INFO_XPADDING                   = 9,  /* SIZET      Horizontal padding of data in the buffer part in pixels. */
       BUFFER_PART_INFO_SOURCE_ID                  = 10, /* UINT64     Identifier allowing to group data parts belonging to the same source. */
       BUFFER_PART_INFO_DELIVERED_IMAGEHEIGHT      = 11, /* SIZET      Height of the data currently in the buffer part in pixels*/
+      BUFFER_PART_INFO_REGION_ID                  = 12, /* UINT64     Identifier allowing to group data parts belonging to the same region. GenTL v1.6 */
+      BUFFER_PART_INFO_DATA_PURPOSE_ID            = 13, /* UINT64     Identifier allowing to group data parts having the same purpose. GenTL v1.6 */
       BUFFER_PART_INFO_CUSTOM_ID                  = 1000 /* Starting value for GenTL Producer custom IDs. */
     };
     typedef int32_t BUFFER_PART_INFO_CMD;   /* GenTL v1.5 */
@@ -467,6 +474,7 @@ extern "C" {
       PAYLOAD_TYPE_CHUNK_ONLY      =  8,   /* GenTL v1.4 */
       PAYLOAD_TYPE_DEVICE_SPECIFIC =  9,   /* GenTL v1.4 */
       PAYLOAD_TYPE_MULTI_PART      =  10,  /* GenTL v1.5 */
+      PAYLOAD_TYPE_GENDC           =  11,  /* GenTL v1.6 */
 
       PAYLOAD_TYPE_CUSTOM_ID       = 1000  /* Starting value for GenTL Producer custom IDs. */
     };
@@ -507,12 +515,14 @@ extern "C" {
       PART_DATATYPE_3D_PLANE_TRIPLANAR   =  7,   /* Single plane of a planar 3D image consisting of 3 planes. */
       PART_DATATYPE_3D_PLANE_QUADPLANAR  =  8,   /* Single plane of a planar 3D image consisting of 4 planes. */
       PART_DATATYPE_CONFIDENCE_MAP       =  9,   /* Confidence of the individual pixel values. */
+      PART_DATATYPE_JPEG                 =  10,  /* JPEG compressed data. GenTL v1.6 */
+      PART_DATATYPE_JPEG2000             =  11,  /* JPEG 2000 compressed data. GenTL v1.6 */
 
       PART_DATATYPE_CUSTOM_ID            = 1000  /* Starting value for GenTL Producer custom IDs. */
     };
     typedef int32_t PARTDATATYPE_ID; /* GenTL v1.5*/
 
-    /* This enumeration defines commands to retrieve information with the GenICam::TL::Client::GCGetPortInfo function on a module or remote device handle. */
+    /* This enumeration defines commands to retrieve information with the GenTL::GCGetPortInfo function on a module or remote device handle. */
     enum PORT_INFO_CMD_LIST
     {
       PORT_INFO_ID              = 0,       /* STRING     Unique ID of the port. */
@@ -545,7 +555,7 @@ extern "C" {
     };
     typedef int32_t URL_SCHEME_ID;
 
-    /* This enumeration defines commands to retrieve information with the GenICam::TL::Client::GCGetPortURLInfo
+    /* This enumeration defines commands to retrieve information with the GenTL::GCGetPortURLInfo
      function on a module or remote device handle. Introduced in GenTL v1.1 */
     enum URL_INFO_CMD_LIST
     {
@@ -565,7 +575,7 @@ extern "C" {
     };
     typedef int32_t URL_INFO_CMD;  /* GenTL v1.1 */
 
-    /* Known event types that can be registered on certain modules with the GenICam::TL::Client::GCRegisterEvent function. */
+    /* Known event types that can be registered on certain modules with the GenTL::GCRegisterEvent function. */
     enum EVENT_TYPE_LIST
     {
       EVENT_ERROR               = 0,     /* Notification on module errors. */
@@ -603,6 +613,28 @@ extern "C" {
     };
     typedef int32_t EVENT_DATA_INFO_CMD;
 
+    /* This enumeration defines commands to retrieve information about individual data stream flows
+     using the GenTL::DSGetFlowInfo function. Introduced in GenTL v1.6. */
+    enum  FLOW_INFO_CMD_LIST
+    {
+      FLOW_INFO_SIZE                              = 0,  /* SIZET      Size of the flow in bytes. */
+      FLOW_INFO_CUSTOM_ID                         = 1000 /* Starting value for GenTL Producer custom IDs. */
+    };
+    typedef int32_t FLOW_INFO_CMD;   /* GenTL v1.6 */
+
+    /* This enumeration defines commands to retrieve information about composite buffer segments
+     using the GenTL::DSGetBufferSegmentInfo function. Introduced in GenTL v1.6. */
+    enum  SEGMENT_INFO_CMD_LIST
+    {
+      SEGMENT_INFO_BASE                           = 0,  /* PTR        Based address of the buffer segment memory. */
+      SEGMENT_INFO_SIZE                           = 1,  /* SIZET      Size of the buffer segment in bytes. */
+      SEGMENT_INFO_IS_INCOMPLETE                  = 2,  /* BOOL8      Flag to indicate that an error occured while filling the segment. */
+      SEGMENT_INFO_SIZE_FILLED                    = 3,  /* SIZET      Number of bytes written into the buffer last time it has been filled. */
+      SEGMENT_INFO_DATA_SIZE                      = 4,  /* SIZET      Size of the data intended to be written to the buffer last time it has been filled. */
+      SEGMENT_INFO_CUSTOM_ID                      = 1000 /* Starting value for GenTL Producer custom IDs. */
+    };
+    typedef int32_t SEGMENT_INFO_CMD;   /* GenTL v1.6 */
+
     /* Structure of the data returned from a signaled "New Buffer" event. */
 #   pragma pack (push, 1)
     typedef struct S_EVENT_NEW_BUFFER
@@ -623,13 +655,38 @@ extern "C" {
 #   pragma pack (pop)
 
 #   pragma pack (push, 1)
-    /* Structure carrying information about a single chunk in the buffer, V1.3 */
+    /* Structure carrying information about a single chunk in the buffer. Introduced in GenTL v1.3. */
     typedef struct S_SINGLE_CHUNK_DATA
     {
       uint64_t ChunkID;       /* Numeric representation of ChunkID */
       ptrdiff_t ChunkOffset;  /* Chunk offset in the buffer */
       size_t ChunkLength;     /* Size of the chunk data */
     } SINGLE_CHUNK_DATA;
+#   pragma pack (pop)
+
+#   pragma pack (push, 1)
+    /* Structure carrying information about a buffer info within a stacked request. Introduced in GenTL v1.6. */
+    typedef struct S_DS_BUFFER_INFO_STACKED
+    {
+      BUFFER_INFO_CMD iInfoCmd; /* Queried buffer info */
+      INFO_DATATYPE iType;      /* The info's data type */
+      void* pBuffer;            /* Pointer to buffer to hold the info data */
+      size_t iSize;             /* Size of the info buffer (in) and the actual info data (out) */
+      GC_ERROR iResult;         /* Result of the buffer info queury */
+    } DS_BUFFER_INFO_STACKED;
+#   pragma pack (pop)
+
+#   pragma pack (push, 1)
+    /* Structure carrying information about a buffer part info within a stacked request. Introduced in GenTL v1.6. */
+    typedef struct S_DS_BUFFER_PART_INFO_STACKED
+    {
+      uint32_t iPartIndex;      /* Index of buffer part to query */
+      BUFFER_PART_INFO_CMD iInfoCmd; /* Queried buffer part info */
+      GC_ERROR iResult;         /* Result of the buffer info queury */
+      INFO_DATATYPE iType;      /* The info's data type */
+      void* pBuffer;            /* Pointer to buffer to hold the info data */
+      size_t iSize;             /* Size of the info buffer (in) and the actual info data (out) */
+    } DS_BUFFER_PART_INFO_STACKED;
 #   pragma pack (pop)
 
 
@@ -674,7 +731,7 @@ extern "C" {
     GC_API IFGetDeviceID           ( IF_HANDLE hIface, uint32_t iIndex, char *sIDeviceID, size_t *piSize );
     GC_API IFUpdateDeviceList      ( IF_HANDLE hIface, bool8_t *pbChanged, uint64_t iTimeout );
     GC_API IFGetDeviceInfo         ( IF_HANDLE hIface, const char *sDeviceID, DEVICE_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
-    GC_API IFOpenDevice            ( IF_HANDLE hIface, const char *sDeviceID, DEVICE_ACCESS_FLAGS iOpenFlags, DEV_HANDLE *phDevice );
+    GC_API IFOpenDevice            ( IF_HANDLE hIface, const char *sDeviceID, DEVICE_ACCESS_FLAGS iOpenFlag, DEV_HANDLE *phDevice );
 
     GC_API DevGetPort              ( DEV_HANDLE hDevice, PORT_HANDLE *phRemoteDevice );
     GC_API DevGetNumDataStreams    ( DEV_HANDLE hDevice, uint32_t *piNumDataStreams );
@@ -714,6 +771,15 @@ extern "C" {
     GC_API DSGetNumBufferParts     ( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t *piNumParts );
     GC_API DSGetBufferPartInfo     ( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t iPartIndex, BUFFER_PART_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
 
+    /* GenTL v1.6 */
+    GC_API DSAnnounceCompositeBuffer ( DS_HANDLE hDataStream, size_t iNumSegments, void **ppSegments, size_t *piSizes, void *pPrivate, BUFFER_HANDLE *phBuffer );
+    GC_API DSGetBufferInfoStacked  ( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, DS_BUFFER_INFO_STACKED *pInfoStacked, size_t iNumInfos );
+    GC_API DSGetBufferPartInfoStacked( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, DS_BUFFER_PART_INFO_STACKED *pInfoStacked, size_t iNumInfos );
+    GC_API DSGetNumFlows           ( DS_HANDLE hDataStream, uint32_t *piNumFlows );
+    GC_API DSGetFlowInfo           ( DS_HANDLE hDataStream, uint32_t iFlowIndex, FLOW_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
+    GC_API DSGetNumBufferSegments  ( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t *piNumSegments );
+    GC_API DSGetBufferSegmentInfo  ( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t iSegmentIndex, SEGMENT_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
+
     /* typedefs for dynamic loading */
 #   define GC_API_P(function) typedef GC_ERROR( GC_CALLTYPE *function )
     GC_API_P(PGCGetInfo               )( TL_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
@@ -746,7 +812,7 @@ extern "C" {
     GC_API_P(PIFGetDeviceID           )( IF_HANDLE hIface, uint32_t iIndex, char *sIDeviceID, size_t *piSize );
     GC_API_P(PIFUpdateDeviceList      )( IF_HANDLE hIface, bool8_t *pbChanged, uint64_t iTimeout );
     GC_API_P(PIFGetDeviceInfo         )( IF_HANDLE hIface, const char *sDeviceID, DEVICE_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
-    GC_API_P(PIFOpenDevice            )( IF_HANDLE hIface, const char *sDeviceID, DEVICE_ACCESS_FLAGS iOpenFlags, DEV_HANDLE *phDevice );
+    GC_API_P(PIFOpenDevice            )( IF_HANDLE hIface, const char *sDeviceID, DEVICE_ACCESS_FLAGS iOpenFlag, DEV_HANDLE *phDevice );
 
     GC_API_P(PDevGetPort              )( DEV_HANDLE hDevice, PORT_HANDLE *phRemoteDevice );
     GC_API_P(PDevGetNumDataStreams    )( DEV_HANDLE hDevice, uint32_t *piNumDataStreams );
@@ -784,6 +850,15 @@ extern "C" {
     /* GenTL v1.5 */
     GC_API_P(PDSGetNumBufferParts     )( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t *piNumParts );
     GC_API_P(PDSGetBufferPartInfo     )( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t iPartIndex, BUFFER_PART_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
+
+    /* GenTL v1.6 */
+    GC_API_P(PDSAnnounceCompositeBuffer)( DS_HANDLE hDataStream, size_t iNumSegments, void **ppSegments, size_t *piSizes, void *pPrivate, BUFFER_HANDLE *phBuffer );
+    GC_API_P(PDSGetBufferInfoStacked  )( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, DS_BUFFER_INFO_STACKED *pInfoStacked, size_t iNumInfos );
+    GC_API_P(PDSGetBufferPartInfoStacked)( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, DS_BUFFER_PART_INFO_STACKED *pInfoStacked, size_t iNumInfos );
+    GC_API_P(PDSGetNumFlows           )( DS_HANDLE hDataStream, uint32_t *piNumFlows );
+    GC_API_P(PDSGetFlowInfo           )( DS_HANDLE hDataStream, uint32_t iFlowIndex, FLOW_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
+    GC_API_P(PDSGetNumBufferSegments  )( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t *piNumSegments );
+    GC_API_P(PDSGetBufferSegmentInfo  )( DS_HANDLE hDataStream, BUFFER_HANDLE hBuffer, uint32_t iSegmentIndex, SEGMENT_INFO_CMD iInfoCmd, INFO_DATATYPE *piType, void *pBuffer, size_t *piSize );
 #ifdef __cplusplus
   } /* end of namespace GenTL */
 } /* end of extern "C" */
