@@ -68,34 +68,12 @@ A Debian package can be built with e.g.
     make
     make package
 
-### Windows and Visual Studio
+### Windows
 
-Building is based on cmake. Therefore, cmake must be downloaded and installed
-according to the operating system from https://cmake.org/download/ After
-starting the cmake-gui, the path to the rc_genicam_api source code directory
-as well as the build directory must be specified. It is common to choose
-a sub-directory of the source code directory and name it 'build' for the
-the temporary files that are created during the build process. After setting
-both paths, the 'Configure' button must be pressed. In the up-coming dialog,
-it can be chosen for which version of Visual Studio and which platform (e.g.
-Win64) the project files should be generated. The dialog is closed by pressing
-'Finish'.
-
-After configuration, the value of the key with the name `CMAKE_INSTALL_PREFIX`
-may be changed to an install directory. By default, the install directory is
-set to a path like `C:/Program Files/rc_genicam_api`. The 'Generate' button
-leads to creating the project file. Visual Studio can be opened with this
-project by pressing the 'Open Project' button.
-
-By default, a 'Debug' version will be compiled. This can be changed to 'Release'
-for compiling an optimized version. The package can then be created, e.g. by
-pressing 'F7'. For installing the compiled package, the 'INSTALL' target can be
-*created* in the project explorer.
-
-After installation, the install directory will contain three sub-directories.
-The 'bin' directory contains the tools, DLLs and the default transport layer
-including configuration. The 'include' and 'lib' sub-directories contain the
-headers and libraries for using the API in own programs.
+The main directory contains the script build_win.bar. Execute this script
+in the Visual Studio command line prompt for building the package.
+Alternatively, you can use cmake manually to generate a build project for
+compilation with your favorite compiler.
 
 NOTE: For using the libraries in own projects, define the symbol
 `GENICAM_NO_AUTO_IMPLIB` in your project file to avoid linker problems with the
