@@ -1,3 +1,15 @@
+2.5.3 (2021-07-17)
+------------------
+
+- Added build script for Visual Studio
+- Added methods for getting region id and data purpose id from buffer
+- On Windows, also try to find producers in sub directories of current library
+- Fixed some compiler warnings
+- Improved error message when writing on cport fails
+- Fixed conversion from YCbCr411 format to Mono8 in convertImage() function
+- Improved error message when setting invalid enum
+- Added support for RGB8 color format in getColor() function
+
 2.5.2 (2021-07-06)
 ------------------
 
