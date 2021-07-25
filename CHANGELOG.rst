@@ -1,3 +1,8 @@
+2.5.4 (2021-07-25)
+------------------
+
+- Fixed reporting of operation status of gc_file tool
+
 2.5.3 (2021-07-17)
 ------------------
 
