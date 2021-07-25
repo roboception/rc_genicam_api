@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
                 if (rf.openFile(devfile.c_str(), std::ios::out))
                 {
                   size_t n=rf.write(data.c_str(), 0, data.size(), devfile.c_str());
+                  rf.closeFile(devfile.c_str());
 
                   std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
 
@@ -123,8 +124,6 @@ int main(int argc, char *argv[])
                   {
                     std::cerr << "Error: Can only write " << n << " of " << data.size() << " bytes" << std::endl;
                   }
-
-                  rf.closeFile(devfile.c_str());
                 }
                 else
                 {
@@ -145,8 +144,6 @@ int main(int argc, char *argv[])
                   std::vector<char> buffer(n);
 
                   n=rf.read(buffer.data(), 0, buffer.size(), devfile.c_str());
-
-                  std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
 
                   if (n == buffer.size())
                   {
@@ -171,6 +168,8 @@ int main(int argc, char *argv[])
                   }
 
                   rf.closeFile(devfile.c_str());
+
+                  std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
                 }
                 else
                 {
