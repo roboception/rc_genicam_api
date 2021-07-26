@@ -183,7 +183,8 @@ void Buffer::setHandle(void *handle)
     multipart=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
                                      GenTL::BUFFER_INFO_PAYLOADTYPE) == PAYLOAD_TYPE_MULTI_PART;
 
-    if (chunkadapter)
+    if (chunkadapter && !getBufferBool(gentl, parent->getHandle(), buffer,
+      GenTL::BUFFER_INFO_IS_INCOMPLETE))
     {
       chunkadapter->AttachBuffer(reinterpret_cast<std::uint8_t *>(
         getBufferValue<void *>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_BASE)),
