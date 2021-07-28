@@ -100,9 +100,10 @@ void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i)
   const int Cb=static_cast<int>(row[j+2])-128;
   const int Cr=static_cast<int>(row[j+5])-128;
 
-  const int rc=(90*Cr+32)>>6;
-  const int gc=(-22*Cb-46*Cr+32)>>6;
-  const int bc=(113*Cb+32)>>6;
+  // conversion of YCbCr into RGB with correct rounding
+  const int rc=((90*Cr+16384+32)>>6)-256;
+  const int gc=((-22*Cb-46*Cr+16384+32)>>6)-256;
+  const int bc=((113*Cb+16384+32)>>6)-256;
 
   rgb[0]=clamp8(Y+rc);
   rgb[1]=clamp8(Y+gc);
@@ -117,9 +118,10 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
   const int Cb=static_cast<int>(row[i+2])-128;
   const int Cr=static_cast<int>(row[i+5])-128;
 
-  const int rc=(90*Cr+32)>>6;
-  const int gc=(-22*Cb-46*Cr+32)>>6;
-  const int bc=(113*Cb+32)>>6;
+  // conversion of YCbCr into RGB with correct rounding
+  const int rc=((90*Cr+16384+32)>>6)-256;
+  const int gc=((-22*Cb-46*Cr+16384+32)>>6)-256;
+  const int bc=((113*Cb+16384+32)>>6)-256;
 
   for (int j=0; j<4; j++)
   {
@@ -285,7 +287,7 @@ inline uint8_t rgb2Grey(uint8_t r, uint8_t g, uint8_t b)
 {
   return static_cast<uint8_t>((9798*static_cast<uint32_t>(r)+
                                19234*static_cast<uint32_t>(g)+
-                               3736*static_cast<uint32_t>(b))/32768);
+                               3736*static_cast<uint32_t>(b)+16384)>>15);
 }
 
 inline void storeRGBMono(uint8_t *&rgb_out, uint8_t *&mono_out, uint8_t red, uint8_t green,
