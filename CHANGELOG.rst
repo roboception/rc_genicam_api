@@ -1,3 +1,10 @@
+2.5.5 (2021-07-28)
+------------------
+
+- Fixed rounding when converting between color and monochrome images
+- Reduce minimum number of buffers
+- Do not attach chunk data handler to incomplete buffer
+
 2.5.4 (2021-07-25)
 ------------------
 
