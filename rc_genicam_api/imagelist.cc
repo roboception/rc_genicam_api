@@ -112,22 +112,50 @@ std::shared_ptr<const Image> ImageList::find(uint64_t timestamp) const
   return std::shared_ptr<const Image>();
 }
 
+namespace
+{
+
+inline uint64_t absDiff(uint64_t a, uint64_t b)
+{
+  if (a < b)
+  {
+    return b-a;
+  }
+
+  return a-b;
+}
+
+}
+
 std::shared_ptr<const Image> ImageList::find(uint64_t timestamp, uint64_t tolerance) const
 {
-  if (tolerance > 0)
+  if (list.size() > 0)
   {
-    for (size_t i=0; i<list.size(); i++)
+    if (tolerance > 0)
     {
-      if (list[i]->getTimestampNS() >= timestamp-tolerance &&
-          list[i]->getTimestampNS() <= timestamp+tolerance)
+      size_t min_i=0;
+      uint64_t min_ad=absDiff(list[0]->getTimestampNS(), timestamp);
+
+      for (size_t i=1; i<list.size(); i++)
       {
-        return list[i];
+        uint64_t ad=absDiff(list[i]->getTimestampNS(), timestamp);
+
+        if (ad < min_ad)
+        {
+          min_i=i;
+          min_ad=ad;
+        }
+      }
+
+      if (min_ad < tolerance)
+      {
+        return list[min_i];
       }
     }
-  }
-  else
-  {
-    return find(timestamp);
+    else
+    {
+      return find(timestamp);
+    }
   }
 
   return std::shared_ptr<const Image>();
