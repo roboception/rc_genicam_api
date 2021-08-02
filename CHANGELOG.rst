@@ -1,3 +1,8 @@
+2.5.6 (2021-08-02)
+------------------
+
+- Changed ImageList::find with tolerance > 0 to return the closest within tolerance
+
 2.5.5 (2021-07-28)
 ------------------
 
