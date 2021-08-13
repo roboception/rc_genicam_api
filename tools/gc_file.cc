@@ -104,6 +104,12 @@ int main(int argc, char *argv[])
               if (op == "-w")
               {
                 std::ifstream in(file);
+
+                if (!in)
+                {
+                  throw std::invalid_argument("Cannot open file: "+file);
+                }
+
                 std::ostringstream buffer;
                 buffer << in.rdbuf();
                 std::string data=buffer.str();
