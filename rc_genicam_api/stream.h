@@ -108,13 +108,23 @@ class Stream : public std::enable_shared_from_this<Stream>
     void attachBuffers(bool enable);
 
     /**
-      Allocates buffers and registers internal events if necessary and starts
-      streaming.
+      Allocates four buffers, registers internal events and starts streaming of
+      nacquire buffers.
 
       @param na Number of buffers to acquire. Set <= 0 for infinity.
     */
 
-    void startStreaming(int na=-1);
+    void startStreaming(int nacquire=-1);
+
+    /**
+      Allocates the given minimum number of buffers, registers internal events
+      and starts streaming of nacquire buffers.
+
+      @param na          Number of buffers to acquire. Set <= 0 for infinity.
+      @param min_buffers Miminum number of buffers to allocate.
+    */
+
+    void startStreaming(int nacquire, int min_buffers);
 
     /**
       Stops streaming.
