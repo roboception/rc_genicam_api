@@ -1,3 +1,9 @@
+2.5.7 (2021-09-01)
+------------------
+
+- Added possibility to specify the internal number of buffers to allocate
+- gc_file tool: Exit with error if file cannot be loaded
+
 2.5.6 (2021-08-02)
 ------------------
 
