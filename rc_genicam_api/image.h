@@ -129,10 +129,35 @@ void convYCbCr411toRGB(uint8_t rgb[3], const uint8_t *row, int i);
 void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i);
 
 /**
-  Expects an image in Mono8, RGB8 or YCbCr411_8 format and returns the color as
-  RGB value at the given pixel location. The downscale factor ds can be greater
-  than one. In this case, the given pixel location refers to the downscaled
-  image and the returned color is averaged over ds x ds pixels.
+  Conversion of one pixel from YCbCr422 format (4 bytes for 2 pixels) to
+  RGB.
+
+  @param rgb Pointer to an array of size 3 for storing the result.
+  @param row Image row.
+  @param i   Index of pixel in row that should be converted.
+*/
+
+void convYCbCr422toRGB(uint8_t rgb[3], const uint8_t *row, int i);
+
+/**
+  Conversion of a group of four pixels from YCbCr422 format (8 bytes for 4
+  pixels) to RGB. Conversion of four pixels is a bit more efficient than
+  conversions of individual pixels.
+
+  @param rgb Pointer to an array of size 3 for storing the result.
+  @param row Image row.
+  @param i   Index of first pixel in row that should be converted. The index
+             must be a multiple of 4!
+*/
+
+void convYCbCr422toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i);
+
+/**
+  Expects an image in Mono8, RGB8, YCbCr411_8, YCbCr422_8 or YUV422_8 format
+  and returns the color as RGB value at the given pixel location. The downscale
+  factor ds can be greater than one. In this case, the given pixel location
+  refers to the downscaled image and the returned color is averaged over
+  ds x ds pixels.
 
   @param rgb  Array of size 3 for returning the color.
   @param img  Pointer to image.
@@ -144,11 +169,8 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
               uint32_t ds, uint32_t i, uint32_t k);
 
 /**
-  Converts image to RGB and monochrome format. Supported input pixel formats
-  are:
-
-  Mono8, Confidence8, Error8, YCbCr411, RGB8, BayerRG8, BayerBG8, BayerGR8,
-  BayerGB8
+  Converts image to RGB and monochrome format. Supported formats can be checked
+  with isFormatSupported().
 
   @param rgb_out     Pointer to target array for rgb image. The array must have
                      a size of 3*width*height pixel. The pointer can be 0.
@@ -165,6 +187,22 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
 
 bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint64_t pixelformat,
   size_t width, size_t height, size_t xpadding);
+
+/**
+  Returns true if the given pixel format is supported by the convertImage()
+  function.
+
+  Currently supported color formats are: RGB8, BayerRG8, BayerBG8, BayerGR8,
+  BayerGB8, YCbCr411_8, YCbCr422_8 and YUV422_8
+
+  Currently supported monochrome formats: Mono8, Confidence8, Error8
+
+  @param only_color If true, the true is returned only for supported color
+                    formats.
+  @return           True if given pixel format is supported.
+*/
+
+bool isFormatSupported(uint64_t pixelformat, bool only_color);
 
 }
 

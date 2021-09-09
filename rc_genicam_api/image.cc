@@ -131,6 +131,49 @@ void convYCbCr411toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
   }
 }
 
+void convYCbCr422toRGB(uint8_t rgb[3], const uint8_t *row, int i)
+{
+  const uint32_t j=static_cast<uint32_t>((i>>1)*4);
+  const uint32_t js=static_cast<uint32_t>(i&0x1)*2;
+
+  const int Y=row[j+js];
+  const int Cb=static_cast<int>(row[j+1])-128;
+  const int Cr=static_cast<int>(row[j+3])-128;
+
+  // conversion of YCbCr into RGB with correct rounding
+  const int rc=((90*Cr+16384+32)>>6)-256;
+  const int gc=((-22*Cb-46*Cr+16384+32)>>6)-256;
+  const int bc=((113*Cb+16384+32)>>6)-256;
+
+  rgb[0]=clamp8(Y+rc);
+  rgb[1]=clamp8(Y+gc);
+  rgb[2]=clamp8(Y+bc);
+}
+
+void convYCbCr422toQuadRGB(uint8_t rgb[12], const uint8_t *row, int i)
+{
+  i=(i>>2)*8;
+
+  for (int k=0; k<8; k+=4)
+  {
+    const int Y[2]={row[i+k], row[i+2+k]};
+    const int Cb=static_cast<int>(row[i+1+k])-128;
+    const int Cr=static_cast<int>(row[i+3+k])-128;
+
+    // conversion of YCbCr into RGB with correct rounding
+    const int rc=((90*Cr+16384+32)>>6)-256;
+    const int gc=((-22*Cb-46*Cr+16384+32)>>6)-256;
+    const int bc=((113*Cb+16384+32)>>6)-256;
+
+    for (int j=0; j<2; j++)
+    {
+      *rgb++=clamp8(Y[j]+rc);
+      *rgb++=clamp8(Y[j]+gc);
+      *rgb++=clamp8(Y[j]+bc);
+    }
+  }
+}
+
 void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
               uint32_t ds, uint32_t i, uint32_t k)
 {
@@ -188,7 +231,7 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
     rgb[1]=static_cast<uint8_t>(g/n);
     rgb[2]=static_cast<uint8_t>(b/n);
   }
-  else if (img->getPixelFormat() == YCbCr411_8) // convert from YUV
+  else if (img->getPixelFormat() == YCbCr411_8) // convert from YUV411
   {
     size_t lstep=(img->getWidth()>>2)*6+img->getXPadding();
     const uint8_t *p=img->getPixels()+k*lstep;
@@ -204,6 +247,36 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
       {
         uint8_t v[3];
         convYCbCr411toRGB(v, p, static_cast<int>(i+ii));
+
+        r+=v[0];
+        g+=v[1];
+        b+=v[2];
+        n++;
+      }
+
+      p+=lstep;
+    }
+
+    rgb[0]=static_cast<uint8_t>(r/n);
+    rgb[1]=static_cast<uint8_t>(g/n);
+    rgb[2]=static_cast<uint8_t>(b/n);
+  }
+  else if (img->getPixelFormat() == YCbCr422_8 || img->getPixelFormat() == YUV422_8) // convert from YUV422
+  {
+    size_t lstep=(img->getWidth()>>2)*8+img->getXPadding();
+    const uint8_t *p=img->getPixels()+k*lstep;
+
+    uint32_t r=0;
+    uint32_t g=0;
+    uint32_t b=0;
+    uint32_t n=0;
+
+    for (uint32_t kk=0; kk<ds; kk++)
+    {
+      for (uint32_t ii=0; ii<ds; ii++)
+      {
+        uint8_t v[3];
+        convYCbCr422toRGB(v, p, static_cast<int>(i+ii));
 
         r+=v[0];
         g+=v[1];
@@ -468,6 +541,40 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
       }
       break;
 
+    case YCbCr422_8:
+    case YUV422_8:
+      {
+        size_t pstep=(width>>2)*8+xpadding;
+        for (size_t k=0; k<height; k++)
+        {
+          for (size_t i=0; i<width; i+=4)
+          {
+            if (rgb_out)
+            {
+              uint8_t rgb[12];
+              convYCbCr422toQuadRGB(rgb, raw, static_cast<int>(i));
+
+              for (int j=0; j<12; j++)
+              {
+                *rgb_out++ = rgb[j];
+              }
+            }
+
+            if (mono_out)
+            {
+              size_t j=(i>>2)*8;
+              *mono_out++ = raw[j];
+              *mono_out++ = raw[j+2];
+              *mono_out++ = raw[j+4];
+              *mono_out++ = raw[j+6];
+            }
+          }
+
+          raw+=pstep;
+        }
+      }
+      break;
+
     case RGB8:
       {
         for (size_t k=0; k<height; k++)
@@ -568,6 +675,24 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
   }
 
   return ret;
+}
+
+bool isFormatSupported(uint64_t pixelformat, bool only_color)
+{
+  if (pixelformat == YCbCr411_8 || pixelformat == YCbCr422_8 || pixelformat == YUV422_8 ||
+    pixelformat == RGB8 || pixelformat == BayerRG8 || pixelformat == BayerBG8 ||
+    pixelformat == BayerGR8 || pixelformat == BayerGB8)
+  {
+    return true;
+  }
+
+  if (!only_color && (pixelformat == Mono8 || pixelformat == Confidence8 ||
+    pixelformat == Error8))
+  {
+    return true;
+  }
+
+  return false;
 }
 
 }

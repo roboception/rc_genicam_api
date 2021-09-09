@@ -212,6 +212,8 @@ std::string storeImagePNM(const std::string &name, const Image &image, size_t yo
       break;
 
     case YCbCr411_8: // convert and store as color image
+    case YCbCr422_8:
+    case YUV422_8:
       {
         full_name=ensureNewFileName(name+".ppm");
         std::ofstream out(full_name, std::ios::binary);
@@ -222,14 +224,31 @@ std::string storeImagePNM(const std::string &name, const Image &image, size_t yo
 
         std::streambuf *sb=out.rdbuf();
 
-        size_t pstep=(width>>2)*6+px;
+        size_t pstep;
+        if (format == YCbCr411_8)
+        {
+          pstep=(width>>2)*6+px;
+        }
+        else
+        {
+          pstep=(width>>2)*8+px;
+        }
+
         p+=pstep*yoffset;
         for (size_t k=0; k<height && out.good(); k++)
         {
           for (size_t i=0; i<width; i+=4)
           {
             uint8_t rgb[12];
-            convYCbCr411toQuadRGB(rgb, p, static_cast<int>(i));
+
+            if (format == YCbCr411_8)
+            {
+              convYCbCr411toQuadRGB(rgb, p, static_cast<int>(i));
+            }
+            else
+            {
+              convYCbCr422toQuadRGB(rgb, p, static_cast<int>(i));
+            }
 
             for (int j=0; j<12; j++)
             {
@@ -407,6 +426,8 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
       break;
 
     case YCbCr411_8: // convert and store as color image
+    case YCbCr422_8:
+    case YUV422_8:
       {
         // open file and init
 
@@ -434,14 +455,32 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
 
         uint8_t *tmp=new uint8_t [3*width];
 
-        size_t pstep=(width>>2)*6+px;
+        size_t pstep;
+        if (format == YCbCr411_8)
+        {
+          pstep=(width>>2)*6+px;
+        }
+        else
+        {
+          pstep=(width>>2)*8+px;
+        }
 
         p+=pstep*yoffset;
         for (size_t k=0; k<height; k++)
         {
-          for (size_t i=0; i<width; i+=4)
+          if (format == YCbCr411_8)
           {
-            convYCbCr411toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+            for (size_t i=0; i<width; i+=4)
+            {
+              convYCbCr411toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+            }
+          }
+          else
+          {
+            for (size_t i=0; i<width; i+=4)
+            {
+              convYCbCr422toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+            }
           }
 
           png_write_row(png, tmp);
