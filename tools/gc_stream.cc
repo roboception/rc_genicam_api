@@ -569,6 +569,11 @@ int main(int argc, char *argv[])
 
               if (buffer != 0)
               {
+                if (buffers_received == 0)
+                {
+                  time_start=std::chrono::steady_clock::now();
+                }
+
                 buffers_received++;
 
                 if (!buffer->getIsIncomplete())
@@ -698,6 +703,8 @@ int main(int argc, char *argv[])
             }
           }
 
+          auto time_stop=std::chrono::steady_clock::now();
+
           stream[0]->stopStreaming();
           stream[0]->close();
 
@@ -707,7 +714,6 @@ int main(int argc, char *argv[])
           std::cout << "Received buffers:   " << buffers_received << std::endl;
           std::cout << "Incomplete buffers: " << buffers_incomplete << std::endl;
 
-          auto time_stop=std::chrono::steady_clock::now();
           std::cout << "Buffers per second: " << std::setprecision(3)
                     << 1000.0*buffers_received/std::chrono::duration_cast<std::chrono::milliseconds>(time_stop-time_start).count()
                     << std::endl;
