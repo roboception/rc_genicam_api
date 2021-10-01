@@ -1,3 +1,9 @@
+2.5.9 (2021-10-01)
+------------------
+
+- Improved measuring of buffers per second in gc_stream
+- Do not show latency in gc_stream -t if PTP is turned off
+
 2.5.8 (2021-09-09)
 ------------------
 
