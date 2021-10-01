@@ -1,3 +1,8 @@
+2.5.10 (2021-10-01)
+-------------------
+
+- Make system, interface, device and stream ignore closing already closed objects
+
 2.5.9 (2021-10-01)
 ------------------
 
