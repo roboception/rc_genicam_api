@@ -720,13 +720,16 @@ int main(int argc, char *argv[])
 
           if (!store)
           {
-            if (buffers_received-buffers_incomplete > 0)
+            if (rcg::getBoolean(nodemap, "PtpEnable") || rcg::getBoolean(nodemap, "GevIEEE1588"))
             {
-              latency_ns/=buffers_received-buffers_incomplete;
-            }
+              if (buffers_received-buffers_incomplete > 0)
+              {
+                latency_ns/=buffers_received-buffers_incomplete;
+              }
 
-            std::cout << "Mean latency:       " << std::setprecision(5) << latency_ns/1.0e6
-                      << " ms (only meaningful if camera is synchronized e.g. via PTP!)" << std::endl;
+              std::cout << "Mean latency:       " << std::setprecision(5) << latency_ns/1.0e6
+                        << " ms" << std::endl;
+            }
           }
 
           // return error code if no images could be received
