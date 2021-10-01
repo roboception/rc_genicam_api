@@ -104,17 +104,17 @@ void Interface::close()
   if (n_open > 0)
   {
     n_open--;
-  }
 
-  if (n_open == 0)
-  {
-    gentl->IFClose(ifh);
-    ifh=0;
+    if (n_open == 0)
+    {
+      gentl->IFClose(ifh);
+      ifh=0;
 
-    nodemap=0;
-    cport=0;
+      nodemap=0;
+      cport=0;
 
-    parent->close();
+      parent->close();
+    }
   }
 }
 

@@ -141,21 +141,21 @@ void Device::close()
   if (n_open > 0)
   {
     n_open--;
-  }
 
-  if (n_open == 0)
-  {
-    gentl->DevClose(dev);
-    dev=0;
-    rp=0;
+    if (n_open == 0)
+    {
+      gentl->DevClose(dev);
+      dev=0;
+      rp=0;
 
-    nodemap=0;
-    rnodemap=0;
+      nodemap=0;
+      rnodemap=0;
 
-    cport=0;
-    rport=0;
+      cport=0;
+      rport=0;
 
-    parent->close();
+      parent->close();
+    }
   }
 }
 

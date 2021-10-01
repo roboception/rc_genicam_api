@@ -120,18 +120,18 @@ void Stream::close()
   if (n_open > 0)
   {
     n_open--;
-  }
 
-  if (n_open == 0)
-  {
-    stopStreaming();
-    gentl->DSClose(stream);
-    stream=0;
+    if (n_open == 0)
+    {
+      stopStreaming();
+      gentl->DSClose(stream);
+      stream=0;
 
-    buffer.setNodemap(0, "");
+      buffer.setNodemap(0, "");
 
-    nodemap=0;
-    cport=0;
+      nodemap=0;
+      cport=0;
+    }
   }
 }
 

@@ -137,9 +137,9 @@ bool System::setSystemsPath(const char *path, const char *ignore)
         if (p != 0) *p='\0';
 
         path_to_exe=procpath;
-		
+
 		if (system_path.size() > 0) system_path+=";";
-		
+
         system_path += path_to_exe;
       }
 
@@ -149,15 +149,15 @@ bool System::setSystemsPath(const char *path, const char *ignore)
       if (!path_to_this_dll.empty() && path_to_this_dll != path_to_exe)
       {
 		if (system_path.size() > 0) system_path+=";";
-		
+
         system_path += path_to_this_dll;
       }
-	  
+
 	  // and possible sub-directories of the library
-	  
+
 	  HANDLE file_handle;
 	  WIN32_FIND_DATA file_info;
-	  
+
 	  file_handle=FindFirstFileA((path_to_this_dll+"\\*").c_str(), &file_info);
 	  if (file_handle != INVALID_HANDLE_VALUE)
 	  {
@@ -169,7 +169,7 @@ bool System::setSystemsPath(const char *path, const char *ignore)
 		  }
 		}
 		while (FindNextFileA(file_handle, &file_info));
-		
+
 		FindClose(file_handle);
 	  }
 #else
@@ -310,15 +310,15 @@ void System::close()
   if (n_open > 0)
   {
     n_open--;
-  }
 
-  if (n_open == 0)
-  {
-    gentl->TLClose(tl);
-    tl=0;
+    if (n_open == 0)
+    {
+      gentl->TLClose(tl);
+      tl=0;
 
-    nodemap=0;
-    cport=0;
+      nodemap=0;
+      cport=0;
+    }
   }
 }
 
