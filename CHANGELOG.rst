@@ -1,3 +1,8 @@
+2.5.11 (2021-10-05)
+-------------------
+
+- Fixed getting buffers with chunk data from Basler ace2 USB cameras
+
 2.5.10 (2021-10-01)
 -------------------
 
