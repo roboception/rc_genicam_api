@@ -283,7 +283,14 @@ uint64_t Buffer::getTimestamp() const
 {
   if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
   {
-    return getInteger(nodemap, "ChunkTimestamp");
+    try
+    {
+      return getInteger(nodemap, "ChunkTimestamp", 0, 0, true);
+    }
+    catch (const std::exception &)
+    {
+      // ignore error and try getBufferValue()
+    }
   }
 
   return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
@@ -345,7 +352,14 @@ size_t Buffer::getWidth(std::uint32_t part) const
   {
     if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
     {
-      return getInteger(nodemap, "ChunkWidth");
+      try
+      {
+        return getInteger(nodemap, "ChunkWidth", 0, 0, true);
+      }
+      catch (const std::exception &)
+      {
+        // ignore error and try getBufferValue()
+      }
     }
 
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_WIDTH);
@@ -363,7 +377,14 @@ size_t Buffer::getHeight(std::uint32_t part) const
   {
     if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
     {
-      return getInteger(nodemap, "ChunkHeight");
+      try
+      {
+        return getInteger(nodemap, "ChunkHeight", 0, 0, true);
+      }
+      catch (const std::exception &)
+      {
+        // ignore error and try getBufferValue()
+      }
     }
 
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_HEIGHT);
@@ -381,7 +402,14 @@ size_t Buffer::getXOffset(std::uint32_t part) const
   {
     if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
     {
-      return getInteger(nodemap, "ChunkOffsetX");
+      try
+      {
+        return getInteger(nodemap, "ChunkOffsetX", 0, 0, true);
+      }
+      catch (const std::exception &)
+      {
+        // ignore error and try getBufferValue()
+      }
     }
 
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_XOFFSET);
@@ -399,7 +427,14 @@ size_t Buffer::getYOffset(std::uint32_t part) const
   {
     if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
     {
-      return getInteger(nodemap, "ChunkOffsetY");
+      try
+      {
+        return getInteger(nodemap, "ChunkOffsetY", 0, 0, true);
+      }
+      catch (const std::exception &)
+      {
+        // ignore error and try getBufferValue()
+      }
     }
 
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_YOFFSET);
@@ -492,7 +527,14 @@ uint64_t Buffer::getPixelFormat(uint32_t part) const
   {
     if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
     {
-      return getInteger(nodemap, "ChunkPixelFormat");
+      try
+      {
+        return getInteger(nodemap, "ChunkPixelFormat", 0, 0, true);
+      }
+      catch (const std::exception &)
+      {
+        // ignore error and try getBufferValue()
+      }
     }
 
     return getBufferValue<uint64_t>(gentl, parent->getHandle(), buffer,
@@ -564,7 +606,14 @@ size_t Buffer::getDeliveredImageHeight(uint32_t part) const
   {
     if (payload_type == PAYLOAD_TYPE_CHUNK_DATA && nodemap)
     {
-      return getInteger(nodemap, "ChunkHeight");
+      try
+      {
+        return getInteger(nodemap, "ChunkHeight", 0, 0, true);
+      }
+      catch (const std::exception &)
+      {
+        // ignore error and try getBufferValue()
+      }
     }
 
     return getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
