@@ -87,7 +87,7 @@ int find(const std::vector<std::shared_ptr<System> > &list, const std::string &f
 static std::string getPathToThisDll()
 {
   HMODULE hm = nullptr;
-  if (GetModuleHandleEx(
+  if (GetModuleHandleExA(
     GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
     GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
     reinterpret_cast<LPCSTR>(&getPathToThisDll), &hm) == 0)
@@ -96,7 +96,7 @@ static std::string getPathToThisDll()
   }
 
   char path[MAX_PATH];
-  if (GetModuleFileName(hm, path, sizeof(path)) == 0)
+  if (GetModuleFileNameA(hm, path, sizeof(path)) == 0)
   {
     return {};
   }
@@ -129,7 +129,7 @@ bool System::setSystemsPath(const char *path, const char *ignore)
       const size_t n=256;
       char procpath[n];
       std::string path_to_exe;
-      if (GetModuleFileName(NULL, procpath, n-1) > 0)
+      if (GetModuleFileNameA(NULL, procpath, n-1) > 0)
       {
         procpath[n-1]='\0';
 
@@ -138,7 +138,7 @@ bool System::setSystemsPath(const char *path, const char *ignore)
 
         path_to_exe=procpath;
 
-		if (system_path.size() > 0) system_path+=";";
+        if (system_path.size() > 0) system_path+=";";
 
         system_path += path_to_exe;
       }
@@ -148,30 +148,31 @@ bool System::setSystemsPath(const char *path, const char *ignore)
       const auto path_to_this_dll = getPathToThisDll();
       if (!path_to_this_dll.empty() && path_to_this_dll != path_to_exe)
       {
-		if (system_path.size() > 0) system_path+=";";
+        if (system_path.size() > 0) system_path+=";";
 
         system_path += path_to_this_dll;
       }
 
 	  // and possible sub-directories of the library
 
-	  HANDLE file_handle;
-	  WIN32_FIND_DATA file_info;
+      HANDLE file_handle;
+      WIN32_FIND_DATAA file_info;
 
-	  file_handle=FindFirstFileA((path_to_this_dll+"\\*").c_str(), &file_info);
-	  if (file_handle != INVALID_HANDLE_VALUE)
-	  {
-		do
-		{
-  		  if ((file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 && file_info.cFileName[0] != '.' )
-		  {
-			system_path += ";" + path_to_this_dll + "\\" + file_info.cFileName;
-		  }
-		}
-		while (FindNextFileA(file_handle, &file_info));
+      file_handle=FindFirstFileA((path_to_this_dll+"\\*").c_str(), &file_info);
 
-		FindClose(file_handle);
-	  }
+      if (file_handle != INVALID_HANDLE_VALUE)
+      {
+        do
+        {
+          if ((file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 && file_info.cFileName[0] != '.' )
+          {
+            system_path += ";" + path_to_this_dll + "\\" + file_info.cFileName;
+          }
+        }
+        while (FindNextFileA(file_handle, &file_info));
+
+        FindClose(file_handle);
+      }
 #else
       // otherwise, use the absolute install path to the default transport layer
 
@@ -249,7 +250,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
         System *p=new System(name[i]);
         ret.push_back(std::shared_ptr<System>(p));
       }
-      catch (const std::exception &)
+      catch (const std::exception &ex)
       {
         // ignore transport layers that cannot be used
       }

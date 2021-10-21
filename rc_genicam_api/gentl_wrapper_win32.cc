@@ -72,7 +72,7 @@ std::vector<std::string> getAvailableGenTLs(const char *paths)
           // get all files with suffix .cti
 
           HANDLE p;
-          WIN32_FIND_DATA data;
+          WIN32_FIND_DATAA data;
 
           std::string dir=path;
 
@@ -129,7 +129,7 @@ GenTLWrapper::GenTLWrapper(const std::string &filename)
 {
   // open library
 
-  HMODULE lp=LoadLibrary(filename.c_str());
+  HMODULE lp=LoadLibraryA(filename.c_str());
 
   if (lp == 0)
   {
