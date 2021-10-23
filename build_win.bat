@@ -22,18 +22,39 @@ if %ERRORLEVEL% NEQ 0 (
   exit /b 1
 )
 
-:: Create directories for building and installing
+echo ----- Create directories for building and installing -----
 
 if not exist "build\" mkdir build
 cd build
 
-for /F "tokens=* USEBACKQ" %%F in (`git describe`) do (set VERSION=%%F)
-
-set TARGET=rc_genicam_api-%VERSION%-win64
-if not exist "%TARGET%\" mkdir %TARGET%
-cd %TARGET%
+if not exist "install\" mkdir install
+cd install
 set INSTALL_PATH=%CD%
-cd ..
+
+cd ..\..\..
+
+echo ----- Download zlib and libpng -----
+
+if not exist "zlib\" (
+  git clone https://github.com/winlibs/zlib.git
+  cd zlib
+  git checkout zlib-1.2.11
+  cd ..
+)
+
+if not exist "libpng\" (
+  git clone https://github.com/winlibs/libpng.git
+  cd libpng
+  git checkout libpng-1.6.34
+  cd ..
+)
+
+echo ----- Building zlib -----
+
+cd zlib
+
+if not exist "build\" mkdir build
+cd build
 
 if exist "build_rc_genicam_api\" (
   cd build_rc_genicam_api\
@@ -44,5 +65,59 @@ if exist "build_rc_genicam_api\" (
 )
 
 nmake install
+if %ERRORLEVEL% NEQ 0 exit /b 1
 
-cd ..\..
+cd ..\..\..
+
+echo ----- Building libpng -----
+
+cd libpng
+
+if not exist "build\" mkdir build
+cd build
+
+if exist "build_rc_genicam_api\" (
+  cd build_rc_genicam_api\
+) else (
+  mkdir build_rc_genicam_api\
+  cd build_rc_genicam_api\
+  cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%INSTALL_PATH%" ..\..
+)
+
+nmake install
+if %ERRORLEVEL% NEQ 0 exit /b 1
+
+cd ..\..\..
+
+echo ----- Build rc_genicam_api -----
+
+cd rc_genicam_api\build
+
+if exist "build_rc_genicam_api\" (
+  cd build_rc_genicam_api\
+) else (
+  mkdir build_rc_genicam_api\
+  cd build_rc_genicam_api\
+  cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%INSTALL_PATH%" ..\..
+)
+
+nmake install
+if %ERRORLEVEL% NEQ 0 exit /b 1
+
+cd ..
+
+echo ----- Extracting files for publication -----
+
+for /F "tokens=* USEBACKQ" %%F in (`git describe`) do (set VERSION=%%F)
+
+set TARGET=rc_genicam_api-%VERSION%-win64
+if not exist "%TARGET%\" mkdir %TARGET%
+
+xcopy /s %INSTALL_PATH%\bin %TARGET%\bin\
+if not exist "%TARGET%\include\" mkdir %TARGET%\include
+xcopy /s %INSTALL_PATH%\include\rc_genicam_api %TARGET%\include\
+if not exist "%TARGET%\lib\" mkdir %TARGET%\lib
+copy %INSTALL_PATH%\lib\GCBase*lib %TARGET%\lib\
+copy %INSTALL_PATH%\lib\GenApi*lib %TARGET%\lib\
+copy %INSTALL_PATH%\lib\rc_genicam_api.lib %TARGET%\lib\
+

@@ -86,6 +86,7 @@ list(APPEND MSVC_DISABLED_WARNINGS
     "/wd4626"
     "/wd5026"
     "/wd5027"
+    "/wd4267"
     "/wd5039")
 
 if (UNIX)
