@@ -1,3 +1,9 @@
+2.5.12 (2021-10-23)
+-------------------
+
+- Imporved Windows build script for compiling with libpng
+- Fixed some issues when compiling under Windows
+
 2.5.11 (2021-10-05)
 -------------------
 
