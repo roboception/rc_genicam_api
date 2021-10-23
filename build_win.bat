@@ -113,9 +113,9 @@ for /F "tokens=* USEBACKQ" %%F in (`git describe`) do (set VERSION=%%F)
 set TARGET=rc_genicam_api-%VERSION%-win64
 if not exist "%TARGET%\" mkdir %TARGET%
 
-xcopy /s %INSTALL_PATH%\bin %TARGET%\bin\
+xcopy /s /y %INSTALL_PATH%\bin %TARGET%\bin\
 if not exist "%TARGET%\include\" mkdir %TARGET%\include
-xcopy /s %INSTALL_PATH%\include\rc_genicam_api %TARGET%\include\
+xcopy /s /y %INSTALL_PATH%\include\rc_genicam_api %TARGET%\include\rc_genicam_api\
 if not exist "%TARGET%\lib\" mkdir %TARGET%\lib
 copy %INSTALL_PATH%\lib\GCBase*lib %TARGET%\lib\
 copy %INSTALL_PATH%\lib\GenApi*lib %TARGET%\lib\
