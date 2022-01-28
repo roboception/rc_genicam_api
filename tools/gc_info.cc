@@ -361,6 +361,41 @@ int main(int argc, char *argv[])
           system[i]->close();
         }
       }
+      else if (std::string(argv[1]) == "-s")
+      {
+        // list all systems, interfaces and devices
+
+        std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
+
+        std::cout << "Interface\tSerial Number\tVendor\tModel\tName" << std::endl;
+
+        for (size_t i=0; i<system.size(); i++)
+        {
+          system[i]->open();
+
+          std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
+
+          for (size_t k=0; k<interf.size(); k++)
+          {
+            interf[k]->open();
+
+            std::vector<std::shared_ptr<rcg::Device> > device=interf[k]->getDevices();
+
+            for (size_t j=0; j<device.size(); j++)
+            {
+              std::cout << interf[k]->getDisplayName() << '\t'
+                        << device[j]->getSerialNumber() << '\t'
+                        << device[j]->getVendor() << '\t'
+                        << device[j]->getModel() << '\t'
+                        << device[j]->getDisplayName() << std::endl;
+            }
+
+            interf[k]->close();
+          }
+
+          system[i]->close();
+        }
+      }
       else
       {
         int k=1;
@@ -515,13 +550,14 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -h | -l | ([-o <xml-output-file>|.] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -h | -l | -s | ([-o <xml-output-file>|.] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Provides information about GenICam transport layers, interfaces and devices." << std::endl;
       std::cout << std::endl;
       std::cout << "Options: " << std::endl;
       std::cout << "-h   Prints help information and exits" << std::endl;
       std::cout << "-l   List all all available devices on all interfaces" << std::endl;
+      std::cout << "-s   List all all available devices on all interfaces (short format)" << std::endl;
       std::cout << "-o   Store XML description from specified device" << std::endl;
       std::cout << std::endl;
       std::cout << "Parameters:" << std::endl;
