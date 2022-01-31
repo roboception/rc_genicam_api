@@ -1,3 +1,9 @@
+2.5.13 (2022-01-31)
+-------------------
+
+- Added parameter '-s' to gc_info for getting a short list of discovered devices
+- Fixed Windows build script
+
 2.5.12 (2021-10-23)
 -------------------
 
