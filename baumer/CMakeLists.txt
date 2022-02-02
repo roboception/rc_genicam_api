@@ -23,6 +23,7 @@ if ("${ARCHITECTURE}" STREQUAL "arm")
       Ubuntu-14.04/armv7l/libbgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
+      license.txt
     COMPONENT bin
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/rc_genicam_api
   )
@@ -33,6 +34,7 @@ elseif ("${ARCHITECTURE}" STREQUAL "aarch64")
       Ubuntu-16.04/arm64/libbgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
+      license.txt
     COMPONENT bin
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/rc_genicam_api
   )
@@ -43,6 +45,7 @@ elseif ("${ARCHITECTURE}" STREQUAL "x86_64")
       Ubuntu-16.04/x86_64/libbgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
+      license.txt
     COMPONENT bin
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/rc_genicam_api
   )
@@ -53,6 +56,7 @@ elseif ("${ARCHITECTURE}" STREQUAL "i686")
       Ubuntu-16.04/i686/libbgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
+      license.txt
     COMPONENT bin
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/rc_genicam_api
   )
@@ -63,6 +67,7 @@ elseif ("${ARCHITECTURE}" STREQUAL "WIN32_i86")
       Win32_i86/bgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
+      license.txt
     COMPONENT bin
     DESTINATION ${CMAKE_INSTALL_BINDIR}
   )
@@ -73,6 +78,7 @@ elseif ("${ARCHITECTURE}" STREQUAL "WIN64_x64")
       Win64_x64/bgapi2_usb.cti
       bsysgige.xml
       bsysusb.xml
+      license.txt
     COMPONENT bin
     DESTINATION ${CMAKE_INSTALL_BINDIR}
   )

@@ -113,6 +113,7 @@ foreach(GENICAM_LIB ${GENICAM_LIBRARIES})
 endforeach()
 
 install(FILES ${GENICAM_LIBRARIES_IN_BUILD_DIR} COMPONENT bin DESTINATION ${GENICAM_INSTALL_LIBDIRS})
+install(DIRECTORY licenses/ COMPONENT bin DESTINATION ${CMAKE_INSTALL_DOCDIR}/GenICam/)
 
 # only install headers if we build and install the shared lib
 if (BUILD_SHARED_LIBS)
