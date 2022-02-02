@@ -1,3 +1,9 @@
+2.5.14 (2022-02-02)
+-------------------
+
+- Install licenses of included binaries
+- Reporting interface id instead of display name in output of gc_info -s
+
 2.5.13 (2022-01-31)
 -------------------
 
