@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
 
             for (size_t j=0; j<device.size(); j++)
             {
-              std::cout << interf[k]->getDisplayName() << '\t'
+              std::cout << interf[k]->getID() << '\t'
                         << device[j]->getSerialNumber() << '\t'
                         << device[j]->getVendor() << '\t'
                         << device[j]->getModel() << '\t'
