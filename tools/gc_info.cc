@@ -252,7 +252,7 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth)
 
           GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
 
-          if (GenApi::IsReadable(p))
+          if (p != nullptr)
           {
             std::cout << '[';
 
@@ -271,7 +271,7 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth)
 
             std::cout << "]: ";
 
-            if (p->GetCurrentEntry() != 0)
+            if (GenApi::IsReadable(p->GetAccessMode()) && p->GetCurrentEntry() != 0)
             {
               std::cout << p->GetCurrentEntry()->GetSymbolic();
             }
