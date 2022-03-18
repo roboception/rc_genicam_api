@@ -66,6 +66,8 @@ option(BUILD_DOC "Add target for building doxygen docs" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(INSTALL_COMPLETION "Install bash completion" OFF)
 
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
 find_package(PNG)
 
 # - Build individual parts -
