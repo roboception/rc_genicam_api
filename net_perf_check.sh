@@ -164,7 +164,8 @@ MTU() {
     iface=$1
   else
     #echo -e "Detecting default interface..."
-    iface=$(route | grep '^default' | grep -o '[^ ]*$')
+    iface=$(route | grep '^default' | head -n1 | grep -o '[^ ]*$')
+    #echo -e "Using default interface $iface"
   fi
   if [[ ! -e /sys/class/net/$iface ]]; then
     echo -e "${c[Warn2]}Warning:${c[Warn1]} Interface $iface does not exist; skipping MTU check${c[0]}" >&2
