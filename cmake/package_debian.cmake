@@ -143,6 +143,8 @@ if (conffiles)
   foreach (conffile ${conffiles})
     file(APPEND "${CONFFILES_FILE}" "${conffile}\n")
   endforeach (conffile)
+
+  execute_process(COMMAND chmod 644 "${CONFFILES_FILE}")
   set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA};${CONFFILES_FILE}")
 endif ()
 

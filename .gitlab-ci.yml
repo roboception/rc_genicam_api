@@ -1,7 +1,9 @@
 before_script:
   - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME
+  - echo -e "\e[0Ksection_start:`date +%s`:install_debs\r\e[0KInstall dependencies"
   - export DEBIAN_FRONTEND=noninteractive
   - apt-get update -yq && apt-get install -y lintian libusb-1.0 libpng-dev
+  - echo -e "\e[0Ksection_end:`date +%s`:install_debs\r\e[0K"
 
 variables:
   GET_SOURCES_ATTEMPTS: "3"
@@ -17,6 +19,12 @@ variables:
     - amd64
     - docker
 
+.arm64_bionic_t: &arm64_bionic_job
+  image: registry.roboception.de/tools/docker_images:bionic-buildimage
+  tags:
+    - arm64
+    - docker
+
 .armhf_bionic_t: &armhf_bionic_job
   image: registry.roboception.de/tools/docker_images:armhf-bionic-buildimage
   tags:
@@ -29,21 +37,61 @@ variables:
     - amd64
     - docker
 
+.arm64_focal_t: &arm64_focal_job
+  image: registry.roboception.de/tools/docker_images:focal-buildimage
+  tags:
+    - arm64
+    - docker
+
+.armhf_focal_t: &armhf_focal_job
+  image: registry.roboception.de/tools/docker_images:armhf-focal-buildimage
+  tags:
+    - armhf
+    - docker
+
 #############
 # Templates
 #############
 .test:
   stage: test
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:build\r\e[0KBuild"
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX="/usr" -DINSTALL_COMPLETION=ON ..
     - make -j 4
+    - echo -e "\e[0Ksection_end:`date +%s`:build\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:test\r\e[0KTest"
     - CTEST_OUTPUT_ON_FAILURE=1 make test
+    - echo -e "\e[0Ksection_end:`date +%s`:test\r\e[0K"
+
+# run test script with latest debs from testing installed
+.test_latest:
+  extends: .test
+  except:
+    - tags
+  variables:
+    TESTING_DEBS: "true"
+
+# run test script with released debs from stable installed (allowed to fail)
+.test_stable:
+  extends: .test
+  allow_failure: true
+  except:
+    - /^v[0-9]+\.[0-9]+\.[0-9]+/
+
+# run test script with released debs from stable (only for releases, mustn't fail)
+.test_release:
+  extends: .test
+  only:
+    - /^v[0-9]+\.[0-9]+\.[0-9]+/
+  except:
+    - branches
 
 # Debian packaging
 .package:
   stage: deploy
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:build\r\e[0KBuild"
     - mkdir build && cd build
     - if [ -n "$ROS_DISTRO" ]; then
         cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/$ROS_DISTRO" -DCMAKE_PREFIX_PATH="/opt/ros/$ROS_DISTRO" -DCMAKE_BUILD_TYPE=Release .. ;
@@ -52,13 +100,18 @@ variables:
       fi
     - make -j 4
     - make package
+    - echo -e "\e[0Ksection_end:`date +%s`:build\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:upload\r\e[0KUpload debian package"
     - if [ -z "$APT_REPO" ]; then export APT_REPO=testing; fi
     - upload_deb.sh $DISTRO_CODENAME-$APT_REPO *.deb
+    - echo -e "\e[0Ksection_end:`date +%s`:upload\r\e[0K"
 
 .package_testing:
   extends: .package
   only:
     - master
+  except:
+    - tags
   variables:
     TESTING_DEBS: "true"
     APT_REPO: "testing"
@@ -76,7 +129,7 @@ variables:
 #### Jobs ####
 ##############
 gen_dox:
-  <<: *amd64_bionic_job
+  <<: *amd64_focal_job
   variables:
     TESTING_DEBS: "true"
   stage: deploy
@@ -89,20 +142,64 @@ gen_dox:
   only:
     - master
     - tags
+  tags:
+    - docs
 
-# Test (on every commit)
-########################
+################
+# Testing builds
+################
+
+# Test against latest (for testing builds)
+##########################################
 test:bionic:amd64:
   <<: *amd64_bionic_job
-  extends: .test
+  extends: .test_latest
 
 test:bionic:armhf:
   <<: *armhf_bionic_job
-  extends: .test
+  extends: .test_latest
+
+test:bionic:arm64:
+  <<: *arm64_bionic_job
+  extends: .test_latest
 
 test:focal:amd64:
   <<: *amd64_focal_job
-  extends: .test
+  extends: .test_latest
+
+test:focal:armhf:
+  <<: *armhf_focal_job
+  extends: .test_latest
+
+test:focal:arm64:
+  <<: *arm64_focal_job
+  extends: .test_latest
+
+# Test against stable (is allowed to fail)
+##########################################
+test_stable:bionic:amd64:
+  <<: *amd64_bionic_job
+  extends: .test_stable
+
+test_stable:bionic:armhf:
+  <<: *armhf_bionic_job
+  extends: .test_stable
+
+test_stable:bionic:arm64:
+  <<: *arm64_bionic_job
+  extends: .test_stable
+
+test_stable:focal:amd64:
+  <<: *amd64_focal_job
+  extends: .test_stable
+
+test_stable:focal:armhf:
+  <<: *armhf_focal_job
+  extends: .test_stable
+
+test_stable:focal:arm64:
+  <<: *arm64_focal_job
+  extends: .test_stable
 
 # Deploy testing (only on master)
 #################################
@@ -114,9 +211,51 @@ package_testing:bionic:armhf:
   <<: *armhf_bionic_job
   extends: .package_testing
 
+package_testing:bionic:arm64:
+  <<: *arm64_bionic_job
+  extends: .package_testing
+
 package_testing:focal:amd64:
   <<: *amd64_focal_job
   extends: .package_testing
+
+package_testing:focal:armhf:
+  <<: *armhf_focal_job
+  extends: .package_testing
+
+package_testing:focal:arm64:
+  <<: *arm64_focal_job
+  extends: .package_testing
+
+################
+# Stable builds
+################
+
+# Test against stable if it is a release
+########################################
+test_release:bionic:amd64:
+  <<: *amd64_bionic_job
+  extends: .test_release
+
+test_release:bionic:armhf:
+  <<: *armhf_bionic_job
+  extends: .test_release
+
+test_release:bionic:arm64:
+  <<: *arm64_bionic_job
+  extends: .test_release
+
+test_release:focal:amd64:
+  <<: *amd64_focal_job
+  extends: .test_release
+
+test_release:focal:armhf:
+  <<: *armhf_focal_job
+  extends: .test_release
+
+test_release:focal:arm64:
+  <<: *arm64_focal_job
+  extends: .test_release
 
 # Deploy stable (only for releases, version tags)
 #################################################
@@ -128,8 +267,20 @@ package_stable:bionic:armhf:
   <<: *armhf_bionic_job
   extends: .package_stable
 
+package_stable:bionic:arm64:
+  <<: *arm64_bionic_job
+  extends: .package_stable
+
 package_stable:focal:amd64:
   <<: *amd64_focal_job
+  extends: .package_stable
+
+package_stable:focal:armhf:
+  <<: *armhf_focal_job
+  extends: .package_stable
+
+package_stable:focal:arm64:
+  <<: *arm64_focal_job
   extends: .package_stable
 
 ########################
