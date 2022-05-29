@@ -1,3 +1,10 @@
+2.5.16 (2022-05-29)
+-------------------
+
+- Added CI build pipelines for ARM64
+- net_perf_check.sh use first default interface
+- Show enum options even if WriteOnly
+
 2.5.14 (2022-02-02)
 -------------------
 
