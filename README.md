@@ -335,12 +335,12 @@ These values can be changed during runtime with `sysctl` or written to
 
 #### rmem_max
 
-If the number of UDP RcvbufErrors increases while streaming, increasing the
+If the number of UDP receive buffer errors increases while streaming, increasing the
 socket receive buffer size usually fixes the problem.
 
-Check the RcvbufErrors with `net_perf_check.sh` or
+Check the errors with `net_perf_check.sh` or
 
-    netstat -us | grep RcvbufErrors
+    netstat -us | grep errors
 
 Increase max receive buffer size:
 
