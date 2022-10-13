@@ -1,3 +1,10 @@
+2.5.17 (2022-10-13)
+-------------------
+
+- Added building for Jammy
+- Added possibility to specify GenICam parameters on the command line of gc_pointcloud tool
+- README: change grep for newer netstat versions
+
 2.5.16 (2022-05-29)
 -------------------
 
