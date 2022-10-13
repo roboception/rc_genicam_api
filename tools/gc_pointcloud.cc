@@ -58,7 +58,7 @@ void printHelp(const char *prgname)
 {
   // show help
 
-  std::cout << prgname << " -h | [-o <output-filename>] [<interface-id>:]<device-id>" << std::endl;
+  std::cout << prgname << " -h | [-o <output-filename>] [<interface-id>:]<device-id> [<key>=<value>] ..." << std::endl;
   std::cout << std::endl;
   std::cout << "Gets the first synchronized image set of the Roboception rc_visard, consisting of left, disparity, confidence and error image, creates a point cloud and stores it in ply ascii format." << std::endl;
   std::cout << std::endl;
@@ -69,6 +69,7 @@ void printHelp(const char *prgname)
   std::cout << "Parameters:" << std::endl;
   std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
   std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
+  std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
 }
 
 }
@@ -85,7 +86,7 @@ int main(int argc, char *argv[])
 
     int i=1;
 
-    while (i+1 < argc)
+    while (i < argc && argv[i][0] == '-')
     {
       if (std::string(argv[i]) == "-o")
       {
@@ -111,7 +112,7 @@ int main(int argc, char *argv[])
 
     // find specific device accross all systems and interfaces and open it
 
-    std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i]);
+    std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i++]);
 
     if (dev)
     {
@@ -187,6 +188,32 @@ int main(int argc, char *argv[])
       // and GenTL producer support multipart)
 
       rcg::setString(nodemap, "AcquisitionMultiPartMode", "SynchronizedComponents");
+
+      // set values as given on the command line
+
+      while (i < argc)
+      {
+        // split argument in key and value
+
+        std::string key=argv[i++];
+        std::string value;
+
+        size_t k=key.find('=');
+        if (k != std::string::npos)
+        {
+          value=key.substr(k+1);
+          key=key.substr(0, k);
+        }
+
+        if (value.size() > 0)
+        {
+          rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+        }
+        else
+        {
+          rcg::callCommand(nodemap, key.c_str(), true);
+        }
+      }
 
       // open image stream
 
