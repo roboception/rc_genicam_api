@@ -18,7 +18,7 @@ Contents
 - [Minimum Requirements](#minimum-requirements)
 - [Compiling and Installing](#compiling-and-installing)
   - [Linux](#linux)
-  - [Windows](#windows-and-visual-studio)
+  - [Windows](#windows)
 - [Description of Tools](#description-of-tools)
   - [gc_info](#gc_info)
   - [gc_config](#gc_config)
@@ -70,8 +70,8 @@ A Debian package can be built with e.g.
 
 ### Windows
 
-The main directory contains the script build_win.bar. Execute this script
-in the Visual Studio command line prompt for building the package.
+The main directory contains the script build_win.bat. Execute this script
+in the **Visual Studio Developer Command Prompt** for building the package.
 Alternatively, you can use cmake manually to generate a build project for
 compilation with your favorite compiler.
 
