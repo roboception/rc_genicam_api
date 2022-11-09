@@ -42,6 +42,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 int main(int argc, char *argv[])
 {
@@ -116,19 +117,28 @@ int main(int argc, char *argv[])
 
                 std::cout << "Input file length: " << data.size() << std::endl;
 
+                // store in pieces of 512 bytes
+
                 GenApi::FileProtocolAdapter rf;
                 rf.attach(nodemap->_Ptr);
 
                 if (rf.openFile(devfile.c_str(), std::ios::out))
                 {
-                  size_t n=rf.write(data.c_str(), 0, data.size(), devfile.c_str());
+                  size_t off=0, n=512;
+                  while (n > 0)
+                  {
+                    n=rf.write(data.c_str()+off, off, std::min(static_cast<size_t>(512), data.size()-off),
+                               devfile.c_str());
+                    off+=n;
+                  }
+
                   rf.closeFile(devfile.c_str());
 
                   std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
 
-                  if (n != data.size())
+                  if (off != data.size())
                   {
-                    std::cerr << "Error: Can only write " << n << " of " << data.size() << " bytes" << std::endl;
+                    std::cerr << "Error: Can only write " << off << " of " << data.size() << " bytes" << std::endl;
                   }
                 }
                 else
@@ -138,44 +148,67 @@ int main(int argc, char *argv[])
               }
               else if (op == "-r" || op == "")
               {
-                // load file completely into memory
+                // load file in pieces of 512 bytes
 
                 GenApi::FileProtocolAdapter rf;
                 rf.attach(nodemap->_Ptr);
 
                 if (rf.openFile(devfile.c_str(), std::ios::in))
                 {
-                  size_t n=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
-                  std::cout << "File size: " << n << std::endl;
-                  std::vector<char> buffer(n);
-
-                  n=rf.read(buffer.data(), 0, buffer.size(), devfile.c_str());
-
-                  if (n == buffer.size())
+                  size_t length=std::numeric_limits<size_t>::max();
+                  try
                   {
-                    if (op == "-r")
-                    {
-                      // store in file
-
-                      std::ofstream out(file);
-                      out.write(buffer.data(), buffer.size());
-                      out.close();
-                    }
-                    else
-                    {
-                      // print on stdout
-
-                      std::cout.write(buffer.data(), buffer.size());
-                    }
+                    // limit read operation to file size, if available
+                    length=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
                   }
-                  else
+                  catch (const std::exception &)
+                  { }
+
+                  std::ofstream out;
+                  if (op == "-r") out.open(file);
+
+                  size_t off=0, n=512;
+                  std::vector<char> buffer(512);
+
+                  while (n > 0 && length > 0)
                   {
-                    std::cerr << "Error: Can only read " << n << " of " << buffer.size() << " bytes" << std::endl;
+                    n=rf.read(buffer.data(), off, std::min(length, buffer.size()), devfile.c_str());
+
+                    if (n == 0)
+                    {
+                      // workaround for reading last partial block if camera reports failure
+
+                      n=rcg::getInteger(nodemap, "FileOperationResult");
+
+                      if (n > 0)
+                      {
+                        n=rf.read(buffer.data(), off, n, devfile.c_str());
+                      }
+                    }
+
+                    if (n > 0)
+                    {
+                      if (out.is_open())
+                      {
+                        out.write(buffer.data(), n);
+                      }
+                      else
+                      {
+                        std::cout.write(buffer.data(), n);
+                      }
+                    }
+
+                    off+=n;
+                    length-=n;
                   }
 
+                  out.close();
                   rf.closeFile(devfile.c_str());
 
-                  std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
+                  if (op == "-r")
+                  {
+                    std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
+                  }
                 }
                 else
                 {
