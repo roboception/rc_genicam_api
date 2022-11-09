@@ -1,3 +1,9 @@
+2.6.0 (2022-11-09)
+------------------
+
+- Upgraded GenAPI to version 3.4
+- Changed gc_file to read and write in blocks of 512 bytes and made FileSize parameter optional
+
 2.5.17 (2022-10-13)
 -------------------
 
