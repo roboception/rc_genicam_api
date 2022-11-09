@@ -44,6 +44,11 @@
 #include <fstream>
 #include <limits>
 
+#ifdef _WIN32
+#undef min
+#undef max
+#endif
+
 int main(int argc, char *argv[])
 {
   int ret=0;
