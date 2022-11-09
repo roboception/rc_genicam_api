@@ -118,14 +118,14 @@ namespace GENAPI_NAMESPACE
         virtual EAccessMode InternalGetAccessMode() const;
         // \}
 
-		//-------------------------------------------------------------
-		// Implementation of INodePrivate
-		//-------------------------------------------------------------
-		//! \name INode implementation
-		// \{
-		virtual void SetProperty(CProperty &Property);
-		virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
-		// \}
+        //-------------------------------------------------------------
+        // Implementation of INodePrivate
+        //-------------------------------------------------------------
+        //! \name INode implementation
+        // \{
+        virtual void SetProperty(CProperty &Property);
+        virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
+        // \}
 
     private:
         //! the GUID identifying the smart features

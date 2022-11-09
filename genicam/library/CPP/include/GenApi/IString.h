@@ -105,55 +105,49 @@ namespace GENAPI_NAMESPACE
         //! Set node value
         virtual void SetValue(const GENICAM_NAMESPACE::gcstring& Value, bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->SetValue(Value, Verify);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->SetValue(Value, Verify);
         }
 
         //! Set node value
         virtual IString& operator=(const GENICAM_NAMESPACE::gcstring& Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator=(Value);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator=(Value);
         }
 
         //! Get node value
         virtual GENICAM_NAMESPACE::gcstring GetValue(bool Verify = false, bool IgnoreCache = false)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetValue(Verify, IgnoreCache);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetValue(Verify, IgnoreCache);
         }
 
         //! Get node value
         virtual GENICAM_NAMESPACE::gcstring operator()()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator()();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator()();
         }
 
         //! Get node value
         virtual GENICAM_NAMESPACE::gcstring operator*()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr-> operator*();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr-> operator*();
         }
 
         //! Get max length of string
-        virtual int64_t GetMaxLength( bool Verify = false )
+        virtual int64_t GetMaxLength(bool Verify = false)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetMaxLength( Verify );
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetMaxLength(Verify);
         }
 
     };

@@ -34,7 +34,7 @@
 namespace GENAPI_NAMESPACE
 {
     //! Connects a generic event to a node map
-    class GENAPI_DECL CEventAdapterGeneric : public  CEventAdapter
+    class GENAPI_DECL CEventAdapterGeneric : public CEventAdapter
     {
     public:
         //! Constructor
@@ -42,13 +42,16 @@ namespace GENAPI_NAMESPACE
 
         //! Destructor
         virtual ~CEventAdapterGeneric();
-
+    private:
+        CEventAdapterGeneric(const CEventAdapterGeneric&);             // copy constructor is not implemented
+        CEventAdapterGeneric& operator =(const CEventAdapterGeneric&); // assignment operator is not implemented
+    public:
         // Does not have implementation, use the version with EventID
-        virtual void DeliverMessage( const uint8_t msg[], uint32_t numBytes ); 
+        virtual void DeliverMessage(const uint8_t msg[], uint32_t numBytes);
 
-        virtual void DeliverMessage( const uint8_t msg[], uint32_t numBytes, const GENICAM_NAMESPACE::gcstring& EventID);
+        virtual void DeliverMessage(const uint8_t msg[], uint32_t numBytes, const GENICAM_NAMESPACE::gcstring& EventID);
 
-        virtual void DeliverMessage( const uint8_t msg[], uint32_t numBytes, uint64_t EventID);
+        virtual void DeliverMessage(const uint8_t msg[], uint32_t numBytes, uint64_t EventID);
     private:
         //! Binary version of the EventID
         uint8_t *m_pEventIDBuffer;

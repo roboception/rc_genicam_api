@@ -56,18 +56,18 @@ namespace GENAPI_NAMESPACE
         //! Get the access mode of the node
         virtual EAccessMode GetAccessMode() const = 0;
 
-		//! Virtual destructor enforcing virtual destructor on all derived classes
-		virtual ~IBase() = 0;
+        //! Virtual destructor enforcing virtual destructor on all derived classes
+        virtual ~IBase() = 0;
     };
 
-	// Implementation required for Windows only.
-	// Note: the C++ standard >= 11 prohibit pure virtual destructors with a function body
-	// in the declaration. Consequently gcc 4.0 and newer reject an inline implementation
-	// in the class.
-	inline IBase::~IBase()
-	{
-		// do nothing
-	}
+    // Implementation required for Windows only.
+    // Note: the C++ standard >= 11 prohibit pure virtual destructors with a function body
+    // in the declaration. Consequently gcc 4.0 and newer reject an inline implementation
+    // in the class.
+    inline IBase::~IBase()
+    {
+        // do nothing
+    }
 
     //*************************************************************
     // CBaseRef class

@@ -32,9 +32,11 @@
 #include <GenApi/GenApiDll.h>
 #include <GenApi/Types.h>
 #include <GenApi/Container.h>
+#include <GenApi/SelectorState.h>
 
 namespace GENAPI_NAMESPACE
 {
+
 
     //! Interface of a "digit" of the "counter" formed by the selector set
     GENICAM_INTERFACE GENAPI_DECL_ABSTRACT ISelectorDigit
@@ -54,25 +56,28 @@ namespace GENAPI_NAMESPACE
         //! Returns a string representation of the digit
         virtual GENICAM_NAMESPACE::gcstring ToString() = 0;
 
+        //! Get the state of the selector.
+        virtual void GetState(CSelectorState &state) = 0;
+
         //! Retrieves an ordered list of selectors
         virtual void GetSelectorList( 
             GENAPI_NAMESPACE::FeatureList_t &SelectorList, //!> List to contain the selector pointer
             bool Incremental = false  //!> if true only seletor changed since the last GetNext are contained 
             ) = 0;
 
-		//! Virtual destructor enforcing virtual destructor on all derived classes
-		virtual ~ISelectorDigit() = 0;
+        //! Virtual destructor enforcing virtual destructor on all derived classes
+        virtual ~ISelectorDigit() = 0;
 
     };
 
-	// Implementation required for Windows only.
-	// Note: the C++ standard >= 11 prohibit pure virtual destructors with a function body
-	// in the declaration. Consequently gcc 4.0 and newer reject an inline implementation
-	// in the class.
-	inline ISelectorDigit::~ISelectorDigit()
-	{
-		// do nothing
-	}
+    // Implementation required for Windows only.
+    // Note: the C++ standard >= 11 prohibit pure virtual destructors with a function body
+    // in the declaration. Consequently gcc 4.0 and newer reject an inline implementation
+    // in the class.
+    inline ISelectorDigit::~ISelectorDigit()
+    {
+        // do nothing
+    }
 }
 
 #endif

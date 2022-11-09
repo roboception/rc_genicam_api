@@ -150,11 +150,11 @@ namespace GENAPI_NAMESPACE
         //! The Name of the external Variable
         GENICAM_NAMESPACE::gcstring m_InputName;
 
-		//! The Swiss Knife for Set
-		CIntegerPolyRef m_pConvertTo;
+        //! The Swiss Knife for Set
+        CIntegerPolyRef m_pConvertTo;
 
-		//! The Swiss Knife for Get
-		CIntegerPolyRef m_pConvertFrom;
+        //! The Swiss Knife for Get
+        CIntegerPolyRef m_pConvertFrom;
 
         //! Refeerence to the value
         CIntegerPolyRef m_Value;

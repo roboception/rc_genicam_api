@@ -54,7 +54,7 @@ namespace GENAPI_NAMESPACE
         virtual GENICAM_NAMESPACE::gcstring ToString(bool Verify = false, bool IgnoreCache = false)
         {
             AutoLock l(Base::GetLock());
-            typename Base::EntryMethodFinalizer E( this, meToString, IgnoreCache );
+            typename Base::EntryMethodFinalizer E(this, meToString, Base::IsStreamable(), IgnoreCache);
 
             GCLOGINFOPUSH( Base::m_pValueLog, "ToString...");
 
@@ -79,10 +79,12 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meFromString );
+                typename Base::EntryMethodFinalizer E(this, meFromString, Base::IsStreamable());
 
-                if( Verify && !IsWritable( this ) )
-                    throw ACCESS_EXCEPTION_NODE("Node is not writable");
+                if (!Base::CanBeWritten( Verify ))
+                {
+                    throw ACCESS_EXCEPTION_NODE( "Node is not writable." );
+                }
 
                 GCLOGINFO( Base::m_pValueLog, "FromString = '%s' ", ValueStr.c_str() );
 

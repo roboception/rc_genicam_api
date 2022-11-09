@@ -55,10 +55,12 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meSetValue );
+                typename Base::EntryMethodFinalizer E(this, meSetValue, Base::IsStreamable());
 
-                if( Verify && !IsWritable( this ) )
-                    throw ACCESS_EXCEPTION_NODE("Node is not writable.");
+                if (!Base::CanBeWritten( Verify ))
+                {
+                    throw ACCESS_EXCEPTION_NODE( "Node is not writable." );
+                }
 #pragma BullseyeCoverage off
                 GCLOGINFOPUSH( Base::m_pValueLog, "SetValue( " + (Value ? GENICAM_NAMESPACE::gcstring("true") : GENICAM_NAMESPACE::gcstring("false")) + " )..." );
 #pragma BullseyeCoverage on
@@ -95,16 +97,17 @@ namespace GENAPI_NAMESPACE
         }
 
         //! IBoolean::operator=()
-        virtual void operator=(bool Value)
+        virtual BooleanT& operator=(bool Value)
         {
-            SetValue( Value );
+            SetValue(Value);
+            return *this;
         }
 
         //! IBoolean::GetValue()
         virtual bool GetValue(bool Verify = false, bool IgnoreCache = false) const
         {
             AutoLock l(Base::GetLock());
-            typename Base::EntryMethodFinalizer E( this, meGetValue, IgnoreCache );
+            typename Base::EntryMethodFinalizer E(this, meGetValue, Base::IsStreamable(), IgnoreCache);
 
             GCLOGINFOPUSH( Base::m_pValueLog, "GetValue..." );
 

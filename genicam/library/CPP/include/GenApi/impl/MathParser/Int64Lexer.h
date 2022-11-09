@@ -22,7 +22,7 @@
 #include "GenApi/Types.h"
 #include "GenApi/impl/Internal_Compatibility.h"
 #include "SymTable.h"
-#include "Lexer.h" // some typdefs
+#include "Lexer.h" // some typedefs
 
 /**
 * \ingroup internal_impl
@@ -57,6 +57,9 @@ namespace GENAPI_NAMESPACE
         CInt64Lexer( void );
         ~CInt64Lexer( void );
         char* GetCurrentPos( void ) const;
+    private:
+        CInt64Lexer( const CInt64Lexer& );             // copy constructor is not implemented
+        CInt64Lexer& operator= ( const CInt64Lexer& ); // assignment operator is not implemented
     };
 }
 

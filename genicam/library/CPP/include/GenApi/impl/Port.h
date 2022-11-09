@@ -195,6 +195,9 @@ namespace GENAPI_NAMESPACE
 
         //! Write stack
         std::vector<PORT_REGISTER_STACK_ENTRY> m_writeStackData;
+    private:
+        CPortImplIntern(const CPortImplIntern&);            // do not allow copy constructor
+        CPortImplIntern& operator=(const CPortImplIntern&); // do not allow assignments
     };
 
     class CPort : public BaseT<  NodeT< CPortImplIntern > >

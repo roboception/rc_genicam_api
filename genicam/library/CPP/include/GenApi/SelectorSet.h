@@ -48,7 +48,10 @@ namespace GENAPI_NAMESPACE
 
         //! Destructor
         virtual ~CSelectorSet();
-
+    private:
+        CSelectorSet(const CSelectorSet&);             // copy constructor not implemented
+        CSelectorSet& operator=(const CSelectorSet&); // assignment operator is not implemented
+    public:
         //! returns true if no selectors are present
         bool IsEmpty();
 
@@ -59,12 +62,15 @@ namespace GENAPI_NAMESPACE
         virtual bool SetNext(bool Tick = true);
         virtual void Restore();
         virtual GENICAM_NAMESPACE::gcstring ToString();
+        virtual void GetState(CSelectorState &state);
         virtual void GetSelectorList( GENAPI_NAMESPACE::FeatureList_t &SelectorList, bool Incremental = false );
 
     private:
         struct SelectorIteratorList_t;
         //! List of selector digits
         SelectorIteratorList_t *m_pSelectorIterators;
+        GENICAM_NAMESPACE::gcstring m_blockStart;
+        GENICAM_NAMESPACE::gcstring m_blockEnd;
 
         //! recursively explores the selectors and sub selectors of a node
         void ExploreSelector( 

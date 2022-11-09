@@ -47,6 +47,9 @@ namespace GENAPI_NAMESPACE
         {
             return FCount == 0;
         }
+    private:
+        CStrMap( const CStrMap& );             // copy constructor is not implemented
+        CStrMap& operator =( const CStrMap& ); // assignment operator is not implemented
     };
     
     // these must match StaticFuncMapDouble

@@ -140,170 +140,151 @@ namespace GENAPI_NAMESPACE
         //! Set node value
         virtual void SetValue(double Value, bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->SetValue(Value, Verify);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->SetValue(Value, Verify);
         }
 
         //! Set node value
         virtual IFloat& operator=(double Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator=(Value);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator=(Value);
         }
 
         //! Get node value
         virtual double GetValue(bool Verify = false, bool IgnoreCache = false)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetValue(Verify, IgnoreCache);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetValue(Verify, IgnoreCache);
         }
 
         //! Get node value
         virtual double operator()()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator()();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator()();
         }
 
         //! Get node value
         virtual double operator*()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator*();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator*();
         }
 
         //! Get minimum value allowed
         virtual double GetMin()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetMin();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetMin();
         }
 
         //! Get maximum value allowed
         virtual double GetMax()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetMax();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetMax();
         }
 
         //! True if the float has a constant increment
         virtual bool HasInc()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->HasInc();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->HasInc();
         }
         virtual EIncMode GetIncMode()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetIncMode();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetIncMode();
         }
 
         //! Get the constant increment if there is any
         virtual double GetInc()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetInc();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetInc();
         }
 
         //! Get list of valid value
         virtual double_autovector_t GetListOfValidValues(bool bounded = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetListOfValidValues(bounded);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetListOfValidValues(bounded);
         }
 
         //! Get recommended representation
         virtual  ERepresentation GetRepresentation()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetRepresentation();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetRepresentation();
         }
 
         //! Get unit
         virtual GENICAM_NAMESPACE::gcstring GetUnit() const
         {
-            if (ref::m_Ptr)
-                return ref::m_Ptr->GetUnit();
-            else
+            if (!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetUnit();
         }
 
         //! Get the way the float should be converted to a string
         virtual EDisplayNotation GetDisplayNotation() const
         {
-            if (ref::m_Ptr)
-                return ref::m_Ptr->GetDisplayNotation();
-            else
+            if (!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetDisplayNotation();
         }
 
         //! Get the precision to be used when converting the float to a string
         virtual int64_t GetDisplayPrecision() const
         {
-            if (ref::m_Ptr)
-                return ref::m_Ptr->GetDisplayPrecision();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetDisplayPrecision();
         }
 
         //! gets the interface of an alias node.
         IInteger *GetIntAlias()
         {
-            if (ref::m_Ptr)
-                return dynamic_cast<IInteger*>(ref::m_Ptr->GetNode()->GetCastAlias());
-            else
+            if (!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return dynamic_cast<IInteger*>(ref::m_Ptr->GetNode()->GetCastAlias());
         }
 
         //! gets the interface of an alias node.
         IEnumeration *GetEnumAlias()
         {
-            if (ref::m_Ptr)
-                return dynamic_cast<IEnumeration*>(ref::m_Ptr->GetNode()->GetCastAlias());
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return dynamic_cast<IEnumeration*>(ref::m_Ptr->GetNode()->GetCastAlias());
         }
 
         //! Restrict minimum value
         virtual void ImposeMin(double Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->ImposeMin(Value);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->ImposeMin(Value);
         }
 
         //! Restrict maximum value
         virtual void ImposeMax(double Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->ImposeMax(Value);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->ImposeMax(Value);
         }
 
     };

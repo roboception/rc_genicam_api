@@ -30,6 +30,7 @@
 #ifndef GENAPI_CHUNKADAPTERDCAM_H
 #define GENAPI_CHUNKADAPTERDCAM_H
 
+#include <cstring>
 #include <Base/GCTypes.h>
 #include <GenApi/ChunkAdapter.h>
 #include <GenApi/Compatibility.h>
@@ -45,14 +46,18 @@ namespace GENAPI_NAMESPACE
 
     typedef struct DCAM_CHUNK_TRAILER
     {
-         GUID     ChunkID ;
-         uint32_t ChunkLength ;
-         uint32_t InverseChunkLength ;
+         GUID     ChunkID;
+         uint32_t ChunkLength;
+         uint32_t InverseChunkLength;
+         explicit DCAM_CHUNK_TRAILER() : ChunkLength(0), InverseChunkLength(0)
+         {
+             memset(&ChunkID, 0, sizeof(ChunkID));
+         }
     } DCAM_CHUNK_TRAILER;
 
     typedef struct DCAM_CHECKSUM
     {
-        uint32_t CRCChecksum ;
+        uint32_t CRCChecksum;
     } DCAM_CHECKSUM;
 
     // restore the previous packing

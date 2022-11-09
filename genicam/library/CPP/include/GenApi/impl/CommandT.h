@@ -53,11 +53,11 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meExecute );
+                typename Base::EntryMethodFinalizer E(this, meExecute, Base::IsStreamable() );
 
                 GCLOGINFOPUSH( Base::m_pValueLog, "Execute...");
 
-                if( Verify && !IsWritable( this ) )
+                if (!IsWritable(this))
                     throw ACCESS_EXCEPTION_NODE("Node is not writable.");
 
                 {
@@ -95,7 +95,6 @@ namespace GENAPI_NAMESPACE
         //! Query whether the command is executed
         virtual bool IsDone(bool Verify = true)
         {
-            typename Base::EntryMethodFinalizer E( this, meIsDone );
 
             bool Result = false;
             bool FireCallbacks = false;
@@ -105,6 +104,7 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
+                typename Base::EntryMethodFinalizer E(this, meIsDone, Base::IsStreamable());
 
                 GCLOGINFOPUSH( Base::m_pValueLog, "IsDone...");
 

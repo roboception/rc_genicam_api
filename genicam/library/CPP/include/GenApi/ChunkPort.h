@@ -57,7 +57,10 @@ namespace GENAPI_NAMESPACE
 
         //! Destructor; detaches from the port
         virtual ~CChunkPort();
-
+    private:
+        CChunkPort(const CChunkPort&);             // copy constructor is not implemented
+        CChunkPort& operator =(const CChunkPort&); // assignment operator is not implemented
+    public:
         //-------------------------------------------------------------
         // IPortConstruct implementation
         //-------------------------------------------------------------

@@ -69,7 +69,7 @@ namespace GENAPI_NAMESPACE
 
             #endif
 
-            typename Base::EntryMethodFinalizer E( this, meGetAccessMode );
+            typename Base::EntryMethodFinalizer E(this, meGetAccessMode);
         
             GCLOGINFOPUSH( Base::m_pAccessLog, "GetAccessMode...");
 

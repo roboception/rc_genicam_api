@@ -28,21 +28,31 @@
 #define GCBASE_GCARRAY_H
 
 #include <Base/GCTypes.h>
+#include <Base/GCException.h>
 namespace GENICAM_NAMESPACE
 {
     template< class T>
     class  gcarray
     {
     public:
-        gcarray( size_t size) : m_p( NULL)
+        gcarray(size_t size) : m_p(NULL)
         {
-            if(size)
+            if (size)
+            {
                 m_p = new T[size];
+                if (!m_p)
+                {
+                    throw BAD_ALLOC_EXCEPTION("Unable to create gcarray");
+                }
+            }
         };
-        ~gcarray( ){ if(m_p) delete [] m_p;};
+        ~gcarray(){ if(m_p) delete [] m_p;};
         T* get() const {return m_p;} ;
         T* operator *() {return m_p;} ;
         T operator[](size_t idx) {return m_p[idx];} ;
+    private:
+        gcarray(const gcarray&);             // copy constructor is not implemented
+        gcarray& operator =(const gcarray&); // assignment operator is not implemented
     private:
        T* m_p;
     };

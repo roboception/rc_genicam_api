@@ -105,7 +105,7 @@ namespace GENAPI_NAMESPACE
         
         
     virtual void SetProperty( CProperty &Property );
-	virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
+    virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
         
         
     private:

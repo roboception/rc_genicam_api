@@ -76,44 +76,47 @@ namespace GENAPI_NAMESPACE
           }
 
           //! set integer value
-          void operator=(int64_t Value)
+          CIntegerPolyRef& operator=(int64_t Value)
           {
               m_Type = typeValue;
               m_Value.Value = Value;
+              return *this;
           }
 
-		  //! set pointer
-		  void operator=(INode *pValue)
-		  {
-			  operator=( dynamic_cast<IBase*>(pValue) );
-		  }
+          //! set pointer
+          CIntegerPolyRef& operator=(INode *pValue)
+          {
+              operator=( dynamic_cast<IBase*>(pValue) );
+              return *this;
+          }
 
           //! set pointer
-          void operator=(IBase *pValue)
+          CIntegerPolyRef& operator=(IBase *pValue)
           {
               m_Value.pInteger = dynamic_cast<IInteger*>(pValue);
-              if( m_Value.pInteger )
+              if (m_Value.pInteger)
                   m_Type = typeIInteger;
               else
               {
                   m_Value.pEnumeration = dynamic_cast<IEnumeration*>(pValue);
-                  if( m_Value.pEnumeration )
+                  if (m_Value.pEnumeration)
                       m_Type = typeIEnumeration;
                   else
                   {
                       m_Value.pBoolean = dynamic_cast<IBoolean*>(pValue);
-                      if( m_Value.pBoolean )
+                      if (m_Value.pBoolean)
                           m_Type = typeIBoolean;
                       else
                       {
                           m_Value.pFloat = dynamic_cast<IFloat*>(pValue);
-                          if( m_Value.pFloat )
+                          if (m_Value.pFloat)
                               m_Type = typeIFloat;
                           else
                               throw RUNTIME_EXCEPTION("CIntegerPolyRef::operator(IBase*) : pointer is neither IInteger*, nor IEnumeration*, nor IBoolean*, nor IFloat*");
                       }
                   }
               }
+              return *this;
           }
 
           //! True if the object references a pointer
@@ -122,13 +125,13 @@ namespace GENAPI_NAMESPACE
               return (m_Type != typeValue) && (m_Type != typeUninitialized);
           }
 
-		  //! True if the object references a pointer
-		  inline bool IsValue() const
-		  {
-			  return (m_Type == typeValue) && (m_Type != typeUninitialized);
-		  }
+          //! True if the object references a pointer
+          inline bool IsValue() const
+          {
+              return (m_Type == typeValue) && (m_Type != typeUninitialized);
+          }
 
-		  //! True if the object is initialized
+          //! True if the object is initialized
           inline bool IsInitialized() const
           {
               return (m_Type != typeUninitialized);
@@ -465,32 +468,34 @@ namespace GENAPI_NAMESPACE
           #pragma BullseyeCoverage on
 
           //! set integer value
-          void operator=(bool Value)
+          CBooleanPolyRef& operator=(bool Value)
           {
               m_Type = typeValue;
               m_Value.Value = Value;
+              return *this;
           }
 
           //! set pointer
-          void operator=(IBase *pValue)
+          CBooleanPolyRef& operator=(IBase *pValue)
           {
               m_Value.pInteger = dynamic_cast<IInteger*>(pValue);
-              if( m_Value.pInteger )
+              if (m_Value.pInteger)
                   m_Type = typeIInteger;
               else
               {
                   m_Value.pEnumeration = dynamic_cast<IEnumeration*>(pValue);
-                  if( m_Value.pEnumeration )
+                  if (m_Value.pEnumeration)
                       m_Type = typeIEnumeration;
                   else
                   {
                       m_Value.pBoolean = dynamic_cast<IBoolean*>(pValue);
-                      if( m_Value.pBoolean )
+                      if (m_Value.pBoolean)
                           m_Type = typeIBoolean;
                       else
                           throw RUNTIME_EXCEPTION("CIntegerPolyRef::operator(IBase*) : pointer is neither IInteger*, IEnumeration*, nor IBoolean*");
                   }
               }
+              return *this;
           }
 
           //! True if the object references a pointer
@@ -636,45 +641,48 @@ namespace GENAPI_NAMESPACE
           }
 
           //! set integer value
-          void operator=(double Value)
+          CFloatPolyRef& operator=(double Value)
           {
               m_Type = typeValue;
               m_Value.Value = Value;
+              return *this;
           }
-		  
-		  //! set pointer
-		  void operator=(INode *pValue)
-		  {
-			  operator=( dynamic_cast<IBase*>(pValue) );
-		  }
+          
+          //! set pointer
+          CFloatPolyRef& operator=(INode *pValue)
+          {
+              operator=(dynamic_cast<IBase*>(pValue));
+              return *this;
+          }
 
           //! set pointer
-          void operator=(IBase *pValue)
+          CFloatPolyRef& operator=(IBase *pValue)
           {
               m_Value.pFloat = dynamic_cast<IFloat*>(pValue);
-              if( m_Value.pFloat)
+              if (m_Value.pFloat)
                   m_Type = typeIFloat;
               else
               {
                   m_Value.pEnumeration = dynamic_cast<IEnumeration*>(pValue);
-                  if( m_Value.pEnumeration )
+                  if (m_Value.pEnumeration)
                       m_Type = typeIEnumeration;
                   else
                   {
                       m_Value.pInteger= dynamic_cast<IInteger*>(pValue);
-                      if( m_Value.pInteger)
+                      if (m_Value.pInteger)
                           m_Type = typeIInteger;
                       else
                           throw RUNTIME_EXCEPTION("CFloatPolyRef::operator(IBase*) : pointer is neither IFloat*, IInteger*, nor IEnumeration*");
                   }
               }
+              return *this;
           }
 
-		  //! True if the object references a pointer
-		  inline bool IsValue() const
-		  {
-			  return (m_Type == typeValue) && (m_Type != typeUninitialized);
-		  }
+          //! True if the object references a pointer
+          inline bool IsValue() const
+          {
+              return (m_Type == typeValue) && (m_Type != typeUninitialized);
+          }
 
           //! True if the object references a pointer
           inline bool IsPointer() const
@@ -717,7 +725,7 @@ namespace GENAPI_NAMESPACE
           }
 
           //! see IFloat interface
-          inline double GetValue( bool Verify = false, bool IgnoreCache = false) const
+          inline double GetValue(bool Verify = false, bool IgnoreCache = false) const
           {
               switch(m_Type)
               {
@@ -741,7 +749,7 @@ namespace GENAPI_NAMESPACE
           }
 
           //! see IFloat interface
-          inline void SetValue( double Value, bool Verify = true)
+          inline void SetValue(double Value, bool Verify = true)
           {
               switch(m_Type)
               {
@@ -772,9 +780,9 @@ namespace GENAPI_NAMESPACE
                       m_Value.pEnumeration->GetEntries(EnumEntries);
                       for( NodeList_t::iterator it=EnumEntries.begin(); it!=EnumEntries.end(); ++it )
                       {
-                          if( IsAvailable(*it) )
+                          if (IsAvailable(*it))
                           {
-                              if( !ptrOldEnumEntry.IsValid() )
+                              if (!ptrOldEnumEntry.IsValid())
                               {
                                   ptrOldEnumEntry = *it;
                                   OldDistance = abs( Value - ptrOldEnumEntry->GetNumericValue() );
@@ -783,7 +791,7 @@ namespace GENAPI_NAMESPACE
                               {
                                   CEnumEntryPtr ptrNewEnumEntry( *it );
                                   double  NewDistance = abs( Value - ptrNewEnumEntry->GetNumericValue() ) ;
-                                  if(NewDistance < OldDistance)
+                                  if (NewDistance < OldDistance)
                                   {
                                       ptrOldEnumEntry = *it;
                                       OldDistance = NewDistance;
@@ -791,7 +799,7 @@ namespace GENAPI_NAMESPACE
                               }
                           }
                       }
-                      if( ptrOldEnumEntry.IsValid() )
+                      if (ptrOldEnumEntry.IsValid())
                           m_Value.pEnumeration->SetIntValue(ptrOldEnumEntry->GetValue(), Verify);
                       else
                           throw ACCESS_EXCEPTION("Failed to write enumeration. None of the entries is writable");
@@ -1056,7 +1064,7 @@ namespace GENAPI_NAMESPACE
     class CStringPolyRef
     {
     public:
-        //! Contructor
+        //! Constructor
         CStringPolyRef() :
           m_Type(typeUninitialized)
           {
@@ -1075,27 +1083,28 @@ namespace GENAPI_NAMESPACE
           #pragma BullseyeCoverage on
 
           //! set string value
-          void operator=(const GENICAM_NAMESPACE::gcstring &Value)
+          CStringPolyRef& operator=(const GENICAM_NAMESPACE::gcstring &Value)
           {
               m_Type = typeValue;
               m_Value.Value = Value;
+              return *this;
           }
 
           //! set pointer
-          void operator=(IBase *pValue)
+          CStringPolyRef& operator=(IBase *pValue)
           {
               m_Value.pString = dynamic_cast<IString*>(pValue);
-              if( m_Value.pString )
-                  m_Type = typeIString;
-              else
+              if( !m_Value.pString )
                   throw RUNTIME_EXCEPTION("CStringPolyRef::operator(IBase*) : pointer is not IString*");
+              m_Type = typeIString;
+              return *this;
           }
 
-		  //! True if the object references a pointer
-		  inline bool IsValue() const
-		  {
-			  return (m_Type == typeValue);
-		  }
+          //! True if the object references a pointer
+          inline bool IsValue() const
+          {
+              return (m_Type == typeValue);
+          }
 
 
           //! True if the object references a pointer
@@ -1228,33 +1237,33 @@ namespace GENAPI_NAMESPACE
         } m_Value;
     };
 
-	class CIntegerOffsetPolyRef
-	{
-	public:
-		CIntegerOffsetPolyRef() 
-		{
-		};
-		CIntegerOffsetPolyRef( INode *_pIndex, int64_t _Offset ) 
-		{
-			pIndex = _pIndex;
-			Offset = _Offset;
-		};
+    class CIntegerOffsetPolyRef
+    {
+    public:
+        CIntegerOffsetPolyRef() 
+        {
+        };
+        CIntegerOffsetPolyRef(INode *_pIndex, int64_t _Offset)
+        {
+            pIndex = _pIndex;
+            Offset = _Offset;
+        };
 
-		CIntegerOffsetPolyRef( INode *_pIndex, INode *_pOffset ) 
-		{
-			pIndex = _pIndex;
-			Offset = _pOffset;
-		};
+        CIntegerOffsetPolyRef(INode *_pIndex, INode *_pOffset)
+        {
+            pIndex = _pIndex;
+            Offset = _pOffset;
+        };
 
-		CIntegerOffsetPolyRef( const CIntegerOffsetPolyRef &Copy ) 
-		{
-			pIndex = Copy.pIndex;
-			Offset = Copy.Offset;
-		};
+        CIntegerOffsetPolyRef(const CIntegerOffsetPolyRef &Copy)
+        {
+            pIndex = Copy.pIndex;
+            Offset = Copy.Offset;
+        };
 
-		CIntegerPolyRef pIndex;
-		CIntegerPolyRef Offset;
-	}; 
+        CIntegerPolyRef pIndex;
+        CIntegerPolyRef Offset;
+    }; 
 
 
 }

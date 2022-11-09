@@ -184,7 +184,7 @@ namespace GENICAM_NAMESPACE
 
         E Report(const char* pFormat, ...)
         {
-            char pBuffer[256];
+            char pBuffer[2048];
             va_list vap;
             va_start(vap, pFormat);
 

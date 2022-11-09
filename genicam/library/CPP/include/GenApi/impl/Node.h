@@ -181,7 +181,7 @@ namespace GENAPI_NAMESPACE
 
             //! Retrieves a property plus an additional attribute by name
             /*! If a property has multiple values/attribute they come with Tabs as delimiters */
-            virtual bool GetProperty(const GENICAM_NAMESPACE::gcstring& PropertyName, GENICAM_NAMESPACE::gcstring& ValueStr, GENICAM_NAMESPACE::gcstring& AttributeStr) const;
+            virtual bool GetProperty(const GENICAM_NAMESPACE::gcstring& PropertyName, GENICAM_NAMESPACE::gcstring& ValueStr, GENICAM_NAMESPACE::gcstring& AttributeStr);
 
             //! Imposes an access mode to the natural access mode of the node
             virtual void ImposeAccessMode(EAccessMode ImposedAccessMode);
@@ -239,10 +239,12 @@ namespace GENAPI_NAMESPACE
             virtual void SetProperty( CProperty &Property );
             virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
             virtual void SetInvalid(ESetInvalidMode simMode);           
-            virtual void CollectCallbacksToFire(std::list<CNodeCallback*> &CallbacksToFire, bool allDependents = false);
+            virtual void CollectCallbacksToFire(std::list<CNodeCallback*> &CallbacksToFire, bool allDependents = false, bool always = false);
             virtual bool IsTerminalNode() const;
             virtual void GetTerminalNodes( GENAPI_NAMESPACE::NodeList_t& Terminals ) const;
             virtual bool Poll( int64_t ElapsedTime );
+            virtual bool CanBeWritten(bool Verify);
+            virtual bool CanBeRead(bool Verify);
         //@}
 
     public:
@@ -592,11 +594,11 @@ namespace GENAPI_NAMESPACE
             {
             public:
                 //! Constructor
-                EntryMethodFinalizer(const INodePrivate* pThis, EMethod EntryMethod, bool IgnoreCache = false ) 
+                EntryMethodFinalizer(const INodePrivate* pThis, EMethod EntryMethod, bool stremable = false, bool IgnoreCache = false)
                 {
                     assert(pThis);
                     m_pNodeMapPrivate = dynamic_cast<INodeMapPrivate*>( pThis->GetNodeMap() );
-                    m_pNodeMapPrivate->SetEntryPoint( EntryMethod, pThis, IgnoreCache );
+                    m_pNodeMapPrivate->SetEntryPoint(EntryMethod, pThis, stremable, IgnoreCache);
                 }
 
                 //! Destructor calling 

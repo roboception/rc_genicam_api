@@ -115,6 +115,21 @@ namespace GENICAM_NAMESPACE
         return INTEGRAL_CAST2<T, int64_t>( ll );
     }
 
+    //! Returns the directory where cache files are located
+    GCBASE_API bool GetCacheFileDirectory(gcstring &CacheFileDirectory);
+
+    //! Returns the truth value for the proposition: The given file name has the valid length
+    GCBASE_API bool HasValidLength(const gcstring &FileName);
+
+    //! Returns the truth value for the proposition: The given file has the valid file extension
+    GCBASE_API bool HasValidExtension(const gcstring &FileName);
+
+    // Returns the cache file names in the given cache directory
+    GCBASE_API void GetCandidateCacheFilePaths(gcstring_vector &CacheFileNames, const gcstring &CacheFileDirectory);  //
+
+    // Returns the message that corresponds to the last error
+    GCBASE_API void GetLastErrorMessage(gcstring &Message);
+
     //! Returns true if an environment variable exists
     GCBASE_API bool DoesEnvironmentVariableExist( const gcstring &VariableName );
 

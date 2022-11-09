@@ -93,6 +93,8 @@ namespace GENAPI_NAMESPACE
         //! finalizes the construction of the node
         virtual void FinalConstruct();
 
+        virtual bool CanBeWritten(bool Verify);
+
         //-------------------------------------------------------------
         // IBase implementation
         //-------------------------------------------------------------

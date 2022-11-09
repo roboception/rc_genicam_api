@@ -132,140 +132,122 @@ namespace GENAPI_NAMESPACE
         //! Set node value
         virtual void SetValue(int64_t Value, bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->SetValue(Value, Verify);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->SetValue(Value, Verify);
         }
 
         //! Set node value
         virtual IInteger& operator=(int64_t Value)
         {
-            if(ref::m_Ptr)
-            {
-                ref::m_Ptr->SetValue(Value);
-                return *this;
-            }
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->SetValue(Value);
+            return *this;
         }
 
         //! Get node value
         virtual int64_t GetValue( bool Verify = false, bool IgnoreCache = false )
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetValue( Verify, IgnoreCache );
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetValue( Verify, IgnoreCache );
         }
 
         //! Get node value
         virtual int64_t operator()()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator()();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator()();
         }
 
         //! Get node value
         virtual int64_t operator*()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator*();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator*();
         }
 
         //! Get minimum value allowed
         virtual int64_t GetMin()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetMin();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetMin();
         }
 
         //! Get maximum value allowed
         virtual int64_t GetMax()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetMax();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetMax();
         }
 
         //! Get increment
         virtual EIncMode GetIncMode()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetIncMode();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetIncMode();
         }
 
         //! Get increment
         virtual int64_t GetInc()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetInc();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetInc();
         }
 
         //! Implementation of IInteger::GetListOfValidValues
         virtual int64_autovector_t GetListOfValidValues(bool bounded = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetListOfValidValues( bounded );
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
-
+            return ref::m_Ptr->GetListOfValidValues(bounded);
         }
 
         //! Get recommended representation
         virtual  ERepresentation GetRepresentation()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetRepresentation();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetRepresentation();
         }
 
         //! Get the physical unit name
         virtual GENICAM_NAMESPACE::gcstring GetUnit()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetUnit();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetUnit();
         }
 
         //! gets the interface of an alias node.
         IFloat *GetFloatAlias()
         {
-            if(ref::m_Ptr)
-                return dynamic_cast<IFloat*>(ref::m_Ptr->GetNode()->GetCastAlias());
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return dynamic_cast<IFloat*>(ref::m_Ptr->GetNode()->GetCastAlias());
         }
 
         //! Restrict minimum value
         virtual void ImposeMin(int64_t Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->ImposeMin(Value);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->ImposeMin(Value);
         }
 
         //! Restrict maximum value
         virtual void ImposeMax(int64_t Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->ImposeMax(Value);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->ImposeMax(Value);
         }
 
     };

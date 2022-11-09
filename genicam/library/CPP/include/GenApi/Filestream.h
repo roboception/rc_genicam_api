@@ -468,11 +468,11 @@ namespace GENAPI_NAMESPACE
             catch (...)
             {
                 delete pAdapter;
-                delete pBuffer;
+                delete [] pBuffer;
                 throw;
             }
             delete pAdapter;
-            delete pBuffer;
+            delete [] pBuffer;
 
             return pFileBuf;
 

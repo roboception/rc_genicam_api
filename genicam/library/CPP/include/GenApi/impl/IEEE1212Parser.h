@@ -65,7 +65,10 @@ namespace GENAPI_NAMESPACE
     public:
         CIEEE1212ParserImpl(void);
         ~CIEEE1212ParserImpl(void);
-
+    private:
+        CIEEE1212ParserImpl(const CIEEE1212ParserImpl&);            // copy constructor not implemented
+        CIEEE1212ParserImpl& operator=(const CIEEE1212ParserImpl&); // assignment operator is not implemented
+    public:
         void FinalConstruct();
 
     protected:

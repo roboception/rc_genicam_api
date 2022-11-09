@@ -104,37 +104,35 @@ namespace GENAPI_NAMESPACE
         //! Get the INode interface of the node
         virtual INode* GetNode()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetNode();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetNode();
         }
 
         //! Get content of the node as string
         virtual GENICAM_NAMESPACE::gcstring ToString(bool Verify = false, bool IgnoreCache = false)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->ToString(Verify, IgnoreCache);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->ToString(Verify, IgnoreCache);
         }
 
         //! Set content of the node as string
         virtual void FromString(const GENICAM_NAMESPACE::gcstring& ValueStr, bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->FromString(ValueStr, Verify);
-            else
+            if (!ref::m_Ptr)
+            {
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            }
+            ref::m_Ptr->FromString(ValueStr, Verify);
         }
 
         //! Checks if the value comes from cache or is requested from another node
         virtual bool IsValueCacheValid() const
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->IsValueCacheValid();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->IsValueCacheValid();
         }
     };
 

@@ -69,7 +69,7 @@ namespace GENAPI_NAMESPACE
             the transport layer the implementation can however use a special command
             which sends all register write commands as one package.
         */
-        virtual void Replay( IPortWriteList *pPortRecorder, bool Invalidate = true ) = 0;
+        virtual void Replay(IPortWriteList *pPortRecorder, bool Invalidate = true) = 0;
     };
 
     /**
@@ -79,7 +79,7 @@ namespace GENAPI_NAMESPACE
     GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IPortRecorder : public IPortReplay
     {
         //! starts logging all WriteRegister commands to a list
-        virtual void StartRecording( IPortWriteList *pPortRecorder ) = 0;
+        virtual void StartRecording(IPortWriteList *pPortRecorder) = 0;
 
         //! stops recording
         virtual void StopRecording() = 0;
@@ -110,32 +110,43 @@ namespace GENAPI_NAMESPACE
         the transport layer the implementation can however use a special command
         which sends all register write commands as one package.
         */
-        virtual void Replay( IPortWriteList *pPortRecorder, bool Invalidate = true )
+        virtual void Replay(IPortWriteList *pPortRecorder, bool Invalidate = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->Replay(pPortRecorder, Invalidate);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->Replay(pPortRecorder, Invalidate);
+            }
             else
-                throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            {
+                throw ACCESS_EXCEPTION( "Feature not present (reference not valid)" );
+            }
         }
 
         //! starts logging all WriteRegister commands to a list
-        virtual void StartRecording( IPortWriteList *pPortRecorder )
+        virtual void StartRecording(IPortWriteList *pPortRecorder)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->StartRecording(pPortRecorder);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->StartRecording(pPortRecorder);
+            }
             else
-                throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            {
+                throw ACCESS_EXCEPTION( "Feature not present (reference not valid)" );
+            }
         }
 
         //! stops recording
         virtual void StopRecording()
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->StopRecording();
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->StopRecording();
+            }
             else
-                throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            {
+                throw ACCESS_EXCEPTION( "Feature not present (reference not valid)" );
+            }
         }
-
     };
 
     //! Reference to an IPortRecorder pointer

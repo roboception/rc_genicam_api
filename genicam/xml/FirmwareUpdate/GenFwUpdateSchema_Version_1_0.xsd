@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+*  (c) 2018 by Basler
+*
+*  License: This file is published under the license of the EMVA GenICam Standard Group.
+*  A text file describing the legal terms is included in your installation as 'GenICam_license.pdf'.
+*  If for some reason you are missing this file please contact the EMVA or visit the website
+*  (http://www.genicam.org) for a full copy.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
+*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+*  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+*  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD GROUP
+*  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+*  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+*  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+*  ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+*  POSSIBILITY OF SUCH DAMAGE.
+******************************************************************************** -->
+<xs:schema xmlns="http://www.genicam.org/GenFwUpdate/Version_1_0"
+	xmlns:tns="http://www.genicam.org/GenFwUpdate/Version_1_0"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.genicam.org/GenFwUpdate/Version_1_0"
+	elementFormDefault="qualified">
+	<xs:element name="GufRuleSet">
+		<xs:annotation>
+			<xs:documentation>Ruleset to control GenICam FW Update</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Procedure" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element name="FeatureWrite" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Write the value "Value" to genicam feature "FeatureName"</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="BaseStep_t">
+											<xs:sequence>
+												<xs:element name="FeatureName" type="CName_t">
+													<xs:annotation>
+														<xs:documentation>Name of the GenICam Feature to write the value into</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="Value" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>Value to write via FromString() Method</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:sequence>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+								<xs:unique name="unique-description-lang-featurewrite">
+									<xs:annotation>
+										<xs:documentation>Description must be unique per language</xs:documentation>
+									</xs:annotation>
+									<xs:selector xpath="tns:Description"/>
+									<xs:field xpath="@Lang"/>
+								</xs:unique>
+							</xs:element>
+							<xs:element name="FeatureExecute" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Execute the feature "FeatureName"</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="BaseStep_t">
+											<xs:sequence>
+												<xs:element name="FeatureName" type="CName_t">
+													<xs:annotation>
+														<xs:documentation>Name of the GenICam Feature to execute</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="MaximumExecutionTimeoutMs" type="xs:unsignedInt" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>After this timeout polling should stop and the update fails</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:sequence>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+								<xs:unique name="unique-description-lang-featureexecute">
+									<xs:annotation>
+										<xs:documentation>Description must be unique per language</xs:documentation>
+									</xs:annotation>
+									<xs:selector xpath="tns:Description"/>
+									<xs:field xpath="@Lang"/>
+								</xs:unique>
+							</xs:element>
+							<xs:element name="FileUpload" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Upload the file specified under reference "FileRef" in the Updatesection to the File "DeviceFilename" using the GenICam FileAccess</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="BaseStep_t">
+											<xs:sequence>
+												<xs:element name="DeviceFileName" type="CName_t">
+													<xs:annotation>
+														<xs:documentation>Filename on Device to open for write action</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="FileName" type="PortableFilename_t">
+													<xs:annotation>
+														<xs:documentation>Filename on Device to open for write action</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:sequence>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+								<xs:unique name="unique-description-lang-fileupload">
+									<xs:annotation>
+										<xs:documentation>Description must be unique per language</xs:documentation>
+									</xs:annotation>
+									<xs:selector xpath="tns:Description"/>
+									<xs:field xpath="@Lang"/>
+								</xs:unique>
+							</xs:element>
+							<xs:element name="FeatureAssert" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="BaseStep_t">
+											<xs:sequence>
+												<xs:element name="FeatureName" type="CName_t">
+													<xs:annotation>
+														<xs:documentation>Name of the GenICam Feature to assert</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="AssertPattern" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>Regular Expression pattern to assert </xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="Message" type="xs:string" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>Message to show to customer in case of assertion failure</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:sequence>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+								<xs:unique name="unique-description-lang-featureassert">
+									<xs:annotation>
+										<xs:documentation>Description must be unique per language</xs:documentation>
+									</xs:annotation>
+									<xs:selector xpath="tns:Description"/>
+									<xs:field xpath="@Lang"/>
+								</xs:unique>
+							</xs:element>
+							<xs:element name="DeviceReset" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Reset the device using "DeviceReset" feature. Reenumerate and reopen the device</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="BaseStep_t">
+											<xs:sequence>
+												<xs:element name="DeviceDiscoveryDelayMs" type="xs:unsignedInt" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>Delay device discovery by n milliseconds</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:sequence>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+								<xs:unique name="unique-description-lang-devicereset">
+									<xs:annotation>
+										<xs:documentation>Description must be unique per language</xs:documentation>
+									</xs:annotation>
+									<xs:selector xpath="tns:Description"/>
+									<xs:field xpath="@Lang"/>
+								</xs:unique>
+							</xs:element>
+						</xs:choice>
+						<xs:attribute name="Id" type="CName_t" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Update" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Info">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Entry" minOccurs="0" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Simple Key-Value list</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="Lang" use="optional" type="xs:string" default=""/>
+														<xs:attribute name="Key" type="xs:string"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+								<xs:unique name="unique-info-entry">
+									<xs:annotation>
+										<xs:documentation>Info entry must be unique per key,language</xs:documentation>
+									</xs:annotation>
+									<xs:selector xpath="tns:Entry"/>
+									<xs:field xpath="@Key"/>
+									<xs:field xpath="@Lang"/>
+								</xs:unique>
+							</xs:element>
+							<xs:element name="Condition" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>All Conditions have to match to enable the update</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="Feature" use="required" type="CName_t">
+												<xs:annotation>
+													<xs:documentation>Name of the Feature to apply the patten on</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="ProcedureId" type="CName_t"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="SchemaMajorVersion" type="xs:unsignedInt" use="required"/>
+			<xs:attribute name="SchemaMinorVersion" type="xs:unsignedInt" use="required"/>
+		</xs:complexType>
+		<xs:unique name="ProcedureName">
+			<xs:annotation>
+				<xs:documentation>Procedure Id has to be unique</xs:documentation>
+			</xs:annotation>
+			<xs:selector xpath="tns:Procedure"/>
+			<xs:field xpath="@Id"/>
+		</xs:unique>
+		<xs:key name="ProcedureKey">
+			<xs:selector xpath=".//tns:Procedure"/>
+			<xs:field xpath="@Id"/>
+		</xs:key>
+		<xs:keyref name="ProcedureKeyRef" refer="ProcedureKey">
+			<xs:annotation>
+				<xs:documentation>the procedure referenced in an update has to exist</xs:documentation>
+			</xs:annotation>
+			<xs:selector xpath="tns:Update"/>
+			<xs:field xpath="@ProcedureId"/>
+		</xs:keyref>
+	</xs:element>
+	<xs:simpleType name="CName_t">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Za-z][0-9A-Za-z_]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PortableFilename_t">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9A-Za-z_.][0-9A-Za-z_.\-]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="BaseStep_t">
+		<xs:sequence>
+			<xs:element name="Description" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A description for this step, localized. Shouldn't be longer than 250 characters.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="Lang" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ExpectedDurationMs" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Expected duration of the step in milliseconds.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

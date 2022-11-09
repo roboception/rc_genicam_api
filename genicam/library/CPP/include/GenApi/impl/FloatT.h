@@ -75,17 +75,19 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meSetValue );
+                typename Base::EntryMethodFinalizer E(this, meSetValue, Base::IsStreamable());
 
                 Base::m_ValueCacheValid = false;
 
                 GCLOGINFOPUSH( Base::m_pValueLog, "SetValue( %f )...", Value );
 
-                if( Verify )
+                if (!Base::CanBeWritten( Verify ))
                 {
-                    if( !IsWritable( this ) )
-                        throw ACCESS_EXCEPTION_NODE("Node is not writable.");
+                    throw ACCESS_EXCEPTION_NODE( "Node is not writable." );
+                }
 
+                if (Verify || !Base::m_pNodeMap->EntryIsStremable())
+                {
                     CHECK_RANGE_FLT_NODE(Value, Base::InternalGetMin(), Base::InternalGetMax());
                 }
 
@@ -287,7 +289,7 @@ namespace GENAPI_NAMESPACE
         virtual double GetValue(bool Verify = false, bool IgnoreCache = false)
         {
             AutoLock l(Base::GetLock());
-            typename Base::EntryMethodFinalizer E( this, meGetValue, IgnoreCache );
+            typename Base::EntryMethodFinalizer E(this, meGetValue, Base::IsStreamable(), IgnoreCache);
 
             // Note that readability is tested regardless of Verify
             if( !IsReadable( this ) )
@@ -457,7 +459,7 @@ namespace GENAPI_NAMESPACE
         virtual double_autovector_t GetListOfValidValues(bool bounded = true)
         {
             AutoLock l(Base::GetLock());
-            typename Base::EntryMethodFinalizer E( this, meGetListOfValidValues );
+            typename Base::EntryMethodFinalizer E(this, meGetListOfValidValues, Base::IsStreamable());
 
             GCLOGINFOPUSH( Base::m_pRangeLog, "GetListOfValidValues...");
             if( ! Base::m_ListOfValidValuesCacheValid )

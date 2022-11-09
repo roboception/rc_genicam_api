@@ -92,12 +92,15 @@ namespace GENAPI_NAMESPACE
         //! Get all features of the category (including sub-categories)
         virtual void GetFeatures(FeatureList_t &Features) const
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetFeatures(Features);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->GetFeatures( Features );
+            }
             else
-                throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            {
+                throw ACCESS_EXCEPTION( "Feature not present (reference not valid)" );
+            }
         }
-
     };
 
     //! Reference to an ICategory pointer

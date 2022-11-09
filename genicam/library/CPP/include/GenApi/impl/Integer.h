@@ -94,7 +94,7 @@ namespace GENAPI_NAMESPACE
             //! Get increment
             virtual int64_t InternalGetInc();
 
-	        //! Get list of valid values
+            //! Get list of valid values
             virtual const int64_autovector_t InternalGetListOfValidValues();
 
             //! Get recommended representation

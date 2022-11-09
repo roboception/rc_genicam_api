@@ -33,8 +33,11 @@
 #include <GenApi/Types.h>
 #include <GenApi/Pointer.h>
 #include <GenApi/GenApiDll.h>
+#include <GenApi/SelectorSet.h>
 #include <list>
 #include <iostream>
+#include <cstring>
+#include <locale>
 
 namespace GENAPI_NAMESPACE
 {
@@ -46,7 +49,7 @@ namespace GENAPI_NAMESPACE
         virtual void SetInfo(const GENICAM_NAMESPACE::gcstring &Info) = 0;
 
         //! Stores a feature
-        virtual void PersistFeature(IValue& item) = 0;
+        virtual void PersistFeature(IValue& item, CSelectorSet *selectorSet = NULL) = 0;
     };
 
     //! Bag holding streamable features of a nodetree
@@ -57,7 +60,7 @@ namespace GENAPI_NAMESPACE
         virtual void SetInfo(const GENICAM_NAMESPACE::gcstring &Info);
 
         //! Stores a feature
-        virtual void PersistFeature(IValue& item);
+        virtual void PersistFeature(IValue& item, CSelectorSet *selectorSet = NULL);
 
         //! Loads the features from the bag to the node tree
         //! \param pNodeMap The node map to load into
@@ -93,14 +96,63 @@ namespace GENAPI_NAMESPACE
         //! puts the bag into a stream
         friend std::ostream& operator <<(std::ostream &os, const CFeatureBag &FeatureBag);
 
-    private:
-        //! The name of the feature bag
-        GENICAM_NAMESPACE::gcstring m_BagName;
-        GENICAM_NAMESPACE::gcstring_vector m_Names;
-        GENICAM_NAMESPACE::gcstring_vector m_Values;
 
-        //! String describing the node map
-        GENICAM_NAMESPACE::gcstring m_Info;
+        CFeatureBag();
+        CFeatureBag(const CFeatureBag&);
+        CFeatureBag& operator=(const CFeatureBag&);
+        virtual ~CFeatureBag();
+    private:
+
+        CSelectorState* AllocateSelector();
+        void DeleteSelector(CSelectorState*& p);
+
+        void Clear();
+        void Push(const char *name, const char *value, CSelectorState *ps);
+
+        const GENICAM_NAMESPACE::gcstring& GetInfo() const;
+
+        struct Triplet
+        {
+            GENICAM_NAMESPACE::gcstring name;
+            GENICAM_NAMESPACE::gcstring value;
+            CSelectorState* pState;
+        };
+
+        class GENAPI_DECL const_iterator
+        {
+            // Ctor / Dtor
+            // -------------------------------------------------------------------------
+        public:
+            const_iterator(Triplet *pTriplet = NULL);
+            const_iterator(const const_iterator&);
+            const_iterator& operator=(const const_iterator&);
+            // Operators
+            // -------------------------------------------------------------------------
+        public:
+            const Triplet &         operator *        (void)                  const;
+            const Triplet *         operator ->       (void)                  const;
+            const_iterator &        operator ++       (void);
+            const_iterator          operator ++       (int);
+            const_iterator &        operator +=       (intptr_t iInc);
+            const_iterator          operator +        (intptr_t iInc)         const;
+            intptr_t                operator -        (const const_iterator &iter) const;
+            bool                    operator ==       (const const_iterator &iter) const;
+            bool                    operator !=       (const const_iterator &iter) const;
+
+            // Member
+            // -------------------------------------------------------------------------
+        protected:
+            Triplet *m_pTriplet;
+
+        };
+        const_iterator GetBegin();
+        const_iterator GetBegin() const;
+        const_iterator GetEnd();
+        const_iterator GetEnd() const;
+    private:
+        struct FeatureBagImpl;
+        FeatureBagImpl *m_pImpl;
+
 
         bool LoadFromBagInternal(INodeMap *pNodeMap, bool Verify /* = true */, GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL);
         int64_t StoreToBagInternal(INodeMap *pNodeMap, const int MaxNumPersistSkriptEntries = -1, GENICAM_NAMESPACE::gcstring_vector *pFeatureFilter = NULL);
@@ -133,6 +185,35 @@ namespace GENAPI_NAMESPACE
     }
 
 #ifndef GENAPI_DONT_USE_DEFAULT_PERSISTENCE_FILE_FORMAT
+    //! Helper function cutting off space characters
+    inline char* TrimSpace( char* Name, std::istream& is )
+    {
+        char* pend = Name + strlen( Name );
+        char* pc = Name;
+        for (; pc < pend && std::isspace( *pc, is.getloc() ); ++pc);
+        for (--pend; pc < pend && std::isspace( *pend, is.getloc() ); --pend);
+        pend[1] = '\0';
+
+        return pc;
+    }
+    inline GENICAM_NAMESPACE::gcstring& TrimSpace( GENICAM_NAMESPACE::gcstring& s, std::istream& is )
+    {
+        size_t iend =s.length();
+        size_t ibegin = 0;
+        for (; ibegin < iend && std::isspace( s[ibegin], is.getloc() ); ++ibegin);
+        for (--iend; ibegin < iend; --iend)
+        {
+            if (!std::isspace( s[iend], is.getloc() ))
+                break;
+        }
+        if (iend < s.length())
+        {
+            s.erase(iend + 1);
+        }
+        s.erase( 0, ibegin );
+
+        return s;
+    }
     //! reads in persistent data from a stream
     // note: this method must be inlined because it uses istream in the parameter list
     // note: May not be used as inline if called against a library where it is already compiled.
@@ -143,15 +224,12 @@ namespace GENAPI_NAMESPACE
             throw RUNTIME_EXCEPTION("The stream is eof");
         }
 
-        FeatureBag.m_Names.clear();
-        FeatureBag.m_Values.clear();
+        FeatureBag.Clear();
 
-        const int BufferSize = 1024;
-        char Buffer[BufferSize] = {0};
-
+        GENICAM_NAMESPACE::gcstring FirstLine;
+        FirstLine.reserve( 128 );
+        GENICAM_NAMESPACE::getline( is, FirstLine, '\n' );
         // Check the magic
-        is.getline(Buffer, BufferSize, '\n');
-        GENICAM_NAMESPACE::gcstring FirstLine(Buffer);
         GENICAM_NAMESPACE::gcstring MagicGUID(GENAPI_PERSISTENCE_MAGIC);
         if( GENICAM_NAMESPACE::gcstring::_npos() == FirstLine.find(MagicGUID) )
         {
@@ -164,25 +242,68 @@ namespace GENAPI_NAMESPACE
         }
 
         EatComments( is );
-        char Name[BufferSize] = {0};
-        GENICAM_NAMESPACE::gcstring Value("");
-        while( !is.eof() )
-        {
-            is.getline(Name, BufferSize, '\t');
-            if (is.fail())  // if reading from stream failed -> stop reading!
-            {
-                break;
-            }
-            GENICAM_NAMESPACE::getline(is, Value);
-            if (is.fail())  // if reading from stream failed -> stop reading!
-            {
-                break;
-            }
-            FeatureBag.m_Names.push_back(Name);
-            FeatureBag.m_Values.push_back(Value);
 
-            Name[0] = '\0';
-            Value = "";
+        GENICAM_NAMESPACE::gcstring Name, Value;
+        Name.reserve( 128 );
+        Value.reserve( 128 );
+        while (!is.eof())
+        {
+            GENICAM_NAMESPACE::getline( is, Name, '\t' );
+            if (is.fail())  // if reading from stream failed -> stop reading!
+            {
+                throw RUNTIME_EXCEPTION( "The stream holds excess data" );
+                break;
+            }
+
+            Name = TrimSpace( Name, is );
+            if (Name.empty())
+            {
+                continue;
+            }
+
+            CSelectorState *pSelectorState = FeatureBag.AllocateSelector();
+            if (!pSelectorState)
+            {
+                throw RUNTIME_EXCEPTION( "Unable to allocate SelectorState" );
+            }
+
+
+            if (is.peek() == '{')
+            {
+                GENICAM_NAMESPACE::getline( is, Value, '\t' );
+                if (is.fail())  // if reading from stream failed -> stop reading!
+                {
+                    break;
+                }
+                for (size_t iassign = Value.find_last_of( '=' ); iassign != GENICAM_NAMESPACE::gcstring::_npos(); iassign = Value.find_last_of( '=' ))
+                {
+                    const size_t iend = Value.find_last_of( '}');
+                    const size_t ibeg = (Value[0] == '{') ? 1 : 0;
+                    const size_t rhs_len = iend == GENICAM_NAMESPACE::gcstring::_npos() ? iend : iend - iassign - 1;
+                    const size_t lhs_len = iassign - ibeg;
+                    GENICAM_NAMESPACE::gcstring selectorName = Value.substr( ibeg, lhs_len );
+                    GENICAM_NAMESPACE::gcstring selectorValue = Value.substr( iassign + 1, rhs_len );
+                    pSelectorState->AddSelector( selectorName, selectorValue );
+                    if (iend != GENICAM_NAMESPACE::gcstring::_npos())
+                    {
+                        break;
+                    }
+
+                    GENICAM_NAMESPACE::getline( is, Value, '\t' );
+                    if (is.fail())
+                    {
+                        break;
+                    }
+                }
+            }
+            GENICAM_NAMESPACE::getline( is, Value, '\n' );
+            if (Value.empty())
+            {
+                FeatureBag.DeleteSelector(pSelectorState);
+                throw RUNTIME_EXCEPTION( "The stream holds incomplete key - value - set" );
+            }
+            FeatureBag.Push( Name.c_str(), Value.c_str(), pSelectorState );
+
             EatComments( is );
         }
         return is;
@@ -194,23 +315,38 @@ namespace GENAPI_NAMESPACE
     inline std::ostream& operator <<(std::ostream &os, const CFeatureBag &FeatureBag)
     {
         os << "# " GENAPI_PERSISTENCE_MAGIC "\n";
-        if( !FeatureBag.m_Info.empty() )
+        if( !FeatureBag.GetInfo().empty() )
         {
             os << "# GenApi persistence file (version " << GENAPI_VERSION_MAJOR << "." << GENAPI_VERSION_MINOR << "." << GENAPI_VERSION_SUBMINOR << ")\n";
-            os << "# " << FeatureBag.m_Info << "\n";
+            os << "# " << FeatureBag.GetInfo() << "\n";
         }
-
-        // This can actually never happen the way the code is written right now, but...
-        assert(FeatureBag.m_Names.size() == FeatureBag.m_Values.size());
-
-        GENICAM_NAMESPACE::gcstring_vector::const_iterator pName = FeatureBag.m_Names.begin();
-        GENICAM_NAMESPACE::gcstring_vector::const_iterator pValue = FeatureBag.m_Values.begin();
-        const GENICAM_NAMESPACE::gcstring_vector::const_iterator endNames = FeatureBag.m_Names.end();
-        for( ; pName != endNames; ++pName, ++pValue )
+        for (
+            CFeatureBag::const_iterator it = FeatureBag.GetBegin(), end = FeatureBag.GetEnd();
+            it != end;
+            ++it
+            )
         {
-            const GENICAM_NAMESPACE::gcstring Name(*pName);
-            const GENICAM_NAMESPACE::gcstring Value(*pValue);
-            os << Name << "\t" << Value << "\n";
+            const GENICAM_NAMESPACE::gcstring Name(it->name);
+            const GENICAM_NAMESPACE::gcstring Value(it->value);
+            if ((it->pState)->IsEmpty())
+            {
+                os << Name << "\t" << Value << "\n";
+            }
+            else
+            {
+                bool isFirst = true;
+                os << Name << "\t{";
+                (it->pState)->SetFirst();
+                do
+                {
+                    if (!isFirst)
+                        os << "\t";
+                    else
+                        isFirst = false;
+                    os << (it->pState)->GetNodeName() << "=" << (it->pState)->GetNodeValue();
+                } while ((it->pState)->SetNext());
+                os << "}\t" << Value << "\n";
+            }
         }
 
         return os;
@@ -285,10 +421,13 @@ namespace GENAPI_NAMESPACE
         friend std::istream& operator >>(std::istream &is, CFeatureBagger &featureBagger);
 
     private:
+        CFeatureBagger(const CFeatureBagger&);            // do not allow copy constructor
+        CFeatureBagger& operator=(const CFeatureBagger&); // do not allow assignments
         CFeatureBag& AddBag(const GENICAM_NAMESPACE::gcstring &bagName);
         void DeleteAllBags( void );
         template<class _Ty>
         void UnBagCustomAction(INodeMap *pNodeMap, _Ty setNodePtr, const GENICAM_NAMESPACE::gcstring& setNodeValue, CCommandPtr saveNodePtr );
+
         void *m_pBags;
         //! String describing the node map
         GENICAM_NAMESPACE::gcstring m_Info;
@@ -328,10 +467,8 @@ namespace GENAPI_NAMESPACE
         }
 
         // Check the magic
-        const int BufferSize = 1024;
-        char Buffer[BufferSize] = { 0 };
-        is.getline(Buffer, BufferSize, '\n');
-        GENICAM_NAMESPACE::gcstring FirstLine(Buffer);
+        GENICAM_NAMESPACE::gcstring FirstLine;
+        GENICAM_NAMESPACE::getline( is, FirstLine, '\n' );
         GENICAM_NAMESPACE::gcstring MagicGUID(GENAPI_PERSISTENCE_MAGIC_FEATUREBAGGER);
         bool boCFeatureBagFormatDetected = false;
         if( GENICAM_NAMESPACE::gcstring::_npos() == FirstLine.find(MagicGUID) )

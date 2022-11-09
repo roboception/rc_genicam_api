@@ -46,8 +46,8 @@ namespace GENAPI_NAMESPACE
     //*************************************************************
     // IPort interface
     //*************************************************************
-	
-	typedef struct S_PORT_REGISTER_STACK_ENTRY
+    
+    typedef struct S_PORT_REGISTER_STACK_ENTRY
     {
       uint64_t   Address;        /* Address of the register. */
       void*      pBuffer;        /* Pointer to the buffer containing the data. */
@@ -89,19 +89,17 @@ namespace GENAPI_NAMESPACE
         //! Reads a chunk of bytes from the port
         virtual void Read(PORT_REGISTER_STACK_ENTRY *pEntries,  size_t numEntries)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->Read(pEntries, numEntries);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->Read(pEntries, numEntries);
         }
 
         //! Writes a chunk of bytes to the port
         virtual void Write(PORT_REGISTER_STACK_ENTRY *pEntries,  size_t numEntries)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->Write(pEntries, numEntries);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->Write(pEntries, numEntries);
         }
 
     };
@@ -118,4 +116,4 @@ namespace GENAPI_NAMESPACE
 #   pragma warning ( pop )
 #endif // #ifdef WIN32
 
-#endif // ifndef GENAPI_IPORT_H
+#endif // ifndef GENAPI_IPORT_STACKED_H

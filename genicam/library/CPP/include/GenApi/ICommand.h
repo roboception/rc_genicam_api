@@ -96,31 +96,26 @@ namespace GENAPI_NAMESPACE
         //! Execute the command
         virtual void Execute(bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->Execute(Verify);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->Execute(Verify);
         }
 
         //! Execute the command
         virtual void operator()()
         {
-            if(ref::m_Ptr)
-                ref::m_Ptr->operator()();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            ref::m_Ptr->operator()();
         }
 
         //! Query whether the command is executed
         virtual bool IsDone(bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->IsDone(Verify);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->IsDone(Verify);
         }
-
-
     };
 
     //! Reference to an ICommand pointer

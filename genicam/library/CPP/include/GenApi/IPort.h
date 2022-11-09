@@ -84,21 +84,28 @@ namespace GENAPI_NAMESPACE
         //! Reads a chunk of bytes from the port
         virtual void Read(void *pBuffer, int64_t Address, int64_t Length)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->Read(pBuffer, Address, Length);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->Read(pBuffer, Address, Length);
+            }
             else
+            {
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            }
         }
 
         //! Writes a chunk of bytes to the port
         virtual void Write(const void *pBuffer, int64_t Address, int64_t Length)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->Write(pBuffer, Address, Length);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->Write(pBuffer, Address, Length);
+            }
             else
+            {
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            }
         }
-
     };
 
     //! Reference to an IEnumEntry pointer

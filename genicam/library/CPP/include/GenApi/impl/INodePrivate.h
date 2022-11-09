@@ -81,7 +81,7 @@ namespace GENAPI_NAMESPACE
         virtual void SetProperty(CProperty &Property) = 0;
 
         //! Gets all properties from a node which map a given PropertyID
-        // BEWARE: PropertyLsit contains pointers to CProperty objects on the heap. the caller is responsible for deleting them
+        // BEWARE: PropertyList contains pointers to CProperty objects on the heap. The caller is responsible for deleting them
         //         e.g. by calling CNodeData::FreePropertiesList( PropertyList )
         virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const = 0;
 
@@ -100,7 +100,7 @@ namespace GENAPI_NAMESPACE
         virtual void SetInvalid(ESetInvalidMode simMode) = 0;
 
         //! Update the registered callbacks
-        virtual void CollectCallbacksToFire(std::list<CNodeCallback*> &CallbacksToFire, bool allDependents = false) = 0;
+        virtual void CollectCallbacksToFire(std::list<CNodeCallback*> &CallbacksToFire, bool allDependents = false, bool always = false) = 0;
 
         //! Returns true, if this node is terminal
         virtual bool IsTerminalNode() const = 0;
@@ -114,6 +114,9 @@ namespace GENAPI_NAMESPACE
         */
         virtual bool Poll( int64_t ElapsedTime ) = 0;
 
+        virtual bool CanBeWritten(bool Verify) = 0;
+
+        virtual bool CanBeRead(bool Verify) = 0;
     };
 
 

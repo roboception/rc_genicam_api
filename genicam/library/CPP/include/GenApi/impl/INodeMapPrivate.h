@@ -75,11 +75,14 @@ namespace GENAPI_NAMESPACE
 
         /**** Methods to handle the call stack at run-time ****/
 
+        //! Returns True if callback have been disabled by the user for this current nodamap call.
+        virtual bool IsCallbackSuppressed() = 0;
+
         //! Returns the object which counts the depth of SetValue() call-chains
         virtual Counter& GetBathometer() = 0;
 
         //! Sets the node and the method the client call has entered the node map
-        virtual void SetEntryPoint( EMethod EntryMethod, const INodePrivate *pEntryNode, bool IgnoreCache ) = 0;
+        virtual void SetEntryPoint(EMethod EntryMethod, const INodePrivate *pEntryNode, bool stremable, bool IgnoreCache) = 0;
 
         //! Sets the entry point to undefined
         virtual void ResetEntryPoint() = 0;
@@ -96,6 +99,10 @@ namespace GENAPI_NAMESPACE
 
         //! Indicates if the GenApi.Device logging is enabled
         virtual bool IsGenApiDeviceLoggingEnabled() = 0;
+
+        virtual bool EntryIsStremable() = 0;
+
+        virtual void SetGenApiPersistenceMode(bool) = 0;
     };
 
 }

@@ -138,7 +138,7 @@ namespace GENAPI_NAMESPACE
         virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
         // \}
 
-	private:
+    private:
         //! \name Node properties
         //\{
         //! The Feature ID consists of Vendor ID and a advanced feature set unique value

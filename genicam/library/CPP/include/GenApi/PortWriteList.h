@@ -50,8 +50,11 @@ namespace GENAPI_NAMESPACE
         CPortWriteList();
 
         //! Destructor
-        ~CPortWriteList();
-
+        virtual ~CPortWriteList();
+    private:
+        CPortWriteList(const CPortWriteList&);            // copy constructor not implemented
+        CPortWriteList& operator=(const CPortWriteList&); // assignment operator is not implemented
+    public:
         /*---------------------------------------------------------------*/
         // IPortWriteList
         /*---------------------------------------------------------------*/

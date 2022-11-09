@@ -60,7 +60,10 @@ namespace GENAPI_NAMESPACE
     public:
         //! Destructor
         virtual ~CChunkAdapter();
-
+    private:
+        CChunkAdapter(const CChunkAdapter&);            // copy constructor is not implemented
+        CChunkAdapter& operator=(const CChunkAdapter&); // assignment operator is not implemented
+    public:
         //! Attaches to a node map and retrieves the chunk ports
         void AttachNodeMap(INodeMap* pNodeMap);
 

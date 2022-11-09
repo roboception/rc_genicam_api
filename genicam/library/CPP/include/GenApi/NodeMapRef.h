@@ -132,6 +132,9 @@ namespace GENAPI_NAMESPACE
         //! Retrieves the node from the central map by name
         virtual INode* _GetNode(const GENICAM_NAMESPACE::gcstring& key) const;
 
+        //! Set suppress callback mode
+        virtual void _SetSuppressCallbackMode(ECallbackSuppressMode) const;
+
         //! Create a new write concatenator object
         virtual CNodeWriteConcatenator *_NewNodeWriteConcatenator() const;
 
@@ -316,7 +319,10 @@ namespace GENAPI_NAMESPACE
 
         // Load the XML file
         CNodeMapFactory nodeMapData(ContentType_Xml, FileName);
-        Attach(nodeMapData.CreateNodeMap(_DeviceName), _DeviceName, new int(0));
+
+        // First create node map then the reference counter. This prevents a leak in case of bad node map
+        INodeMap* pNodeMap = nodeMapData.CreateNodeMap( _DeviceName );
+        Attach( pNodeMap, _DeviceName, new int( 0 ) );
     }
 
     template<class TCameraParams>
@@ -330,7 +336,10 @@ namespace GENAPI_NAMESPACE
 
         // Load the XML file
         CNodeMapFactory nodeMapData(ContentType_ZippedXml, ZipFileName);
-        Attach(nodeMapData.CreateNodeMap(), _DeviceName, new int(0));
+
+        // First create node map then the reference counter. This prevents a leak in case of bad node map
+        INodeMap* pNodeMap = nodeMapData.CreateNodeMap();
+        Attach( pNodeMap, _DeviceName, new int(0));
     }
 
     template<class TCameraParams>
@@ -346,7 +355,10 @@ namespace GENAPI_NAMESPACE
         CNodeMapFactory nodeMapData(ContentType_Xml, TargetFileName);
         CNodeMapFactory injectNodeMapData(ContentType_Xml, InjectFileName);
         nodeMapData.AddInjectionData(injectNodeMapData);
-        Attach(nodeMapData.CreateNodeMap(), _DeviceName, new int(0));
+
+        // First create node map then the reference counter. This prevents a leak in case of bad node map
+        INodeMap* pNodeMap = nodeMapData.CreateNodeMap(_DeviceName);
+        Attach( pNodeMap, _DeviceName, new int( 0 ) );
     }
 
     template<class TCameraParams>
@@ -358,7 +370,10 @@ namespace GENAPI_NAMESPACE
 
         // Load the XML file
         CNodeMapFactory nodeMapData(ContentType_Xml, XMLData.c_str(), XMLData.size()); //avoid string copy
-        Attach(nodeMapData.CreateNodeMap(_DeviceName), _DeviceName, new int(0));
+
+        // First create node map then the reference counter. This prevents a leak in case of bad node map
+        INodeMap* pNodeMap = nodeMapData.CreateNodeMap(_DeviceName);
+        Attach( pNodeMap, _DeviceName, new int( 0 ) );
     }
 
 
@@ -371,7 +386,10 @@ namespace GENAPI_NAMESPACE
 
         // Load the XML file
         CNodeMapFactory nodeMapData(ContentType_ZippedXml, zipData, zipSize);
-        Attach(nodeMapData.CreateNodeMap(), _DeviceName, new int(0));
+
+        // First create node map then the reference counter. This prevents a leak in case of bad node map
+        INodeMap* pNodeMap = nodeMapData.CreateNodeMap();
+        Attach( pNodeMap, _DeviceName, new int( 0 ) );
     }
 
     template<class TCameraParams>
@@ -385,7 +403,10 @@ namespace GENAPI_NAMESPACE
         CNodeMapFactory nodeMapData(ContentType_Xml, TargetXMLData.c_str(), TargetXMLData.size()); //avoid string copy
         CNodeMapFactory injectNodeMapData(ContentType_Xml, InjectXMLData.c_str(), InjectXMLData.size()); //avoid string copy
         nodeMapData.AddInjectionData(injectNodeMapData);
-        Attach(nodeMapData.CreateNodeMap(), _DeviceName, new int(0));
+
+        // First create node map then the reference counter. This prevents a leak in case of bad node map
+        INodeMap* pNodeMap = nodeMapData.CreateNodeMap();
+        Attach( pNodeMap, _DeviceName, new int( 0 ) );
     }
 
     template<class TCameraParams>
@@ -417,6 +438,16 @@ namespace GENAPI_NAMESPACE
             return _Ptr->GetNodes(Nodes);
         throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
     }
+
+    
+    template<class TCameraParams>
+    inline void CNodeMapRefT<TCameraParams>::_SetSuppressCallbackMode(ECallbackSuppressMode mode) const
+    {
+        if (_Ptr)
+            return _Ptr->SetSuppressCallbackMode(mode);
+        throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+    }
+
 
     template<class TCameraParams>
     inline CNodeWriteConcatenator  *CNodeMapRefT<TCameraParams>::_NewNodeWriteConcatenator() const
@@ -504,6 +535,10 @@ namespace GENAPI_NAMESPACE
     {
     protected:
         virtual void _Initialize(GENAPI_NAMESPACE::INodeMap*) {}
+        virtual ~CGeneric_XMLLoaderParams()
+        {
+            // ensure to release all ressources
+        }
     };
 
 

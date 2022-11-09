@@ -55,7 +55,8 @@ namespace GENAPI_NAMESPACE
         meSet,
         meGet,
         meGetIncMode,
-        meGetListOfValidValues
+        meGetListOfValidValues,
+        meInvalidateNode
     } EMethod;
 
     class EMethodClass
@@ -94,6 +95,12 @@ namespace GENAPI_NAMESPACE
                 ValueStr = "Set";
             else if( *pValue == meGet )
                 ValueStr = "Get";
+            else if( *pValue == meGetIncMode)
+                ValueStr = "GetIncMode";
+            else if (*pValue == meGetListOfValidValues)
+                ValueStr = "GetListOfValidValues";
+            else if (*pValue == meInvalidateNode)
+                ValueStr = "InvalidateNode";
             else
                 ValueStr = "_UndefinedMethod";
         }
@@ -128,7 +135,7 @@ namespace GENAPI_NAMESPACE
             va_start( vap, pFormat );
 
 #if defined (_MSC_VER)
-			vsnprintf_s( pBuffer, sizeof pBuffer, _TRUNCATE, pFormat, vap );
+            vsnprintf_s( pBuffer, sizeof pBuffer, _TRUNCATE, pFormat, vap );
 #else 
             vsnprintf( pBuffer, sizeof pBuffer, pFormat, vap );
 #endif 
@@ -195,8 +202,6 @@ namespace GENAPI_NAMESPACE
         else if ((_Value) > (_Max)) \
             throw OUT_OF_RANGE_EXCEPTION_NODE( "Value %f must be smaller than or equal %f.", (_Value), (_Max) );
 
-
 }
 
 #endif // GENAPI_EXCEPTION_H
-

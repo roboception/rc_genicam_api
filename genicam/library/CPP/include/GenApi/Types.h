@@ -60,7 +60,6 @@ namespace GENAPI_NAMESPACE
         RW,        //!< Read and Write
         _UndefinedAccesMode,    //!< Object is not yet initialized
         _CycleDetectAccesMode   //!< used internally for AccessMode cycle detection
-
     } EAccessMode;
 
     //! recommended visibility of a node
@@ -166,12 +165,12 @@ namespace GENAPI_NAMESPACE
     //! \ingroup GenApi_PublicImpl
     typedef enum _EXMLValidation
     {
-        xvLoad      = 0x00000001L,    //!< Creates a dummy node map
-        xvCycles    = 0x00000002L,    //!< checks for write and dependency cycles (implies xvLoad)
-        xvSFNC      = 0x00000004L,    //!< checks for conformance with the standard feature naming convention (SFNC)
-        xvDefault   = 0x00000000L,    //!< checks performed if nothing else is said
-        xvAll       = 0xffffffffL,    //!< all possible checks
-        _UndefinedEXMLValidation = 0x8000000L //!< Object is not yet initialized
+        xvLoad                   = 0x00000001L,    //!< Creates a dummy node map
+        xvCycles                 = 0x00000002L,    //!< checks for write and dependency cycles (implies xvLoad)
+        xvSFNC                   = 0x00000004L,    //!< checks for conformance with the standard feature naming convention (SFNC)
+        xvDefault                = 0x00000000L,    //!< checks performed if nothing else is said
+        xvAll                    = 0xffffffffL,    //!< all possible checks
+        _UndefinedEXMLValidation = 0x8000000L      //!< Object is not yet initialized
     } EXMLValidation;
 
     //! typedef for float notation
@@ -238,10 +237,19 @@ namespace GENAPI_NAMESPACE
     //! GenApi schema version
     typedef enum _EGenApiSchemaVersion
     {
-        v1_0 = 1,
-        v1_1 = 2,
-        _Undefined = -1
+        v1_0 = 1,        //!< Indicates schema version 1.0
+        v1_1 = 2,        //!< Indicates schema version 1.1
+        _Undefined = -1  //!< Indicates undefined version
     } EGenApiSchemaVersion;
+
+    //! typedef for callback suppression mod
+    //! \ingroup GenApi_PublicImpl
+    typedef enum _ECallbackSuppressMode
+    {
+        csmOff = 0, //!< Indicates suppression is turned off
+        csmActive,  //!< Indicates suppression is active
+        csmOnce     //!< Indicates suppression is used once
+    } ECallbackSuppressMode;
 
 }
 

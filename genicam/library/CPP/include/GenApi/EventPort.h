@@ -51,7 +51,10 @@ namespace GENAPI_NAMESPACE
 
         //! Destructor; detaches from the port
         ~CEventPort();
-
+    private:
+        CEventPort(const CEventPort&);             // copy constructor not implemented
+        CEventPort& operator =(const CEventPort&); // assignment operator is not implemented
+    public:
         //-------------------------------------------------------------
         // IPortConstruct implementation
         //-------------------------------------------------------------

@@ -100,6 +100,9 @@ namespace GENAPI_NAMESPACE
         //! Execute the transaction
         virtual bool ConcatenatedWrite(CNodeWriteConcatenator *, bool featureStreaming = true, GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL) = 0;
 
+        //! Set suppress callback mode
+        virtual void SetSuppressCallbackMode(ECallbackSuppressMode) = 0;
+
     };
 }
 

@@ -122,10 +122,16 @@ namespace GENICAM_NAMESPACE
         virtual size_t      length                ( void )                  const;
         virtual size_t      size                  ( void )                  const;
         virtual void        resize                ( size_t n );
+        virtual void        reserve               ( size_t n = 0 );
+        virtual gcstring &  erase                 ( size_t pos, size_t len = GCSTRING_NPOS );
         virtual size_t      max_size              ( )                       const;
         virtual gcstring    substr                ( size_t offset = 0, size_t count = GCSTRING_NPOS ) const;
         virtual size_t      find_first_of         ( const gcstring &str, size_t offset = 0 ) const;
         virtual size_t      find_first_not_of     ( const gcstring &str, size_t offset = 0 ) const;
+        virtual size_t      find_last_of          ( const gcstring& str, size_t offset = GCSTRING_NPOS ) const;
+        virtual size_t      find_last_of          ( char c, size_t offset = GCSTRING_NPOS ) const;
+        virtual size_t      find_last_not_of      ( const gcstring& str, size_t offset = GCSTRING_NPOS ) const;
+        virtual size_t      find_last_not_of      ( char c, size_t offset = GCSTRING_NPOS ) const;
         static size_t       _npos                 ( void );
         virtual void        swap                  ( gcstring &Right );
 

@@ -88,8 +88,8 @@ namespace GENAPI_NAMESPACE
             virtual uint64_t GetNumNodes() const;
             virtual CNodeWriteConcatenator *NewNodeWriteConcatenator() const;
             virtual bool ConcatenatedWrite(CNodeWriteConcatenator *, bool featureStreaming = true, GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL);
-
             virtual bool ParseSwissKnifes( GENICAM_NAMESPACE::gcstring_vector *pErrorList = NULL ) const;
+            virtual void SetSuppressCallbackMode(ECallbackSuppressMode mode);
         //@}
 
         //-------------------------------------------------------------
@@ -101,12 +101,15 @@ namespace GENAPI_NAMESPACE
             virtual INodePrivate* GetNodeByID(NodeID_t NodeID);
             virtual void SetProperty(CProperty &Property);
             virtual bool GetProperty(CNodeDataMap *pNodeDataMap, CPropertyID::EProperty_ID_t PropertyID, CNodeData::PropertyVector_t &PropertyList) const;
+            virtual bool IsCallbackSuppressed() { return m_suppressCallback!=csmOff; };
             virtual Counter& GetBathometer() { return m_Bathometer; }
-            virtual void SetEntryPoint(EMethod EntryMethod, const INodePrivate *pEntryNode, bool IgnoreCache);
+            virtual void SetEntryPoint(EMethod EntryMethod, const INodePrivate *pEntryNode, bool stremable, bool IgnoreCache);
             virtual void ResetEntryPoint();
             virtual GENICAM_NAMESPACE::gcstring GetEntryPoint();
             virtual bool IsGenApiLoggingEnabled();
             virtual bool IsGenApiDeviceLoggingEnabled();
+            virtual bool EntryIsStremable();
+            virtual void SetGenApiPersistenceMode(bool);
             //@}
 
         //-------------------------------------------------------------
@@ -213,6 +216,9 @@ namespace GENAPI_NAMESPACE
         //-------------------------------------------------------------
 
         //! counts the depth of SetValue call-chains
+        uint64_t m_suppressCallback;
+
+        //! counts the depth of SetValue call-chains
         Counter m_Bathometer;
 
         //! The node where a call entered the tree
@@ -227,6 +233,9 @@ namespace GENAPI_NAMESPACE
         //! Indicates if the entry point had the Ignore Cache flag set
         bool m_EntryPointIgnoreCache;
 
+        //! Indicate if the entry point has the stremable flag
+        bool m_EntryPointStreamable;
+
         //! List of pointers to nodes which need to be polled
         NodePrivateVector_t* m_pPollingNodes;
 
@@ -235,6 +244,9 @@ namespace GENAPI_NAMESPACE
 
         //! indicates GenApi logging is enabled (caches the returnvalue of CLog::Exists("GenApi.Device") )
         bool m_GenApiDeviceLoggingEnabled;
+
+        //! indicates who GenApi deals with the verify flag.
+        bool m_GenApiPersistenceMode;
 
     private:
         //! The own lock guarding access to the node map
@@ -253,6 +265,32 @@ namespace GENAPI_NAMESPACE
     private:
         std::list<CPort *> m_connectedPort;
 
+    protected:
+    
+    //! Used to ensure that PostSetValue() is called in any case
+    class EntryMethodFinalizer
+    {
+    public:
+        //! Constructor
+        EntryMethodFinalizer(CNodeMap* pThis)
+        {
+            assert(pThis);
+            m_pNodeMapPrivate = pThis;
+        }
+
+        //! Destructor calling 
+        ~EntryMethodFinalizer()
+        {
+            if (m_pNodeMapPrivate->m_suppressCallback == csmOnce)
+            {
+                m_pNodeMapPrivate->m_suppressCallback = csmOff;
+            }
+        }
+
+    private:
+        //! Private cache for the INodeMapPrivate pointer
+        CNodeMap* m_pNodeMapPrivate;
+    };
 
         //-------------------------------------------------------------
         // No copying of this class

@@ -44,7 +44,7 @@ namespace GENAPI_NAMESPACE
 
 #   ifdef _MSC_VER
 #       pragma warning ( push )
-#       pragma warning ( disable : 4996 ) // depcretaced function
+#       pragma warning ( disable : 4996 ) // deprecated function
 #   endif
     /**
         \brief Implementation of the IRegister interface
@@ -62,7 +62,7 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meSet );
+                typename Base::EntryMethodFinalizer E(this, meSet, Base::IsStreamable());
 
                 // logging the set
                 if (Base::m_pValueLog && GENICAM_NAMESPACE::CLog::Exist( "" ))
@@ -97,8 +97,10 @@ namespace GENAPI_NAMESPACE
                     }
                 }
 
-                if( Verify && !IsWritable( this ) )
-                    throw  ACCESS_EXCEPTION_NODE("Node is not writable");
+                if (!Base::CanBeWritten( Verify ))
+                {
+                    throw  ACCESS_EXCEPTION_NODE( "Node is not writable" );
+                }
 
                 {
                     typename Base::PostSetValueFinalizer PostSetValueCaller(this, CallbacksToFire);  // dtor calls Base::PostSetValue
@@ -135,7 +137,7 @@ namespace GENAPI_NAMESPACE
         virtual void Get(uint8_t *pBuffer, int64_t Length, bool Verify = false, bool IgnoreCache = false)
         {
             AutoLock l(Base::GetLock());
-            typename Base::EntryMethodFinalizer E( this, meGet, IgnoreCache );
+            typename Base::EntryMethodFinalizer E(this, meGet, Base::IsStreamable(), IgnoreCache);
 
             GCLOGINFOPUSH( Base::m_pValueLog, "Get...");
 

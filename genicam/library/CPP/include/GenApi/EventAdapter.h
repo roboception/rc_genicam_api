@@ -53,7 +53,10 @@ namespace GENAPI_NAMESPACE
 
         //! Destructor
         virtual ~CEventAdapter();
-
+    private:
+        CEventAdapter(const CEventAdapter&);             // copy constructor not implemented
+        CEventAdapter& operator=(const CEventAdapter &); // assignment operator is not implemented
+    public:
         //! Attaches to a node map and retrieves the chunk ports
         virtual void AttachNodeMap(INodeMap* pNodeMap);
 

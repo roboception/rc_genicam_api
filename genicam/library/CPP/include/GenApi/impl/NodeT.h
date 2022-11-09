@@ -85,6 +85,7 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
+                typename Base::EntryMethodFinalizer E(this, meInvalidateNode);
 
                 Base::InternalInvalidateNode( CallbacksToFire );
 
@@ -173,7 +174,7 @@ namespace GENAPI_NAMESPACE
         {
             AutoLock l(Base::GetLock());
 
-            return Base::InternalGetChildren( Children, LinkType );
+            Base::InternalGetChildren( Children, LinkType );
         }
 
         //! Implementation of INode::RegisterCallback()

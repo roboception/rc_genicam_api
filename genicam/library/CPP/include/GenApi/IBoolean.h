@@ -50,7 +50,7 @@ namespace GENAPI_NAMESPACE
     \brief Interface for Boolean  properties
     \ingroup GenApi_PublicInterface
     */
-    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IBoolean   : virtual public IValue
+    GENICAM_INTERFACE GENAPI_DECL_ABSTRACT IBoolean : virtual public IValue
     {
     public:
         //! Set node value
@@ -61,7 +61,11 @@ namespace GENAPI_NAMESPACE
         virtual void SetValue(bool Value, bool Verify = true) = 0;
 
         //! Set node value
-        virtual void operator=(bool Value){ SetValue( Value ); }
+        virtual IBoolean& operator=(bool Value)
+        {
+            SetValue( Value );
+            return *this;
+        }
 
         //! Get node value
         /*!
@@ -99,42 +103,46 @@ namespace GENAPI_NAMESPACE
         //! Set node value
         virtual void SetValue(bool Value, bool Verify = true)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->SetValue(Value, Verify);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->SetValue( Value, Verify );
+            }
             else
-                throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
-
-            // unused param *JS* (removed warning)
-            GC_UNUSED(Verify);
+            {
+                throw ACCESS_EXCEPTION( "Feature not present (reference not valid)" );
+            }
         }
 
         //! Set node value
-        virtual void operator=(bool Value)
+        virtual CBooleanRefT& operator=(bool Value)
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator=(Value);
+            if (ref::m_Ptr)
+            {
+                ref::m_Ptr->operator=(Value);
+            }
             else
+            {
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            }
+
+            return *this;
         }
 
         //! Get node value
         virtual bool GetValue(bool Verify = false, bool IgnoreCache = false) const
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->GetValue(Verify, IgnoreCache);
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->GetValue(Verify, IgnoreCache);
         }
 
         //! Get node value
         virtual bool operator()() const
         {
-            if(ref::m_Ptr)
-                return ref::m_Ptr->operator()();
-            else
+            if(!ref::m_Ptr)
                 throw ACCESS_EXCEPTION("Feature not present (reference not valid)");
+            return ref::m_Ptr->operator()();
         }
-
     };
 
     //! Reference to an IBoolean pointer
@@ -142,8 +150,6 @@ namespace GENAPI_NAMESPACE
     typedef CBooleanRefT<IBoolean> CBooleanRef;
 
 #endif
-
-
 
 }
 

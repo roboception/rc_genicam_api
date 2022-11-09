@@ -53,12 +53,14 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meSetValue );
+                typename Base::EntryMethodFinalizer E(this, meSetValue, Base::IsStreamable());
 
                 GCLOGINFOPUSH( Base::m_pValueLog, "SetValue( '%s' )...", Value.c_str() );
 
-                if( Verify && !IsWritable( this ) )
-                    throw  ACCESS_EXCEPTION_NODE("Node is not writable");
+                if (!Base::CanBeWritten( Verify ))
+                {
+                    throw  ACCESS_EXCEPTION_NODE( "Node is not writable" );
+                }
 
                 {
                     typename Base::PostSetValueFinalizer PostSetValueCaller(this, CallbacksToFire);  // dtor calls Base::PostSetValue

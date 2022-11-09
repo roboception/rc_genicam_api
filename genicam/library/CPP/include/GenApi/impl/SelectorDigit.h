@@ -59,6 +59,7 @@ namespace GENAPI_NAMESPACE
         virtual bool SetNext(bool Tick = true);
         virtual void Restore();
         virtual GENICAM_NAMESPACE::gcstring ToString();
+        virtual void GetState(CSelectorState &state);
         virtual void GetSelectorList( GENAPI_NAMESPACE::FeatureList_t &SelectorList, bool Incremental = false );
 
     protected:
@@ -98,6 +99,7 @@ namespace GENAPI_NAMESPACE
         virtual bool SetNext(bool Tick = true);
         virtual void Restore();
         virtual GENICAM_NAMESPACE::gcstring ToString();
+        virtual void GetState(CSelectorState &state);
         virtual void GetSelectorList( GENAPI_NAMESPACE::FeatureList_t &SelectorList, bool Incremental = false );
 
     protected:
@@ -124,6 +126,7 @@ namespace GENAPI_NAMESPACE
         virtual bool SetNext( bool Tick = true );
         virtual void Restore();
         virtual GENICAM_NAMESPACE::gcstring ToString();
+        virtual void GetState( CSelectorState& state );
         virtual void GetSelectorList( GENAPI_NAMESPACE::FeatureList_t& SelectorList, bool Incremental = false );
     private:
         CBooleanPtr m_ptrBoolSelector;

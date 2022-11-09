@@ -79,6 +79,9 @@ namespace GENAPI_NAMESPACE
         CLexer();
         ~CLexer();
         char* GetCurrentPos();
+    private:
+        CLexer(const CLexer&);            // copy constructor is not implemented
+        CLexer operator =(const CLexer&); // assignment operator is not implemented
     };
     
 } /* GENAPI_NAMESPACE*/

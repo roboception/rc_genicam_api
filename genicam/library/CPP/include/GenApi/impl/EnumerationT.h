@@ -50,7 +50,7 @@ namespace GENAPI_NAMESPACE
         {
             AutoLock l(Base::GetLock());
 
-            return Base::InternalGetSymbolics(Symbolics);
+            Base::InternalGetSymbolics(Symbolics);
         }
 
         //! Implementation of IEnumeration::GetEntries()
@@ -58,7 +58,7 @@ namespace GENAPI_NAMESPACE
         {
             AutoLock l(Base::GetLock());
 
-            return Base::InternalGetEntries(Entries);
+            Base::InternalGetEntries(Entries);
         }
 
         //! Implementation of IEnumeration::operator=()
@@ -75,12 +75,14 @@ namespace GENAPI_NAMESPACE
             std::list<CNodeCallback*> CallbacksToFire;
             {
                 AutoLock l(Base::GetLock());
-                typename Base::EntryMethodFinalizer E( this, meSetIntValue );
+                typename Base::EntryMethodFinalizer E(this, meSetIntValue, Base::IsStreamable());
 
                 GCLOGINFOPUSH( Base::m_pValueLog, "SetIntValue( %" FMT_I64 "d )...", Value );
 
-                if( Verify && !IsWritable( this ) )
-                    throw ACCESS_EXCEPTION_NODE("Node is not writable.");
+                if (!Base::CanBeWritten( Verify ))
+                {
+                    throw ACCESS_EXCEPTION_NODE( "Node is not writable." );
+                }
 
                 {
                     typename Base::PostSetValueFinalizer PostSetValueCaller(this, CallbacksToFire);  // dtor calls Base::PostSetValue
@@ -121,7 +123,7 @@ namespace GENAPI_NAMESPACE
         virtual int64_t GetIntValue(bool Verify = false, bool IgnoreCache = false)
         {
             AutoLock l(Base::GetLock());
-            typename Base::EntryMethodFinalizer E( this, meGetIntValue, IgnoreCache );
+            typename Base::EntryMethodFinalizer E(this, meGetIntValue, Base::IsStreamable(), IgnoreCache);
 
             GCLOGINFOPUSH( Base::m_pValueLog, "GetIntValue...");
 

@@ -34,7 +34,7 @@
 #include <sstream>
 #include <cctype>
 #include <iomanip>
-
+#include <utility>
 #include "Base/GCBase.h"
 #include "../GenApiDll.h"
 #include "PolyReference.h"
@@ -124,7 +124,10 @@ namespace GENAPI_NAMESPACE
     GENAPI_DECL void Value2String(uint8_t *pValue, GENICAM_NAMESPACE::gcstring &ValueStr, int64_t len);
 
     //! Converts a string to a byte array
-    GENAPI_DECL bool String2Value(const GENICAM_NAMESPACE::gcstring &ValueStr, uint8_t *pValue, int64_t len);
+    typedef std::pair<bool, int64_t> String2Value_ReturnType;
+
+    GENAPI_DECL bool String2Value(const GENICAM_NAMESPACE::gcstring &ValueStr, uint8_t * pValue, const int64_t len, int64_t *filled);
+    GENAPI_DECL bool String2Value( const GENICAM_NAMESPACE::gcstring& ValueStr, uint8_t* pValue, int64_t len );
 
     //! Converts a string to a bool value
     GENAPI_DECL bool String2Value( const GENICAM_NAMESPACE::gcstring &ValueStr, bool* pValue );
