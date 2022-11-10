@@ -122,102 +122,21 @@ int main(int argc, char *argv[])
 
                 std::cout << "Input file length: " << data.size() << std::endl;
 
-                // store in pieces of 512 bytes
-
-                GenApi::FileProtocolAdapter rf;
-                rf.attach(nodemap->_Ptr);
-
-                if (rf.openFile(devfile.c_str(), std::ios::out))
-                {
-                  size_t off=0, n=512;
-                  while (n > 0)
-                  {
-                    n=rf.write(data.c_str()+off, off, std::min(static_cast<size_t>(512), data.size()-off),
-                               devfile.c_str());
-                    off+=n;
-                  }
-
-                  rf.closeFile(devfile.c_str());
-
-                  std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
-
-                  if (off != data.size())
-                  {
-                    std::cerr << "Error: Can only write " << off << " of " << data.size() << " bytes" << std::endl;
-                  }
-                }
-                else
-                {
-                  std::cerr << "ERROR: Failed to open remote file!" << std::endl;
-                }
+                rcg::saveFile(nodemap, devfile.c_str(), data, true);
               }
               else if (op == "-r" || op == "")
               {
-                // load file in pieces of 512 bytes
+                std::string data=rcg::loadFile(nodemap, devfile.c_str(), true);
 
-                GenApi::FileProtocolAdapter rf;
-                rf.attach(nodemap->_Ptr);
-
-                if (rf.openFile(devfile.c_str(), std::ios::in))
+                if (op == "-r")
                 {
-                  size_t length=std::numeric_limits<size_t>::max();
-                  try
-                  {
-                    // limit read operation to file size, if available
-                    length=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
-                  }
-                  catch (const std::exception &)
-                  { }
-
-                  std::ofstream out;
-                  if (op == "-r") out.open(file);
-
-                  size_t off=0, n=512;
-                  std::vector<char> buffer(512);
-
-                  while (n > 0 && length > 0)
-                  {
-                    n=rf.read(buffer.data(), off, std::min(length, buffer.size()), devfile.c_str());
-
-                    if (n == 0)
-                    {
-                      // workaround for reading last partial block if camera reports failure
-
-                      n=rcg::getInteger(nodemap, "FileOperationResult");
-
-                      if (n > 0)
-                      {
-                        n=rf.read(buffer.data(), off, n, devfile.c_str());
-                      }
-                    }
-
-                    if (n > 0)
-                    {
-                      if (out.is_open())
-                      {
-                        out.write(buffer.data(), n);
-                      }
-                      else
-                      {
-                        std::cout.write(buffer.data(), n);
-                      }
-                    }
-
-                    off+=n;
-                    length-=n;
-                  }
-
+                  std::ofstream out(file);
+                  out << data;
                   out.close();
-                  rf.closeFile(devfile.c_str());
-
-                  if (op == "-r")
-                  {
-                    std::cout << "Status: " << rcg::getString(nodemap, "FileOperationStatus") << std::endl;
-                  }
                 }
                 else
                 {
-                  std::cerr << "Error: Cannot open remote file: " << devfile << std::endl;
+                  std::cout << data;
                 }
               }
               else

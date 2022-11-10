@@ -38,12 +38,14 @@
 
 #include <stdexcept>
 #include <iomanip>
+#include <limits>
 
 #include "Base/GCException.h"
 
 #include <GenApi/ChunkAdapterGEV.h>
 #include <GenApi/ChunkAdapterU3V.h>
 #include <GenApi/ChunkAdapterGeneric.h>
+#include <GenApi/Filestream.h>
 
 #include <rc_genicam_api/pixel_formats.h>
 
@@ -1006,6 +1008,114 @@ std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodema
   }
 
   return component;
+}
+
+std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                     bool exception)
+{
+  std::string ret;
+
+  // load file in pieces of 512 bytes
+
+  GenApi::FileProtocolAdapter rf;
+  rf.attach(nodemap->_Ptr);
+
+  if (rf.openFile(name, std::ios::in))
+  {
+    size_t length=std::numeric_limits<size_t>::max();
+    try
+    {
+      // limit read operation to file size, if available
+      length=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
+    }
+    catch (const std::exception &)
+    { }
+
+    size_t off=0, n=512;
+    std::vector<char> buffer(512);
+
+    while (n > 0 && length > 0)
+    {
+      n=rf.read(buffer.data(), off, std::min(length, buffer.size()), name);
+
+      if (n == 0)
+      {
+        // workaround for reading last partial block if camera reports failure
+
+        n=rcg::getInteger(nodemap, "FileOperationResult");
+
+        if (n > 0)
+        {
+          n=rf.read(buffer.data(), off, n, name);
+        }
+      }
+
+      if (n > 0)
+      {
+        ret.append(buffer.data(), n);
+      }
+
+      off+=n;
+      length-=n;
+    }
+
+    rf.closeFile(name);
+  }
+  else
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(std::string("Cannot open file for reading: ")+name);
+    }
+  }
+
+  return ret;
+}
+
+bool saveFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  const std::string &data, bool exception)
+{
+  bool ret=true;
+
+  // store in pieces of 512 bytes
+
+  GenApi::FileProtocolAdapter rf;
+  rf.attach(nodemap->_Ptr);
+
+  if (rf.openFile(name, std::ios::out))
+  {
+    size_t off=0, n=512;
+    while (n > 0)
+    {
+      n=rf.write(data.c_str()+off, off, std::min(static_cast<size_t>(512), data.size()-off), name);
+      off+=n;
+    }
+
+    rf.closeFile(name);
+
+    if (off != data.size())
+    {
+      if (exception)
+      {
+        std::ostringstream out;
+        out << "Error: Can only write " << off << " of " << data.size() << " bytes";
+        throw std::invalid_argument(out.str());
+      }
+
+      ret=false;
+    }
+  }
+  else
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(std::string("Cannot open file for reading: ")+name);
+    }
+
+    ret=false;
+  }
+
+  return ret;
 }
 
 }

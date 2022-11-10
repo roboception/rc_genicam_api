@@ -314,6 +314,34 @@ class Buffer;
 std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                               const Buffer *buffer, uint32_t part);
 
+/**
+  Loads the contents of a file via the GenICam FileAccessControl interface.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of file.
+  @param exception True if an error should be signaled via exception.
+  @return          Value or an empty string in case of an error and exception
+                   is false.
+*/
+
+std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+                     bool exception=false);
+
+/**
+  Loads the contents of the given string as a file via the GenICam
+  FileAccessControl interface.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of file.
+  @param data      String with file contents.
+  @param exception True if an error should be signaled via exception.
+  @return          True if file has been written successfully. False in case of
+                   an error.
+*/
+
+bool saveFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  const std::string &data, bool exception=false);
+
 }
 
 #endif
