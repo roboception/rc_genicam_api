@@ -67,9 +67,14 @@ void CPort::Read(void *buffer, int64_t addr, int64_t length)
       throw GenTLException("CPort::Read()", gentl);
     }
 
-    if (size != static_cast<size_t>(length))
+    if (size == 0)
     {
-      throw GenTLException("CPort::Read(): Returned size not as expected");
+      throw GenTLException("CPort::Read(): Returned size is 0");
+    }
+
+    while (size < static_cast<size_t>(length))
+    {
+      reinterpret_cast<uint8_t *>(buffer)[size++]=0;
     }
   }
   else
