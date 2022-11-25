@@ -193,8 +193,9 @@ GenTLWrapper::GenTLWrapper(const std::string &filename)
 
   if (err != 0)
   {
+    std::string tmp=err;
     dlclose(lib);
-    throw std::invalid_argument(std::string("Cannot resolve GenTL symbol: ")+err);
+    throw std::invalid_argument(std::string("Cannot resolve GenTL symbol: ")+tmp);
   }
 }
 

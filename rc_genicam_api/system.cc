@@ -220,6 +220,7 @@ std::vector<std::shared_ptr<System> > System::getSystems()
   // get list of all available transport layer libraries
 
   std::vector<std::string> name=getAvailableGenTLs(system_path.c_str());
+  std::ostringstream info;
 
   // create list of systems according to the list, using either existing
   // systems or instantiating new ones
@@ -250,9 +251,12 @@ std::vector<std::shared_ptr<System> > System::getSystems()
         System *p=new System(name[i]);
         ret.push_back(std::shared_ptr<System>(p));
       }
-      catch (const std::exception &)
+      catch (const std::exception &ex)
       {
-        // ignore transport layers that cannot be used
+        // ignore transport layers that cannot be used, but collect reason
+        // for failure
+
+        info << ex.what() << std::endl;
       }
     }
   }
@@ -265,7 +269,8 @@ std::vector<std::shared_ptr<System> > System::getSystems()
 
   if (ret.size() == 0)
   {
-    throw GenTLException(std::string("No transport layers found in path ")+system_path);
+    info << "No transport layers found in path: " << system_path;
+    throw GenTLException(info.str());
   }
 
   return ret;
