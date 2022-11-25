@@ -49,6 +49,11 @@
 
 #include <rc_genicam_api/pixel_formats.h>
 
+#ifdef _WIN32
+#undef min
+#undef max
+#endif
+
 namespace rcg
 {
 
