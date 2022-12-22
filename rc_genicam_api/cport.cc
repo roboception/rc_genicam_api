@@ -230,7 +230,7 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
     {
       // interpret local URL
 
-      size_t i=6;
+      size_t i=5;
       if (url.compare(i, 3, "///") == 0)
       {
         i+=3;
