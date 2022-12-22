@@ -370,7 +370,7 @@ std::vector<std::shared_ptr<Interface> > System::getInterfaces()
 
     // update available interfaces
 
-    if (gentl->TLUpdateInterfaceList(tl, 0, 10) != GenTL::GC_ERR_SUCCESS)
+    if (gentl->TLUpdateInterfaceList(tl, 0, GENTL_INFINITE) != GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("System::getInterfaces()", gentl);
     }
