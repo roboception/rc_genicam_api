@@ -119,8 +119,11 @@ bool System::setSystemsPath(const char *path, const char *ignore)
 {
   std::lock_guard<std::recursive_mutex> lock(system_mtx);
 
-  if (system_path.size() == 0)
+  if (system_list.size() == 0)
   {
+    system_path="";
+    system_ignore="";
+
     if (path == 0 || path[0] == '\0')
     {
 #ifdef _WIN32

@@ -65,8 +65,8 @@ class System : public std::enable_shared_from_this<System>
       Set the path for finding GenTL producers on the file system and the name
       of a producer that should be ignored.
 
-      NODE: This function must be called before the first call to getSystems().
-      It can only be called once.
+      NODE: This function must be called before the first call to getSystems()
+      or after calling clearSystems().
 
       If this function is not called before calling getSystems() for the first
       time, then the path is taken from the environment variable
