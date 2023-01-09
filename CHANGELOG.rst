@@ -1,3 +1,12 @@
+2.6.1 (2023-01-09)
+------------------
+
+- Fixed resetting of systems so that setSystemsPath() can be called again
+- Report reason if loading of producer fails
+- Fixed compiling under Windows
+- Fixed reading registers with size that is less than the requested size
+- Added convenience functions for loading and storing data on the camera via GenICam file interface
+
 2.6.0 (2022-11-09)
 ------------------
 
