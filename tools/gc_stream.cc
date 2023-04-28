@@ -335,6 +335,18 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
       catch (const std::exception &)
       { }
 
+      for (int i=0; i<4; i++)
+      {
+        try
+        {
+          rcg::setEnum(nodemap, "ChunkLineSelector", ("Out"+std::to_string(i)).c_str(), true);
+          float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcLineRatio", 0, 0, true));
+          out << "camera.out" << i << "_ratio=" << v << std::endl;
+        }
+        catch (const std::exception &)
+        { }
+      }
+
       if (scale > 0)
       {
         out << "disp.inv=" << inv << std::endl;
