@@ -33,269 +33,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "nodemap_io.h"
+
 #include <rc_genicam_api/system.h>
 #include <rc_genicam_api/interface.h>
 #include <rc_genicam_api/device.h>
 #include <rc_genicam_api/stream.h>
-#include <rc_genicam_api/config.h>
 
 #include <iostream>
-
-namespace
-{
-
-/**
-  Returns the access mode of a node as string.
-
-  @param node Node.
-  @return     String with access mode.
-*/
-
-const char *getAccessMode(const GenApi::INode *node)
-{
-  switch (node->GetAccessMode())
-  {
-    case GenApi::NI:
-      return "(NI)";
-
-    case GenApi::NA:
-      return "(NA)";
-
-    case GenApi::WO:
-      return "(WO)";
-
-    case GenApi::RO:
-      return "(RO)";
-
-    case GenApi::RW:
-      return "(RW)";
-
-    case GenApi::_UndefinedAccesMode:
-      return "(undefined access mode)";
-
-    case GenApi::_CycleDetectAccesMode:
-      return "(cycle detection)";
-
-    default:
-      return "(unknown)";
-  }
-}
-
-/**
-  Takes an integer value and formats it according to the specification in the
-  node.
-
-  @param node  Node.
-  @param value Integer value.
-  @return      Formated value.
-*/
-
-std::string formatValue(GenApi::IInteger *node, int64_t value)
-{
-  std::ostringstream out;
-
-  switch (node->GetRepresentation())
-  {
-    case GenApi::HexNumber:
-      out << "0x" << std::hex << value;
-      break;
-
-    case GenApi::IPV4Address:
-       out << ((value>>24)&0xff) << '.' << ((value>>16)&0xff) << '.'
-           << ((value>>8)&0xff) << '.' << (value&0xff);
-       break;
-
-    case GenApi::MACAddress:
-       out << std::hex << ((value>>40)&0xff) << ':' << ((value>>32)&0xff) << ':'
-                       << ((value>>24)&0xff) << ':' << ((value>>16)&0xff) << ':'
-                       << ((value>>8)&0xff) << ':' << (value&0xff);
-       break;
-
-    default:
-      out << value;
-      break;
-  }
-
-  return out.str();
-}
-
-/**
-  Recursive printing of nodes to standard out.
-
-  @param prefix Prefix that will be prepended to every line.
-  @param node   Node to be printed.
-  @param depth  This value is reduced when calling printNode() recursively on
-                category nodes. If the value is <= 0, then no recursion is
-                done.
-*/
-
-void printNode(const std::string &prefix, GenApi::INode *node, int depth)
-{
-  if (node != 0 && node->GetAccessMode() != GenApi::NI)
-  {
-    switch (node->GetPrincipalInterfaceType())
-    {
-      case GenApi::intfIValue:
-        std::cout << prefix << "Value: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
-        break;
-
-      case GenApi::intfIBase:
-        std::cout << prefix << "Base: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
-        break;
-
-      case GenApi::intfIInteger:
-        {
-          std::cout << prefix << "Integer: " << node->GetName() << " "
-                    << getAccessMode(node) << " ";
-
-          GenApi::IInteger *p=dynamic_cast<GenApi::IInteger *>(node);
-
-          if (GenApi::IsReadable(p))
-          {
-            std::cout << "[" << formatValue(p, p->GetMin()) << ", "
-                      << formatValue(p, p->GetMax()) << "]: ";
-            std::cout << formatValue(p, p->GetValue()) << " " << p->GetUnit();
-          }
-
-          std::cout << std::endl;
-        }
-        break;
-
-      case GenApi::intfIBoolean:
-        {
-          std::cout << prefix << "Boolean: " << node->GetName() << " " << getAccessMode(node);
-
-          GenApi::IBoolean *p=dynamic_cast<GenApi::IBoolean *>(node);
-
-          if (GenApi::IsReadable(p))
-          {
-            std::cout << ": " << p->GetValue();
-          }
-
-          std::cout << std::endl;
-        }
-        break;
-
-      case GenApi::intfICommand:
-        std::cout << prefix << "Command: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
-        break;
-
-      case GenApi::intfIFloat:
-        {
-          std::cout << prefix << "Float: " << node->GetName() << " " << getAccessMode(node)
-                    << " ";
-
-          GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
-
-          if (GenApi::IsReadable(p))
-          {
-            std::cout << "[" << p->GetMin() << ", "
-                      << p->GetMax() << "]: "
-                      << p->GetValue() << " " << p->GetUnit();
-          }
-
-          std::cout << std::endl;
-        }
-        break;
-
-      case GenApi::intfIString:
-        {
-          std::cout << prefix << "String: " << node->GetName() << " " << getAccessMode(node)
-                    << ": ";
-
-          GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
-
-          if (GenApi::IsReadable(p))
-          {
-            std::cout << p->GetValue();
-          }
-
-          std::cout << std::endl;
-        }
-        break;
-
-      case GenApi::intfIRegister:
-        std::cout << prefix << "Register: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
-        break;
-
-      case GenApi::intfICategory:
-        {
-          std::cout << prefix << "Category: " << node->GetName() << " "
-                    << getAccessMode(node) << std::endl;
-
-          if (depth > 0)
-          {
-            GenApi::ICategory *root=dynamic_cast<GenApi::ICategory *>(node);
-
-            if (root != 0)
-            {
-              GenApi::FeatureList_t feature;
-              root->GetFeatures(feature);
-
-              for (size_t i=0; i<feature.size(); i++)
-              {
-                printNode(prefix+"  ", feature[i]->GetNode(), depth-1);
-              }
-            }
-          }
-        }
-        break;
-
-      case GenApi::intfIEnumeration:
-        {
-          std::cout << prefix << "Enumeration: " << node->GetName() << " " << getAccessMode(node)
-                    << ' ';
-
-          GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
-
-          if (p != nullptr)
-          {
-            std::cout << '[';
-
-            GenApi::StringList_t list;
-            p->GetSymbolics(list);
-
-            for (size_t i=0; i<list.size(); i++)
-            {
-              if (i > 0)
-              {
-                std::cout << ' ';
-              }
-
-              std::cout << list[i];
-            }
-
-            std::cout << "]: ";
-
-            if (GenApi::IsReadable(p->GetAccessMode()) && p->GetCurrentEntry() != 0)
-            {
-              std::cout << p->GetCurrentEntry()->GetSymbolic();
-            }
-          }
-
-          std::cout << std::endl;
-        }
-        break;
-
-      case GenApi::intfIEnumEntry:
-        std::cout << prefix << "EnumEntry: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
-        break;
-
-      case GenApi::intfIPort:
-        std::cout << prefix << "Port: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
-        break;
-
-    }
-  }
-}
-
-}
 
 int main(int argc, char *argv[])
 {
@@ -509,7 +254,7 @@ int main(int argc, char *argv[])
                 std::cout << std::endl;
 
                 std::cout << "Available features:" << std::endl;
-                printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth);
+                printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth, true);
               }
               else
               {
@@ -519,7 +264,7 @@ int main(int argc, char *argv[])
 
                 if (p)
                 {
-                  printNode(std::string(), p, depth);
+                  printNode(std::string(), p, depth, true);
                 }
                 else
                 {
