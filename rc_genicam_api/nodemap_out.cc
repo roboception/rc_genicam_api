@@ -33,9 +33,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nodemap_io.h"
+#include "nodemap_out.h"
 
 #include <iostream>
+
+#ifdef USE_NCURSES
+#include <ncurses.h>
+#endif
+
+namespace rcg
+{
 
 namespace
 {
@@ -77,14 +84,7 @@ const char *getAccessMode(const GenApi::INode *node)
   }
 }
 
-/**
-  Takes an integer value and formats it according to the specification in the
-  node.
-
-  @param node  Node.
-  @param value Integer value.
-  @return      Formated value.
-*/
+}
 
 std::string formatValue(GenApi::IInteger *node, int64_t value)
 {
@@ -113,8 +113,6 @@ std::string formatValue(GenApi::IInteger *node, int64_t value)
   }
 
   return out.str();
-}
-
 }
 
 void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool show_enum_list)
@@ -288,4 +286,21 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool s
 
     }
   }
+}
+
+bool printNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[],
+  int depth, bool show_enum_list)
+{
+  GenApi::INode *p=nodemap->_GetNode(root);
+  bool ret=false;
+
+  if (p)
+  {
+    printNode(std::string("  "), p, depth, show_enum_list);
+    ret=true;
+  }
+
+  return ret;
+}
+
 }

@@ -46,6 +46,7 @@ set(src
   imagelist.cc
   image_store.cc
   pointcloud.cc
+  nodemap_out.cc
   ${CMAKE_CURRENT_BINARY_DIR}/project_version.cc
   $<$<PLATFORM_ID:Linux>:gentl_wrapper_linux.cc>
   $<$<PLATFORM_ID:Windows>:gentl_wrapper_win32.cc>)
@@ -62,6 +63,7 @@ set(hh
   imagelist.h
   image_store.h
   pointcloud.h
+  nodemapout.h
   pixel_formats.h
   ${CMAKE_CURRENT_BINARY_DIR}/project_version.h)
 

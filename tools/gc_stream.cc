@@ -33,8 +33,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nodemap_io.h"
-
 #include <rc_genicam_api/system.h>
 #include <rc_genicam_api/interface.h>
 #include <rc_genicam_api/device.h>
@@ -43,6 +41,7 @@
 #include <rc_genicam_api/image.h>
 #include <rc_genicam_api/image_store.h>
 #include <rc_genicam_api/config.h>
+#include <rc_genicam_api/nodemap_out.h>
 
 #include <rc_genicam_api/pixel_formats.h>
 
@@ -712,14 +711,14 @@ int main(int argc, char *argv[])
 
                   if (print_chunk_data)
                   {
-                    GenApi::INode *p=nodemap->_GetNode("ChunkDataControl");
+                    std::cout << std::endl;
 
-                    if (p)
+                    if (!rcg::printNodemap(nodemap, "ChunkDataControl", 100, false))
                     {
-                      std::cout << std::endl;
-                      printNode(std::string("  "), p, 100, false);
-                      std::cout << std::endl;
+                      std::cout << "Cannot find node 'ChunkDataControl'" << std::endl;
                     }
+
+                    std::cout << std::endl;
                   }
                 }
                 else

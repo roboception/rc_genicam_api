@@ -33,12 +33,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nodemap_io.h"
-
 #include <rc_genicam_api/system.h>
 #include <rc_genicam_api/interface.h>
 #include <rc_genicam_api/device.h>
 #include <rc_genicam_api/stream.h>
+#include <rc_genicam_api/nodemap_out.h>
 
 #include <iostream>
 
@@ -254,19 +253,13 @@ int main(int argc, char *argv[])
                 std::cout << std::endl;
 
                 std::cout << "Available features:" << std::endl;
-                printNode(std::string("  "), nodemap->_GetNode(node.c_str()), depth, true);
+                rcg::printNodemap(nodemap, node.c_str(), depth, true);
               }
               else
               {
                 // report requested node only
 
-                GenApi::INode *p=nodemap->_GetNode(node.c_str());
-
-                if (p)
-                {
-                  printNode(std::string(), p, depth, true);
-                }
-                else
+                if (!rcg::printNodemap(nodemap, node.c_str(), depth, true))
                 {
                   std::cerr << "Unknown node: " << node << std::endl;
                   ret=1;

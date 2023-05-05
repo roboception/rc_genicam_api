@@ -35,7 +35,7 @@ project(tools CXX)
 
 # build programs
 
-add_executable(gc_info gc_info.cc nodemap_io.cc)
+add_executable(gc_info gc_info.cc)
 target_link_libraries(gc_info
   PRIVATE
       ${PROJECT_NAMESPACE}::rc_genicam_api_static)
@@ -47,7 +47,7 @@ target_link_libraries(gc_config
     ${PROJECT_NAMESPACE}::rc_genicam_api_static)
 target_compile_options(gc_config PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
-add_executable(gc_stream gc_stream.cc nodemap_io.cc)
+add_executable(gc_stream gc_stream.cc)
 target_link_libraries(gc_stream
   PRIVATE
     ${PROJECT_NAMESPACE}::rc_genicam_api_static)
