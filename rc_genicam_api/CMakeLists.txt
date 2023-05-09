@@ -64,7 +64,7 @@ set(hh
   imagelist.h
   image_store.h
   pointcloud.h
-  nodemapout.h
+  nodemap_out.h
   nodemap_edit.h
   pixel_formats.h
   ${CMAKE_CURRENT_BINARY_DIR}/project_version.h)
