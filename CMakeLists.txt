@@ -68,6 +68,9 @@ option(INSTALL_COMPLETION "Install bash completion" OFF)
 
 find_package(PNG)
 
+set(CURSES_NEED_NCURSES TRUE)
+find_package(Curses)
+
 # - Build individual parts -
 find_package(Genicam REQUIRED NO_CMAKE_PATH PATHS ${CMAKE_CURRENT_SOURCE_DIR}/genicam CONFIG NO_DEFAULT_PATH)
 add_library(${PROJECT_NAMESPACE}::genicam ALIAS genicam)

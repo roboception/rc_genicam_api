@@ -38,6 +38,7 @@
 #include <rc_genicam_api/device.h>
 #include <rc_genicam_api/stream.h>
 #include <rc_genicam_api/nodemap_out.h>
+#include <rc_genicam_api/nodemap_edit.h>
 
 #include <iostream>
 
@@ -158,6 +159,13 @@ int main(int argc, char *argv[])
           }
         }
 
+        bool edit=false;
+        if (k < argc && std::string(argv[k]) == "-e")
+        {
+          k++;
+          edit=true;
+        }
+
         if (k < argc)
         {
           // separate optional node name from device id
@@ -182,8 +190,7 @@ int main(int argc, char *argv[])
             }
           }
 
-          // find specific device accross all systems and interfaces and show some
-          // information
+          // find specific device accross all systems and interfaces
 
           std::shared_ptr<rcg::Device> dev=rcg::getDevice(devid.c_str());
 
@@ -191,7 +198,7 @@ int main(int argc, char *argv[])
           {
             // open device and optionally change some settings
 
-            if (k < argc)
+            if (k < argc || edit)
             {
               dev->open(rcg::Device::CONTROL);
             }
@@ -227,7 +234,15 @@ int main(int argc, char *argv[])
                 }
               }
 
-              if (depth > 1)
+              if (edit)
+              {
+                if (!rcg::editNodemap(nodemap, node.c_str()))
+                {
+                  std::cerr << "Unknown node: " << node << std::endl;
+                  ret=1;
+                }
+              }
+              else if (depth > 1)
               {
                 // report all features
 
@@ -288,7 +303,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -h | -l | -s | ([-o <xml-output-file>|.] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -h | -l | -s | ([-o <xml-output-file>|.] [-e] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Provides information about GenICam transport layers, interfaces and devices." << std::endl;
       std::cout << std::endl;
@@ -297,6 +312,7 @@ int main(int argc, char *argv[])
       std::cout << "-l   List all all available devices on all interfaces" << std::endl;
       std::cout << "-s   List all all available devices on all interfaces (short format)" << std::endl;
       std::cout << "-o   Store XML description from specified device" << std::endl;
+      std::cout << "-e   Open nodemap editor instead of printing nodemap" << std::endl;
       std::cout << std::endl;
       std::cout << "Parameters:" << std::endl;
       std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;

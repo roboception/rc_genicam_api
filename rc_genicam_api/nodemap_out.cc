@@ -284,6 +284,8 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool s
                   << std::endl;
         break;
 
+      default:
+        break;
     }
   }
 }
