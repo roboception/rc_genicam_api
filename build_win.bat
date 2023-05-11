@@ -91,7 +91,7 @@ cd ..\..\..
 
 echo ----- Build rc_genicam_api -----
 
-cd rc_genicam_api\build
+cd %INSTALL_PATH%\..
 
 if exist "build_rc_genicam_api\" (
   cd build_rc_genicam_api\
@@ -120,4 +120,6 @@ if not exist "%TARGET%\lib\" mkdir %TARGET%\lib
 copy %INSTALL_PATH%\lib\GCBase*lib %TARGET%\lib\
 copy %INSTALL_PATH%\lib\GenApi*lib %TARGET%\lib\
 copy %INSTALL_PATH%\lib\rc_genicam_api.lib %TARGET%\lib\
+if not exist "%TARGET%\lib\rc_genicam_api" mkdir %TARGET%\lib\rc_genicam_api
+copy %INSTALL_PATH%\lib\rc_genicam_api\* %TARGET%\lib\rc_genicam_api\
 
