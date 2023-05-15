@@ -928,122 +928,130 @@ bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char
 
   initscr();
 
-  curs_set(0);
-  keypad(stdscr, TRUE);
-  cbreak();
-  noecho();
-  nonl();
-
-  redraw(list, top_row, focus_row);
-
-  // enter navigation and editing loop
-
-  bool run=true;
-  while (run)
+  try
   {
-    move(0, 0);
-    int c=getch();
+    curs_set(0);
+    keypad(stdscr, TRUE);
+    cbreak();
+    noecho();
+    nonl();
 
-    switch (c)
+    redraw(list, top_row, focus_row);
+
+    // enter navigation and editing loop
+
+    bool run=true;
+    while (run)
     {
-      case KEY_RESIZE:
-        redraw(list, top_row, focus_row);
-        break;
+      move(0, 0);
+      int c=getch();
 
-      case KEY_PPAGE:
-        if (focus_row > 0)
-        {
-          int rows=getmaxy(stdscr);
-
-          if (rows > 1)
-          {
-            rows--;
-            top_row=std::max(0, top_row-rows);
-            focus_row=std::max(0, focus_row-rows);
-          }
-
+      switch (c)
+      {
+        case KEY_RESIZE:
           redraw(list, top_row, focus_row);
-        }
-        break;
+          break;
 
-      case KEY_NPAGE:
-        if (focus_row+1 < static_cast<int>(list.size()))
-        {
-          int rows=getmaxy(stdscr);
-
-          if (rows > 1)
+        case KEY_PPAGE:
+          if (focus_row > 0)
           {
-            rows--;
-            top_row=std::min(top_row+rows, std::max(0, static_cast<int>(list.size())-rows));
-            focus_row=std::min(focus_row+rows, static_cast<int>(list.size())-1);
-          }
+            int rows=getmaxy(stdscr);
 
-          redraw(list, top_row, focus_row);
-        }
-        break;
-
-      case KEY_UP:
-        if (focus_row > 0)
-        {
-          focus_row--;
-          redraw(list, top_row, focus_row);
-        }
-        break;
-
-      case KEY_DOWN:
-        if (focus_row+1 < static_cast<int>(list.size()))
-        {
-          focus_row++;
-          redraw(list, top_row, focus_row);
-        }
-        break;
-
-      case KEY_RIGHT:
-      case KEY_ENTER:
-      case '\n':
-      case '\r':
-        if (list[focus_row].isWritable())
-        {
-          // edit value
-
-          std::string message;
-
-          if (list[focus_row].isExecutable())
-          {
-            message=editNodeExecute(list, top_row, focus_row);
-          }
-          else
-          {
-            std::vector<std::string> option;
-            int current=list[focus_row].getOptions(option);
-
-            if (option.size() > 0)
+            if (rows > 1)
             {
-              message=editNodeOption(list, top_row, focus_row, option, current);
+              rows--;
+              top_row=std::max(0, top_row-rows);
+              focus_row=std::max(0, focus_row-rows);
+            }
+
+            redraw(list, top_row, focus_row);
+          }
+          break;
+
+        case KEY_NPAGE:
+          if (focus_row+1 < static_cast<int>(list.size()))
+          {
+            int rows=getmaxy(stdscr);
+
+            if (rows > 1)
+            {
+              rows--;
+              top_row=std::min(top_row+rows, std::max(0, static_cast<int>(list.size())-rows));
+              focus_row=std::min(focus_row+rows, static_cast<int>(list.size())-1);
+            }
+
+            redraw(list, top_row, focus_row);
+          }
+          break;
+
+        case KEY_UP:
+          if (focus_row > 0)
+          {
+            focus_row--;
+            redraw(list, top_row, focus_row);
+          }
+          break;
+
+        case KEY_DOWN:
+          if (focus_row+1 < static_cast<int>(list.size()))
+          {
+            focus_row++;
+            redraw(list, top_row, focus_row);
+          }
+          break;
+
+        case KEY_RIGHT:
+        case KEY_ENTER:
+        case '\n':
+        case '\r':
+          if (list[focus_row].isWritable())
+          {
+            // edit value
+
+            std::string message;
+
+            if (list[focus_row].isExecutable())
+            {
+              message=editNodeExecute(list, top_row, focus_row);
             }
             else
             {
-              message=editNodeString(list, top_row, focus_row);
+              std::vector<std::string> option;
+              int current=list[focus_row].getOptions(option);
+
+              if (option.size() > 0)
+              {
+                message=editNodeOption(list, top_row, focus_row, option, current);
+              }
+              else
+              {
+                message=editNodeString(list, top_row, focus_row);
+              }
             }
+
+            // redraw and show message
+
+            redraw(list, top_row, focus_row, message.c_str());
           }
+          break;
 
-          // redraw and show message
+        case 27:
+        case 'q':
+          run=false;
+          break;
 
-          redraw(list, top_row, focus_row, message.c_str());
-        }
-        break;
-
-      case 27:
-      case 'q':
-        run=false;
-        break;
-
-      default:
-        break;
+        default:
+          break;
+      }
     }
-  }
 
-  endwin();
+    endwin();
+  }
+  catch (...)
+  {
+    endwin();
+    throw;
+  }
 
   return true;
 }
