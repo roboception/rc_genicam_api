@@ -57,14 +57,28 @@ CPort::CPort(std::shared_ptr<const GenTLWrapper> _gentl, void **_port) : gentl(_
 
 void CPort::Read(void *buffer, int64_t addr, int64_t length)
 {
-  size_t size=static_cast<size_t>(length);
+  size_t size=0;
 
   if (*port != 0)
   {
-    if (gentl->GCReadPort(*port, static_cast<uint64_t>(addr), buffer, &size) !=
-        GenTL::GC_ERR_SUCCESS)
+    int retry=3;
+    GenTL::GC_ERROR err=GenTL::GC_ERR_ERROR;
+
+    while (err != GenTL::GC_ERR_SUCCESS && retry > 0)
     {
-      throw GenTLException("CPort::Read()", gentl);
+      retry--;
+
+      size=static_cast<size_t>(length);
+      err=gentl->GCReadPort(*port, static_cast<uint64_t>(addr), buffer, &size);
+    }
+
+    if (err != GenTL::GC_ERR_SUCCESS)
+    {
+      std::ostringstream out;
+      out << "CPort::Read(address=0x" << std::hex << addr << ", length=" <<
+        std::dec << static_cast<size_t>(length) << ")";
+
+      throw GenTLException(out.str(), gentl);
     }
 
     if (size == 0)
