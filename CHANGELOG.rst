@@ -1,3 +1,16 @@
+2.6.2 (2023-05-17)
+------------------
+
+- If available, use user defined name of device as display name
+- Moving function for printing (part of) nodemap from tools to library
+- gc_info:
+  - Added possibility to edit nodemap in curses gui
+- gc_stream:
+  - Storing ChunkRcLineRatio in properties, if available
+  - Added option to print chunk data
+- Fixed build_win.bat: Include cmake files and allow renaming of base directory
+- Fixed allocating too much memory in Image class
+
 2.6.1 (2023-01-09)
 ------------------
 
