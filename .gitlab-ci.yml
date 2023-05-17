@@ -2,7 +2,7 @@ before_script:
   - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME
   - echo -e "\e[0Ksection_start:`date +%s`:install_debs\r\e[0KInstall dependencies"
   - export DEBIAN_FRONTEND=noninteractive
-  - apt-get update -yq && apt-get install -y lintian libusb-1.0 libpng-dev
+  - apt-get update -yq && apt-get install -y lintian libusb-1.0 libpng-dev libncurses-dev
   - echo -e "\e[0Ksection_end:`date +%s`:install_debs\r\e[0K"
 
 variables:

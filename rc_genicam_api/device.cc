@@ -299,7 +299,18 @@ std::string Device::getTLType()
 std::string Device::getDisplayName()
 {
   std::lock_guard<std::mutex> lock(mtx);
-  return cDevGetInfo(this, gentl, GenTL::DEVICE_INFO_DISPLAYNAME);
+
+  // return user defined name if available, otherwise the display name that
+  // the producer provides
+
+  std::string ret=cDevGetInfo(this, gentl, GenTL::DEVICE_INFO_USER_DEFINED_NAME);
+
+  if (ret.size() == 0)
+  {
+    ret=cDevGetInfo(this, gentl, GenTL::DEVICE_INFO_DISPLAYNAME);
+  }
+
+  return ret;
 }
 
 std::string Device::getAccessStatus()
