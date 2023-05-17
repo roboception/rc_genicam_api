@@ -559,21 +559,24 @@ std::string NodeParam::execute()
 
 void addNodeToList(std::vector<NodeParam> &list, GenApi::INode *node, int level)
 {
-  list.push_back(NodeParam(level, node));
-
-  if (node->GetPrincipalInterfaceType() == GenApi::intfICategory)
+  if (node->GetAccessMode() != GenApi::NI)
   {
-    GenApi::ICategory *root=dynamic_cast<GenApi::ICategory *>(node);
+    list.push_back(NodeParam(level, node));
 
-    if (root != 0)
+    if (node->GetPrincipalInterfaceType() == GenApi::intfICategory)
     {
-      GenApi::FeatureList_t feature;
-      root->GetFeatures(feature);
+      GenApi::ICategory *root=dynamic_cast<GenApi::ICategory *>(node);
 
-      level++;
-      for (size_t i=0; i<feature.size(); i++)
+      if (root != 0)
       {
-        addNodeToList(list, feature[i]->GetNode(), level);
+        GenApi::FeatureList_t feature;
+        root->GetFeatures(feature);
+
+        level++;
+        for (size_t i=0; i<feature.size(); i++)
+        {
+          addNodeToList(list, feature[i]->GetNode(), level);
+        }
       }
     }
   }
