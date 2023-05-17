@@ -1066,9 +1066,10 @@ bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char
 namespace rcg
 {
 
-void editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[])
+bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[])
 {
   std::cerr << "Editing of nodemap is not implemented! Recompile with ncurses." << std::endl;
+  return false;
 }
 
 }

@@ -103,12 +103,16 @@ if (PNG_FOUND)
   include_directories(${PNG_INCLUDE_DIRS})
   add_definitions(-DINCLUDE_PNG)
   add_definitions(${PNG_DEFINITIONS})
+else ()
+  set(PNG_LIBRARIES)
 endif ()
 
 if (CURSES_FOUND)
   include_directories(${CURSES_INCLUDE_DIRS})
   add_definitions(-DINCLUDE_CURSES)
-endif()
+else ()
+  set(CURSES_LIBRARIES)
+endif ()
 
 add_library(rc_genicam_api_private_properties INTERFACE)
 add_library(${PROJECT_NAMESPACE}::rc_genicam_api_private_properties ALIAS
