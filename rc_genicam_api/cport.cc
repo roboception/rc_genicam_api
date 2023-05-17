@@ -61,7 +61,7 @@ void CPort::Read(void *buffer, int64_t addr, int64_t length)
 
   if (*port != 0)
   {
-    int retry=3;
+    int retry=1;
     GenTL::GC_ERROR err=GenTL::GC_ERR_ERROR;
 
     while (err != GenTL::GC_ERR_SUCCESS && retry > 0)
