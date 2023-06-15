@@ -34,6 +34,7 @@
 
     <depend>libpng-dev</depend>
     <depend>libusb-1.0</depend>
+    <depend>libncurses-dev</depend>
 
     <doc_depend>doxygen</doc_depend>
 
