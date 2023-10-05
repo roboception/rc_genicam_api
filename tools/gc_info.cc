@@ -50,8 +50,10 @@ int main(int argc, char *argv[])
   {
     if (argc >= 2 && std::string(argv[1]) != "-h")
     {
-      if (std::string(argv[1]) == "-l")
+      if (std::string(argv[1]) == "-L" || std::string(argv[1]) == "-l")
       {
+        bool extended=(std::string(argv[1]) == "-L");
+
         // list all systems, interfaces and devices
 
         std::vector<std::shared_ptr<rcg::System> > system=rcg::System::getSystems();
@@ -74,6 +76,12 @@ int main(int argc, char *argv[])
 
           std::vector<std::shared_ptr<rcg::Interface> > interf=system[i]->getInterfaces();
 
+          if (extended)
+          {
+            rcg::printNodemap(system[i]->getNodeMap(), "Root");
+            std::cout << std::endl;
+          }
+
           for (size_t k=0; k<interf.size(); k++)
           {
             interf[k]->open();
@@ -84,6 +92,12 @@ int main(int argc, char *argv[])
             std::cout << std::endl;
 
             std::vector<std::shared_ptr<rcg::Device> > device=interf[k]->getDevices();
+
+            if (extended)
+            {
+              rcg::printNodemap(interf[k]->getNodeMap(), "Root");
+              std::cout << std::endl;
+            }
 
             for (size_t j=0; j<device.size(); j++)
             {
@@ -207,6 +221,12 @@ int main(int argc, char *argv[])
               dev->open(rcg::Device::READONLY);
             }
 
+            rcg::printNodemap(dev->getNodeMap(), "Root");
+
+            std::cout << std::endl;
+            std::cout << "  ----------" << std::endl;
+            std::cout << std::endl;
+
             std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap(xml);
 
             if (nodemap)
@@ -303,14 +323,15 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -h | -l | -s | ([-o <xml-output-file>|.] [-e] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -h | -L | -l | -s | ([-o <xml-output-file>|.] [-e] [<interface-id>:]<device-id>[?<node>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Provides information about GenICam transport layers, interfaces and devices." << std::endl;
       std::cout << std::endl;
       std::cout << "Options: " << std::endl;
       std::cout << "-h   Prints help information and exits" << std::endl;
-      std::cout << "-l   List all all available devices on all interfaces" << std::endl;
-      std::cout << "-s   List all all available devices on all interfaces (short format)" << std::endl;
+      std::cout << "-L   List all available devices on all interfaces (extended format)" << std::endl;
+      std::cout << "-l   List all available devices on all interfaces" << std::endl;
+      std::cout << "-s   List all available devices on all interfaces (short format)" << std::endl;
       std::cout << "-o   Store XML description from specified device" << std::endl;
       std::cout << "-e   Open nodemap editor instead of printing nodemap" << std::endl;
       std::cout << std::endl;
