@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
         if (dev != 0)
         {
           bool showsummary=false;
+          bool readonly=false;
           bool iponly=false;
 
           // open device with control or read only access, depending on the
@@ -108,7 +109,20 @@ int main(int argc, char *argv[])
 
           if (i == argc || (i+1 == argc && std::string(argv[i]) == "--iponly"))
           {
-            dev->open(rcg::Device::READONLY);
+            try
+            {
+              // try to open with control to also show PTP status, which
+              // requires calling data latch
+              dev->open(rcg::Device::CONTROL);
+            }
+            catch (const std::exception &)
+            {
+              // fallback if another application is blocking the device, which
+              // means that PTP status cannot be shown
+              dev->open(rcg::Device::READONLY);
+              readonly=true;
+            }
+
             showsummary=true;
           }
           else
@@ -249,11 +263,21 @@ int main(int argc, char *argv[])
               // just test if Ptp parameters are available
               rcg::getString(nodemap, "PtpEnable", true);
 
-              std::cout << "PTP:                        " << rcg::getString(nodemap, "PtpEnable") << std::endl;
-              std::cout << "PTP status:                 " << rcg::getString(nodemap, "PtpStatus") << std::endl;
-              std::cout << "PTP offset:                 " << rcg::getInteger(nodemap, "PtpOffsetFromMaster") << " ns" << std::endl;
+              if (!readonly)
+              {
+                rcg::callCommand(nodemap, "PtpDataSetLatch");
+
+                std::cout << "PTP:                        " << rcg::getString(nodemap, "PtpEnable") << std::endl;
+                std::cout << "PTP status:                 " << rcg::getString(nodemap, "PtpStatus") << std::endl;
+                std::cout << "PTP offset:                 " << rcg::getInteger(nodemap, "PtpOffsetFromMaster") << " ns" << std::endl;
+              }
+              else
+              {
+                std::cout << "Ptp cannot be shown due to another application with control access." << std::endl;
+                std::cout << std::endl;
+              }
             }
-            catch (const std::exception &)
+            catch (const std::exception &ex)
             {
               std::cout << "Ptp parameters are not available" << std::endl;
               std::cout << std::endl;
