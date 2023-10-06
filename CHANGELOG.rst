@@ -1,3 +1,12 @@
+2.6.3 (2023-10-06)
+------------------
+
+- gc_config:
+  -Fixed calling data latch to properly show PTP status
+- gc_info:
+  - Added choice to either use local or remote nodemap of device
+  - Added extended output that includes printing the local nodemaps of system, interface and device as well
+
 2.6.2 (2023-05-17)
 ------------------
 
