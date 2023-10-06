@@ -13,24 +13,6 @@ variables:
 #########################
 # Templates using anchors
 #########################
-.amd64_bionic_t: &amd64_bionic_job
-  image: registry.roboception.de/tools/docker_images:bionic-buildimage
-  tags:
-    - amd64
-    - docker
-
-.arm64_bionic_t: &arm64_bionic_job
-  image: registry.roboception.de/tools/docker_images:bionic-buildimage
-  tags:
-    - arm64
-    - docker
-
-.armhf_bionic_t: &armhf_bionic_job
-  image: registry.roboception.de/tools/docker_images:armhf-bionic-buildimage
-  tags:
-    - armhf
-    - docker
-
 .amd64_focal_t: &amd64_focal_job
   image: registry.roboception.de/tools/docker_images:focal-buildimage
   tags:
@@ -53,6 +35,12 @@ variables:
   image: registry.roboception.de/tools/docker_images:jammy-buildimage
   tags:
     - amd64
+    - docker
+
+.arm64_focal_t: &arm64_jammy_job
+  image: registry.roboception.de/tools/docker_images:jammy-buildimage
+  tags:
+    - arm64
     - docker
 
 #############
@@ -157,18 +145,6 @@ gen_dox:
 
 # Test against latest (for testing builds)
 ##########################################
-test:bionic:amd64:
-  <<: *amd64_bionic_job
-  extends: .test_latest
-
-test:bionic:armhf:
-  <<: *armhf_bionic_job
-  extends: .test_latest
-
-test:bionic:arm64:
-  <<: *arm64_bionic_job
-  extends: .test_latest
-
 test:focal:amd64:
   <<: *amd64_focal_job
   extends: .test_latest
@@ -185,20 +161,12 @@ test:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .test_latest
 
+test:jammy:arm64:
+  <<: *arm64_jammy_job
+  extends: .test_latest
+
 # Test against stable (is allowed to fail)
 ##########################################
-test_stable:bionic:amd64:
-  <<: *amd64_bionic_job
-  extends: .test_stable
-
-test_stable:bionic:armhf:
-  <<: *armhf_bionic_job
-  extends: .test_stable
-
-test_stable:bionic:arm64:
-  <<: *arm64_bionic_job
-  extends: .test_stable
-
 test_stable:focal:amd64:
   <<: *amd64_focal_job
   extends: .test_stable
@@ -215,20 +183,12 @@ test_stable:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .test_stable
 
+test_stable:jammy:arm64:
+  <<: *arm64_jammy_job
+  extends: .test_stable
+
 # Deploy testing (only on master)
 #################################
-package_testing:bionic:amd64:
-  <<: *amd64_bionic_job
-  extends: .package_testing
-
-package_testing:bionic:armhf:
-  <<: *armhf_bionic_job
-  extends: .package_testing
-
-package_testing:bionic:arm64:
-  <<: *arm64_bionic_job
-  extends: .package_testing
-
 package_testing:focal:amd64:
   <<: *amd64_focal_job
   extends: .package_testing
@@ -245,24 +205,16 @@ package_testing:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .package_testing
 
+package_testing:jammy:arm64:
+  <<: *arm64_jammy_job
+  extends: .package_testing
+
 ################
 # Stable builds
 ################
 
 # Test against stable if it is a release
 ########################################
-test_release:bionic:amd64:
-  <<: *amd64_bionic_job
-  extends: .test_release
-
-test_release:bionic:armhf:
-  <<: *armhf_bionic_job
-  extends: .test_release
-
-test_release:bionic:arm64:
-  <<: *arm64_bionic_job
-  extends: .test_release
-
 test_release:focal:amd64:
   <<: *amd64_focal_job
   extends: .test_release
@@ -279,20 +231,12 @@ test_release:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .test_release
 
+test_release:jammy:arm64:
+  <<: *arm64_jammy_job
+  extends: .test_release
+
 # Deploy stable (only for releases, version tags)
 #################################################
-package_stable:bionic:amd64:
-  <<: *amd64_bionic_job
-  extends: .package_stable
-
-package_stable:bionic:armhf:
-  <<: *armhf_bionic_job
-  extends: .package_stable
-
-package_stable:bionic:arm64:
-  <<: *arm64_bionic_job
-  extends: .package_stable
-
 package_stable:focal:amd64:
   <<: *amd64_focal_job
   extends: .package_stable
@@ -309,19 +253,23 @@ package_stable:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .package_stable
 
+package_stable:jammy:arm64:
+  <<: *arm64_jammy_job
+  extends: .package_stable
+
 ########################
 # package as ROS package
 ########################
 
-ros_testing:melodic:amd64:
-  image: ros:melodic-perception
+ros_testing:noetic:amd64:
+  image: ros:noetic-perception
   tags:
     - amd64
     - docker
   extends: .package_testing
 
-ros_stable:melodic:amd64:
-  image: ros:melodic-perception
+ros_stable:noetic:amd64:
+  image: ros:noetic-perception
   tags:
     - amd64
     - docker
