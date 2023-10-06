@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
                 std::cout << std::endl;
               }
             }
-            catch (const std::exception &ex)
+            catch (const std::exception &)
             {
               std::cout << "Ptp parameters are not available" << std::endl;
               std::cout << std::endl;
