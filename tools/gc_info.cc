@@ -191,6 +191,7 @@ int main(int argc, char *argv[])
           {
             std::cerr << "Unknown parameter: " << argv[k] << std::endl;
             ret=1;
+            break;
           }
         }
 
