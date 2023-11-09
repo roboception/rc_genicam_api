@@ -1,3 +1,9 @@
+2.6.4 (2023-11-09)
+------------------
+
+- Fixed loading nodemap from file system
+- Return device display name, if device user defined name returns an error
+
 2.6.3 (2023-10-06)
 ------------------
 
