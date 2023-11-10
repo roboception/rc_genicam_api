@@ -475,6 +475,22 @@ std::shared_ptr<GenApi::CNodeMapRef> Device::getRemoteNodeMap(const char *xml)
   return rnodemap;
 }
 
+std::shared_ptr<CPort> getRemotePort()
+{
+  std::lock_guard<std::mutex> lock(mtx);
+
+  if (dev != 0 && !rnodemap)
+  {
+    if (gentl->DevGetPort(dev, &rp) == GenTL::GC_ERR_SUCCESS)
+    {
+      rport=std::shared_ptr<CPort>(new CPort(gentl, &rp));
+      rnodemap=allocNodeMap(gentl, rp, rport.get(), xml);
+    }
+  }
+
+  return rport;
+}
+
 void *Device::getHandle() const
 {
   return dev;
