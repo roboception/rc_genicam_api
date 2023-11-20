@@ -538,7 +538,7 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
 
           for (size_t k=0; k<height; k++)
           {
-            png_write_row(png, p);
+            png_write_row(png, const_cast<png_bytep>(p));
             p+=3*width;
           }
 
