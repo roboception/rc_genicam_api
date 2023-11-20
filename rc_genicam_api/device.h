@@ -242,6 +242,15 @@ class Device : public std::enable_shared_from_this<Device>
     std::shared_ptr<GenApi::CNodeMapRef> getRemoteNodeMap(const char *xml=0);
 
     /**
+      Returns the remote port that is used by the remote node map to read and
+      write registers.
+
+      @return Remote port.
+    */
+
+    std::shared_ptr<CPort> getRemotePort();
+
+    /**
       Get internal interface handle.
 
       @return Internal handle.
