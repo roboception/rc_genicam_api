@@ -8,3 +8,5 @@ cmake-build-*
 !.gitignore
 !.gitlab-ci.yml
 !.dockerignore
+
+CMakeLists.txt.user
