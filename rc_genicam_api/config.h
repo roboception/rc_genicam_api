@@ -141,6 +141,22 @@ bool setEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *na
              const char *value, bool exception=false);
 
 /**
+  Set value of type register.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of feature.
+  @param buffer    Buffer of length len.
+  @param len       Number of bytes to write.
+  @param total     Total size of register. A null pointer can be given if this
+                   is not required.
+  @param exception True if an error should be signaled via exception.
+  @return          Number of successfuly written bytes.
+*/
+
+size_t setRegister(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  const uint8_t *buffer, size_t len, bool exception=false);
+
+/**
   Set the value of a feature of the given nodemap. The datatype of the feature
   can be boolean, integer, float, enum or string. The given value will be
   converted depending on the datatype and representation of the feature, which
@@ -240,10 +256,31 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
                     std::vector<std::string> &list, bool exception=false);
 
 /**
+  Read value of type register.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of feature.
+  @param buffer    Buffer of length len.
+  @param len       Number of bytes to read. This can be 0 if only the size of
+                   the register is of interest.
+  @param total     Total size of register. A null pointer can be given if this
+                   is not required.
+  @param exception True if an error should be signaled via exception.
+  @param igncache  True if value is always read from the device, even if cached.
+  @return          Number of successfuly read bytes.
+*/
+
+size_t getRegister(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  uint8_t *buffer, size_t len, size_t *total=0, bool exception=false, bool igncache=false);
+
+/**
   Get the value of a feature of the given nodemap. The datatype of the feature
-  can be boolean, integer, float, enum or string. The given value will be
+  can be boolean, integer, float, enum, register or string. The given value will be
   converted depending on the datatype and representation of the feature, which
   can be hex, ip4v or mac for an integer feature.
+
+  Note: Only the first 32 bytes of registers will be converted and represented
+  in hex.
 
   @param nodemap   Initialized nodemap.
   @param name      Name of feature.

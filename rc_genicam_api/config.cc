@@ -362,6 +362,53 @@ bool setEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *na
   return ret;
 }
 
+size_t setRegister(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  const uint8_t *buffer, size_t len, bool exception)
+{
+  size_t ret=0;
+
+  try
+  {
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
+    {
+      if (GenApi::IsWritable(node))
+      {
+        GenApi::IRegister *val=dynamic_cast<GenApi::IRegister *>(node);
+
+        if (val != 0)
+        {
+          len=std::min(len, static_cast<size_t>(val->GetLength()));
+          val->Set(buffer, len);
+          ret=len;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not of type register: ")+name);
+        }
+      }
+      else if (exception)
+      {
+        throw std::invalid_argument(std::string("Feature not writable: ")+name);
+      }
+    }
+    else if (exception)
+    {
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
+    }
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+
+  return ret;
+}
+
 bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                const char *value, bool exception)
 {
@@ -476,6 +523,29 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
                 throw std::invalid_argument(std::string("Enumeration '")+name+
                                             "' does not contain: "+value);
               }
+            }
+            break;
+
+          case GenApi::intfIRegister:
+            {
+              GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
+
+              std::string s=value;
+
+              size_t n=s.find_first_not_of("0123456789abcdefABCDEF");
+              if (n != std::string::npos)
+              {
+                throw std::invalid_argument(std::string("Register '")+name+
+                  "only accepts hedadecimal values: "+s);
+              }
+
+              std::vector<uint8_t> buffer;
+              for (size_t i=0; i<s.size()-1; i+=2)
+              {
+                buffer.push_back(stoi(s.substr(i, 2), 0, 16));
+              }
+
+              p->Set(buffer.data(), std::min(buffer.size(), static_cast<size_t>(p->GetLength())));
             }
             break;
 
@@ -791,6 +861,59 @@ std::string getEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const c
   return ret;
 }
 
+size_t getRegister(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  uint8_t *buffer, size_t len, size_t *total, bool exception, bool igncache)
+{
+  size_t ret=0;
+
+  if (total != 0) *total=0;
+
+  try
+  {
+    GenApi::INode *node=nodemap->_GetNode(name);
+
+    if (node != 0)
+    {
+      if (GenApi::IsReadable(node))
+      {
+        GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
+
+        if (p != 0)
+        {
+          size_t n=static_cast<size_t>(p->GetLength());
+
+          if (total) *total=n;
+
+          len=std::min(len, n);
+          p->Get(buffer, static_cast<int64_t>(len));
+          ret=len;
+        }
+        else if (exception)
+        {
+          throw std::invalid_argument(std::string("Feature not of type register: ")+name);
+        }
+      }
+      else if (exception)
+      {
+        throw std::invalid_argument(std::string("Feature not readable: ")+name);
+      }
+    }
+    else if (exception)
+    {
+      throw std::invalid_argument(std::string("Feature not found: ")+name);
+    }
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+
+  return ret;
+}
+
 std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                       bool exception, bool igncache)
 {
@@ -857,6 +980,23 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
             {
               GenApi::IEnumeration *p=dynamic_cast<GenApi::IEnumeration *>(node);
               out << p->GetCurrentEntry()->GetSymbolic();
+            }
+            break;
+
+          case GenApi::intfIRegister:
+            {
+              GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
+
+              int len=std::min(static_cast<int>(p->GetLength()), 32);
+
+              uint8_t buffer[32];
+              p->Get(buffer, len);
+
+              out << std::hex;
+              for (int i=0; i<len; i++)
+              {
+                out << std::setfill('0') << std::setw(2) << static_cast<int>(buffer[i]);
+              }
             }
             break;
 

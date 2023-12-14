@@ -41,6 +41,9 @@
 #include <ncurses.h>
 #endif
 
+#include <iostream>
+#include <iomanip>
+
 namespace rcg
 {
 
@@ -204,8 +207,36 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool s
         break;
 
       case GenApi::intfIRegister:
-        std::cout << prefix << "Register: " << node->GetName() << " " << getAccessMode(node)
-                  << std::endl;
+        {
+          GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
+
+          if (p)
+          {
+            int len=static_cast<int>(p->GetLength());
+
+            std::cout << prefix << "Register: " << node->GetName() << "[" << len << "] "
+              << getAccessMode(node) << ": " << std::hex;
+
+            if (GenApi::IsReadable(p))
+            {
+              uint8_t buffer[32];
+              p->Get(buffer, std::min(len, 32));
+
+              for (int i=0; i<len && i<32; i++)
+              {
+                std::cout << std::setfill('0') << std::setw(2) << static_cast<int>(buffer[i]);
+              }
+
+              if (len > 32)
+              {
+                std::cout << "...";
+              }
+            }
+
+            std::cout << std::dec << std::endl;
+          }
+        }
+
         break;
 
       case GenApi::intfICategory:

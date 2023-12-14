@@ -42,6 +42,7 @@
 #include <ncurses.h>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 namespace rcg
 {
@@ -165,6 +166,29 @@ std::string NodeParam::getValue(bool add_unit_range)
       }
       break;
 
+    case GenApi::intfIRegister:
+      {
+        GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
+
+        if (GenApi::IsReadable(p))
+        {
+          int len=static_cast<int>(p->GetLength());
+
+          len=std::min(len, (getmaxx(stdscr)-value_column)/2-1);
+          len=std::min(len, 128);
+
+          uint8_t buffer[128];
+          p->Get(buffer, len);
+
+          out << std::hex;
+          for (int i=0; i<len && i<len; i++)
+          {
+            out << std::setfill('0') << std::setw(2) << static_cast<int>(buffer[i]);
+          }
+        }
+      }
+      break;
+
     case GenApi::intfIFloat:
       {
         GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
@@ -279,6 +303,25 @@ std::string NodeParam::getAllowedCharacters()
           }
         }
       }
+      break;
+
+    case GenApi::intfIRegister:
+      ret.push_back('0');
+      ret.push_back('1');
+      ret.push_back('2');
+      ret.push_back('3');
+      ret.push_back('4');
+      ret.push_back('5');
+      ret.push_back('6');
+      ret.push_back('7');
+      ret.push_back('8');
+      ret.push_back('9');
+      ret.push_back('a');
+      ret.push_back('b');
+      ret.push_back('c');
+      ret.push_back('d');
+      ret.push_back('e');
+      ret.push_back('f');
       break;
 
     case GenApi::intfIString:
@@ -455,6 +498,20 @@ std::string NodeParam::setValue(const std::string &value)
                 p->SetValue(std::stoll(std::string(value)));
                 break;
             }
+          }
+          break;
+
+        case GenApi::intfIRegister:
+          {
+            GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
+
+            std::vector<uint8_t> buffer;
+            for (size_t i=0; i<value.size()-1; i+=2)
+            {
+              buffer.push_back(stoi(value.substr(i, 2), 0, 16));
+            }
+
+            p->Set(buffer.data(), buffer.size());
           }
           break;
 
