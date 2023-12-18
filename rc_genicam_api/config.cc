@@ -1254,7 +1254,7 @@ bool saveFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *n
   {
     if (exception)
     {
-      throw std::invalid_argument(std::string("Cannot open file for reading: ")+name);
+      throw std::invalid_argument(std::string("Cannot open file for writing: ")+name);
     }
 
     ret=false;
