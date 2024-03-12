@@ -1,3 +1,11 @@
+2.6.5 (2024-03-12)
+------------------
+
+- Added method to get remote port of device to directly read and write register
+- Added functions to read and write GenICam register parameters
+- Fixed write error message of gc_file tool
+- fix for gcc 13: use global stdint
+
 2.6.4 (2023-11-09)
 ------------------
 
