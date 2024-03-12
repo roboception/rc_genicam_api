@@ -63,7 +63,7 @@ class Image
       @param part   Part number from which the image should be created.
     */
 
-    Image(const Buffer *buffer, std::uint32_t part);
+    Image(const Buffer *buffer, uint32_t part);
 
     /**
       Pointer to pixel information of the image.

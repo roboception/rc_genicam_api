@@ -98,7 +98,7 @@ std::string getDigitalIO(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap)
 {
   try
   {
-    std::int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll", 0, 0, true);
+    int64_t line_status=rcg::getInteger(nodemap, "ChunkLineStatusAll", 0, 0, true);
 
     std::string out;
     std::string in;

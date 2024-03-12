@@ -48,7 +48,7 @@
 namespace rcg
 {
 
-Image::Image(const Buffer *buffer, std::uint32_t part)
+Image::Image(const Buffer *buffer, uint32_t part)
 {
   if (buffer->getImagePresent(part))
   {

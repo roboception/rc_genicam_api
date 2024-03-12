@@ -109,7 +109,7 @@ inline std::string getBufferString(const std::shared_ptr<const GenTLWrapper> &ge
 }
 
 template<class T> inline T getBufferPartValue(const std::shared_ptr<const GenTLWrapper> &gentl,
-                                              void *stream, void *buffer, std::uint32_t part,
+                                              void *stream, void *buffer, uint32_t part,
                                               GenTL::BUFFER_PART_INFO_CMD cmd)
 {
   T ret=0;
@@ -186,7 +186,7 @@ void Buffer::setHandle(void *handle)
     if (chunkadapter && !getBufferBool(gentl, parent->getHandle(), buffer,
       GenTL::BUFFER_INFO_IS_INCOMPLETE))
     {
-      chunkadapter->AttachBuffer(reinterpret_cast<std::uint8_t *>(
+      chunkadapter->AttachBuffer(reinterpret_cast<uint8_t *>(
         getBufferValue<void *>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_BASE)),
         static_cast<int64_t>(getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_SIZE_FILLED)));
     }
@@ -232,7 +232,7 @@ size_t Buffer::getGlobalSize() const
   return getBufferValue<size_t>(gentl, parent->getHandle(), buffer, GenTL::BUFFER_INFO_SIZE);
 }
 
-void *Buffer::getBase(std::uint32_t part) const
+void *Buffer::getBase(uint32_t part) const
 {
   if (multipart)
   {
@@ -255,7 +255,7 @@ void *Buffer::getBase(std::uint32_t part) const
   }
 }
 
-size_t Buffer::getSize(std::uint32_t part) const
+size_t Buffer::getSize(uint32_t part) const
 {
   if (multipart)
   {
@@ -341,7 +341,7 @@ size_t Buffer::getPartDataType(uint32_t part) const
   }
 }
 
-size_t Buffer::getWidth(std::uint32_t part) const
+size_t Buffer::getWidth(uint32_t part) const
 {
   if (multipart)
   {
@@ -366,7 +366,7 @@ size_t Buffer::getWidth(std::uint32_t part) const
   }
 }
 
-size_t Buffer::getHeight(std::uint32_t part) const
+size_t Buffer::getHeight(uint32_t part) const
 {
   if (multipart)
   {
@@ -391,7 +391,7 @@ size_t Buffer::getHeight(std::uint32_t part) const
   }
 }
 
-size_t Buffer::getXOffset(std::uint32_t part) const
+size_t Buffer::getXOffset(uint32_t part) const
 {
   if (multipart)
   {
@@ -416,7 +416,7 @@ size_t Buffer::getXOffset(std::uint32_t part) const
   }
 }
 
-size_t Buffer::getYOffset(std::uint32_t part) const
+size_t Buffer::getYOffset(uint32_t part) const
 {
   if (multipart)
   {
@@ -441,7 +441,7 @@ size_t Buffer::getYOffset(std::uint32_t part) const
   }
 }
 
-size_t Buffer::getXPadding(std::uint32_t part) const
+size_t Buffer::getXPadding(uint32_t part) const
 {
   if (multipart)
   {
@@ -556,7 +556,7 @@ uint64_t Buffer::getPixelFormatNamespace(uint32_t part) const
   }
 }
 
-uint64_t Buffer::getPartSourceID(std::uint32_t part) const
+uint64_t Buffer::getPartSourceID(uint32_t part) const
 {
   if (multipart)
   {
@@ -569,7 +569,7 @@ uint64_t Buffer::getPartSourceID(std::uint32_t part) const
   }
 }
 
-uint64_t Buffer::getPartRegionID(std::uint32_t part) const
+uint64_t Buffer::getPartRegionID(uint32_t part) const
 {
   if (multipart)
   {
@@ -582,7 +582,7 @@ uint64_t Buffer::getPartRegionID(std::uint32_t part) const
   }
 }
 
-uint64_t Buffer::getPartDataPurposeID(std::uint32_t part) const
+uint64_t Buffer::getPartDataPurposeID(uint32_t part) const
 {
   if (multipart)
   {

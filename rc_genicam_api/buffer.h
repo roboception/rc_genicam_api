@@ -152,7 +152,7 @@ class Buffer
       @return Number of parts.
     */
 
-    std::uint32_t getNumberOfParts() const;
+    uint32_t getNumberOfParts() const;
 
     /**
       Returns the global base address of the buffer memory.
@@ -176,7 +176,7 @@ class Buffer
       @return Base address of the buffer memory part.
     */
 
-    void *getBase(std::uint32_t part) const;
+    void *getBase(uint32_t part) const;
 
     /**
       Returns the size of the specified part of the mult-part buffer.
@@ -184,7 +184,7 @@ class Buffer
       @return Size of the buffer part in bytes.
     */
 
-    size_t getSize(std::uint32_t part) const;
+    size_t getSize(uint32_t part) const;
 
     /**
       Returns the private data pointer of the GenTL Consumer.
@@ -272,7 +272,7 @@ class Buffer
       @return     Width of image.
     */
 
-    size_t getWidth(std::uint32_t part) const;
+    size_t getWidth(uint32_t part) const;
 
     /**
       Returns the height of the image in pixel.
@@ -281,7 +281,7 @@ class Buffer
       @return     Height of image.
     */
 
-    size_t getHeight(std::uint32_t part) const;
+    size_t getHeight(uint32_t part) const;
 
     /**
       Returns the horizontal offset of the data in the buffer in pixels from
@@ -291,7 +291,7 @@ class Buffer
       @return     Horizontal offset of image.
     */
 
-    size_t getXOffset(std::uint32_t part) const;
+    size_t getXOffset(uint32_t part) const;
 
     /**
       Returns the vertical offset of the data in the buffer in lines from
@@ -301,7 +301,7 @@ class Buffer
       @return     Vertical offset of image.
     */
 
-    size_t getYOffset(std::uint32_t part) const;
+    size_t getYOffset(uint32_t part) const;
 
     /**
       Returns horizontal padding of the data in the buffer in bytes.
@@ -310,7 +310,7 @@ class Buffer
       @return     Horizontal padding of image.
     */
 
-    size_t getXPadding(std::uint32_t part) const;
+    size_t getXPadding(uint32_t part) const;
 
     /**
       Returns vertical padding of the data in the buffer in bytes.
@@ -336,7 +336,7 @@ class Buffer
       @return     True if image is present.
     */
 
-    bool getImagePresent(std::uint32_t part) const;
+    bool getImagePresent(uint32_t part) const;
 
     /**
       Returns the payload type according to PAYLOADTYPE_INFO_IDS.
@@ -355,7 +355,7 @@ class Buffer
       @return Pixel format id.
     */
 
-    uint64_t getPixelFormat(std::uint32_t part) const;
+    uint64_t getPixelFormat(uint32_t part) const;
 
     /**
       Returns the pixel format namespace, which preferably should be
@@ -365,7 +365,7 @@ class Buffer
       @return One of PIXELFORMAT_NAMESPACE_IDS.
     */
 
-    uint64_t getPixelFormatNamespace(std::uint32_t part) const;
+    uint64_t getPixelFormatNamespace(uint32_t part) const;
 
     /**
       Returns the source id of the specified part. Images with the same source
@@ -375,7 +375,7 @@ class Buffer
       @return     Source id of part or 0 if the buffer is not multi-part.
     */
 
-    uint64_t getPartSourceID(std::uint32_t part) const;
+    uint64_t getPartSourceID(uint32_t part) const;
 
     /**
       Returns the region id of the specified part.
@@ -384,7 +384,7 @@ class Buffer
       @return     Region id of part or 0 if the buffer is not multi-part.
     */
 
-    uint64_t getPartRegionID(std::uint32_t part) const;
+    uint64_t getPartRegionID(uint32_t part) const;
 
     /**
       Returns the data purpose id of the specified part.
@@ -393,7 +393,7 @@ class Buffer
       @return     Data purpose id of part or 0 if the buffer is not multi-part.
     */
 
-    uint64_t getPartDataPurposeID(std::uint32_t part) const;
+    uint64_t getPartDataPurposeID(uint32_t part) const;
 
     /**
       Returns the number of lines that are delivered in this buffer. For areea
@@ -404,7 +404,7 @@ class Buffer
       @return     Number of delivered image lines.
     */
 
-    size_t getDeliveredImageHeight(std::uint32_t part) const;
+    size_t getDeliveredImageHeight(uint32_t part) const;
 
     /**
       Returnes the delivered chung payload size.
