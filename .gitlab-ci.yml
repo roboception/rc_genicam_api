@@ -37,7 +37,7 @@ variables:
     - amd64
     - docker
 
-.arm64_focal_t: &arm64_jammy_job
+.arm64_jammy_t: &arm64_jammy_job
   image: registry.roboception.de/tools/docker_images:jammy-buildimage
   tags:
     - arm64
