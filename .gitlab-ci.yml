@@ -43,6 +43,12 @@ variables:
     - arm64
     - docker
 
+.armhf_jammy_t: &armhf_jammy_job
+  image: registry.roboception.de/tools/docker_images:armhf-jammy-buildimage
+  tags:
+    - armhf
+    - docker
+    
 #############
 # Templates
 #############
@@ -165,6 +171,10 @@ test:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .test_latest
 
+test:jammy:armhf:
+  <<: *armhf_jammy_job
+  extends: .test_latest
+
 # Test against stable (is allowed to fail)
 ##########################################
 test_stable:focal:amd64:
@@ -185,6 +195,10 @@ test_stable:jammy:amd64:
 
 test_stable:jammy:arm64:
   <<: *arm64_jammy_job
+  extends: .test_stable
+
+test_stable:jammy:armhf:
+  <<: *armhf_jammy_job
   extends: .test_stable
 
 # Deploy testing (only on master)
@@ -209,6 +223,10 @@ package_testing:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .package_testing
 
+package_testing:jammy:armhf:
+  <<: *armhf_jammy_job
+  extends: .package_testing
+  
 ################
 # Stable builds
 ################
@@ -235,6 +253,10 @@ test_release:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .test_release
 
+test_release:jammy:armhf:
+  <<: *armhf_jammy_job
+  extends: .test_release
+  
 # Deploy stable (only for releases, version tags)
 #################################################
 package_stable:focal:amd64:
@@ -255,6 +277,10 @@ package_stable:jammy:amd64:
 
 package_stable:jammy:arm64:
   <<: *arm64_jammy_job
+  extends: .package_stable
+
+package_stable:jammy:armhf:
+  <<: *armhf_jammy_job
   extends: .package_stable
 
 ########################
