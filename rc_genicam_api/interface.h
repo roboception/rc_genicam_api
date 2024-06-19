@@ -100,9 +100,12 @@ class Interface : public std::enable_shared_from_this<Interface>
 
       NOTE: open() must be called before calling this method.
 
-      @return List of devices.
+      @param timeout Timeout in ms for discovery of devices. The method without
+                     this parameter uses a timeout of 1000 ms.
+      @return        List of devices.
     */
 
+    std::vector<std::shared_ptr<Device> > getDevices(uint64_t timeout);
     std::vector<std::shared_ptr<Device> > getDevices();
 
     /**
@@ -110,9 +113,13 @@ class Interface : public std::enable_shared_from_this<Interface>
 
       NOTE: open() must be called before calling this method.
 
-      @return Pointer to device or std::nullptr.
+      @param devid   Device ID.
+      @param timeout Timeout in ms for discovery of devices. The method without
+                     this parameter uses a timeout of 1000 ms.
+      @return        Pointer to device or std::nullptr.
     */
 
+    std::shared_ptr<Device> getDevice(const char *devid, uint64_t timeout);
     std::shared_ptr<Device> getDevice(const char *devid);
 
     /**

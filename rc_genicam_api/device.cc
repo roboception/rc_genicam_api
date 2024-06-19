@@ -496,7 +496,7 @@ void *Device::getHandle() const
   return dev;
 }
 
-std::vector<std::shared_ptr<Device> > getDevices()
+std::vector<std::shared_ptr<Device> > getDevices(uint64_t timeout)
 {
   std::vector<std::shared_ptr<Device> > ret;
 
@@ -512,7 +512,7 @@ std::vector<std::shared_ptr<Device> > getDevices()
     {
       interf[k]->open();
 
-      std::vector<std::shared_ptr<Device> > device=interf[k]->getDevices();
+      std::vector<std::shared_ptr<Device> > device=interf[k]->getDevices(timeout);
 
       for (size_t j=0; j<device.size(); j++)
       {
@@ -528,7 +528,12 @@ std::vector<std::shared_ptr<Device> > getDevices()
   return ret;
 }
 
-std::shared_ptr<Device> getDevice(const char *id)
+std::vector<std::shared_ptr<Device> > getDevices()
+{
+  return getDevices(1000);
+}
+
+std::shared_ptr<Device> getDevice(const char *id, uint64_t timeout)
 {
   int found=0;
   std::shared_ptr<Device> ret;
@@ -569,7 +574,7 @@ std::shared_ptr<Device> getDevice(const char *id)
           {
             interf[k]->open();
 
-            std::shared_ptr<Device> dev=interf[k]->getDevice(devid.c_str());
+            std::shared_ptr<Device> dev=interf[k]->getDevice(devid.c_str(), timeout);
 
             if (dev)
             {
@@ -590,7 +595,7 @@ std::shared_ptr<Device> getDevice(const char *id)
         {
           interf[k]->open();
 
-          dev=interf[k]->getDevice(devid.c_str());
+          dev=interf[k]->getDevice(devid.c_str(), timeout);
 
           if (dev)
           {
@@ -614,6 +619,11 @@ std::shared_ptr<Device> getDevice(const char *id)
   }
 
   return ret;
+}
+
+std::shared_ptr<Device> getDevice(const char *id)
+{
+  return getDevice(id, 1000);
 }
 
 }

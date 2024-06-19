@@ -136,7 +136,7 @@ int find(const std::vector<std::shared_ptr<Device> > &list, const std::string &i
 
 }
 
-std::vector<std::shared_ptr<Device> > Interface::getDevices()
+std::vector<std::shared_ptr<Device> > Interface::getDevices(uint64_t timeout)
 {
   std::lock_guard<std::mutex> lock(mtx);
 
@@ -159,7 +159,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
     // update available interfaces
 
-    GenTL::GC_ERROR err=gentl->IFUpdateDeviceList(ifh, 0, 1000);
+    GenTL::GC_ERROR err=gentl->IFUpdateDeviceList(ifh, 0, timeout);
 
     if (err == GenTL::GC_ERR_INVALID_HANDLE)
     {
@@ -177,7 +177,7 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
       // try to repeat discovery of devices
 
-      err=gentl->IFUpdateDeviceList(ifh, 0, 1000);
+      err=gentl->IFUpdateDeviceList(ifh, 0, timeout);
     }
 
     if (err != GenTL::GC_ERR_SUCCESS)
@@ -228,11 +228,16 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
   return ret;
 }
 
-std::shared_ptr<Device> Interface::getDevice(const char *devid)
+std::vector<std::shared_ptr<Device> > Interface::getDevices()
+{
+  return getDevices(1000);
+}
+
+std::shared_ptr<Device> Interface::getDevice(const char *devid, uint64_t timeout)
 {
   // get list of all devices
 
-  std::vector<std::shared_ptr<Device> > list=getDevices();
+  std::vector<std::shared_ptr<Device> > list=getDevices(timeout);
 
   // find requested device by ID or user defined name
 
@@ -279,6 +284,11 @@ std::shared_ptr<Device> Interface::getDevice(const char *devid)
   }
 
   return ret;
+}
+
+std::shared_ptr<Device> Interface::getDevice(const char *devid)
+{
+  return getDevice(devid, 1000);
 }
 
 namespace

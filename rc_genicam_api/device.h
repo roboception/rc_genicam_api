@@ -283,9 +283,12 @@ class Device : public std::enable_shared_from_this<Device>
   Returns a list of all devices that are available across all transport layers
   and interfaces.
 
-  @return List of available devices.
+  @param timeout Timeout in ms for discovery of devices on each interface. The
+                 function without this parameter uses a timeout of 1000 ms.
+  @return        List of available devices.
 */
 
+std::vector<std::shared_ptr<Device> > getDevices(uint64_t timeout);
 std::vector<std::shared_ptr<Device> > getDevices();
 
 /**
@@ -294,10 +297,13 @@ std::vector<std::shared_ptr<Device> > getDevices();
   i.e. "[<interfaca_id>[:]]<device_id>". If the interface ID is not given, then
   all interfaces are sought and the first device with the given ID returned.
 
-  @param devid Device ID.
-  @return      Device or null pointer.
+  @param devid   Device ID.
+  @param timeout Timeout in ms for discovery of devices on each interface. The
+                 function without this parameter uses a timeout of 1000 ms.
+  @return        Device or null pointer.
 */
 
+std::shared_ptr<Device> getDevice(const char *devid, uint64_t timeout);
 std::shared_ptr<Device> getDevice(const char *devid);
 
 }
