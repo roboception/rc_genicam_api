@@ -66,6 +66,11 @@ Image::Image(const Buffer *buffer, uint32_t part)
 
     const size_t size=std::min(buffer->getSize(part), buffer->getSizeFilled());
 
+    if (buffer->getSizeFilled() == 0)
+    {
+      throw GenTLException("Image without data");
+    }
+
     pixel.reset(new uint8_t [size]);
 
     memcpy(pixel.get(), reinterpret_cast<uint8_t *>(buffer->getBase(part)), size);
