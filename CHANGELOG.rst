@@ -1,3 +1,10 @@
+2.6.7 (2024-08-23)
+------------------
+
+- Added functions and parameters to command line tools for loading and storing streamable parameters
+- Throw an exception if an image buffer does not contain any data
+- Added methods and function with timeout parameters for device discovery
+
 2.6.6 (2024-06-04)
 ------------------
 
