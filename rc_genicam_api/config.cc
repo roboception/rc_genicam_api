@@ -39,6 +39,7 @@
 #include <stdexcept>
 #include <iomanip>
 #include <limits>
+#include <fstream>
 
 #include "Base/GCException.h"
 
@@ -1258,6 +1259,82 @@ bool saveFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *n
     }
 
     ret=false;
+  }
+
+  return ret;
+}
+
+bool loadStreamableParameters(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  bool exception)
+{
+  bool ret=false;
+
+  try
+  {
+    GenApi::CFeatureBag bag;
+
+    std::ifstream in;
+    in.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+
+    in.open(name);
+    in >> bag;
+    in.close();
+
+    bag.LoadFromBag(nodemap->_Ptr, true);
+
+    ret=true;
+  }
+  catch (const std::exception &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+
+  return ret;
+}
+
+bool saveStreamableParameters(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  bool exception)
+{
+  bool ret=false;
+
+  try
+  {
+    GenApi::CFeatureBag bag;
+
+    bag.StoreToBag(nodemap->_Ptr);
+
+    std::ofstream out;
+    out.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+
+    out.open(name);
+    out << bag;
+    out.close();
+
+    ret=true;
+  }
+  catch (const std::exception &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    if (exception)
+    {
+      throw std::invalid_argument(ex.what());
+    }
   }
 
   return ret;

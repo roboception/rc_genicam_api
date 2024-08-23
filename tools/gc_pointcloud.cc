@@ -1,7 +1,7 @@
 /*
  * This file is part of the rc_genicam_api package.
  *
- * Copyright (c) 2017 Roboception GmbH
+ * Copyright (c) 2017-2024 Roboception GmbH
  * All rights reserved
  *
  * Author: Heiko Hirschmueller
@@ -58,7 +58,7 @@ void printHelp(const char *prgname)
 {
   // show help
 
-  std::cout << prgname << " -h | [-o <output-filename>] [<interface-id>:]<device-id> [<key>=<value>] ..." << std::endl;
+  std::cout << prgname << " -h | [-o <output-filename>] [<interface-id>:]<device-id> [@<file>] [<key>=<value>] ..." << std::endl;
   std::cout << std::endl;
   std::cout << "Gets the first synchronized image set of the Roboception rc_visard, consisting of left, disparity, confidence and error image, creates a point cloud and stores it in ply ascii format." << std::endl;
   std::cout << std::endl;
@@ -69,6 +69,7 @@ void printHelp(const char *prgname)
   std::cout << "Parameters:" << std::endl;
   std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
   std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
+  std::cout << "@<file>        Optional file with parameters as store with parameter 'gc_info -p ...'" << std::endl;
   std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
 }
 
@@ -193,25 +194,44 @@ int main(int argc, char *argv[])
 
       while (i < argc)
       {
-        // split argument in key and value
-
         std::string key=argv[i++];
-        std::string value;
 
-        size_t k=key.find('=');
-        if (k != std::string::npos)
+        if (key.size() > 0 && key[0] == '@')
         {
-          value=key.substr(k+1);
-          key=key.substr(0, k);
-        }
+          // load streamable parameters from file into nodemap
 
-        if (value.size() > 0)
-        {
-          rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+          try
+          {
+            rcg::loadStreamableParameters(nodemap, key.substr(1).c_str(), true);
+          }
+          catch (const std::exception &ex)
+          {
+            std::cerr << "Warning: Loading of parameters from file '" << key.substr(1) <<
+              "' failed at least partially" << std::endl;
+            std::cerr << ex.what() << std::endl;
+          }
         }
         else
         {
-          rcg::callCommand(nodemap, key.c_str(), true);
+          // split argument in key and value
+
+          std::string value;
+
+          size_t k=key.find('=');
+          if (k != std::string::npos)
+          {
+            value=key.substr(k+1);
+            key=key.substr(0, k);
+          }
+
+          if (value.size() > 0)
+          {
+            rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+          }
+          else
+          {
+            rcg::callCommand(nodemap, key.c_str(), true);
+          }
         }
       }
 

@@ -1,7 +1,7 @@
 /*
  * This file is part of the rc_genicam_api package.
  *
- * Copyright (c) 2017-2019 Roboception GmbH
+ * Copyright (c) 2017-2024 Roboception GmbH
  * All rights reserved
  *
  * Author: Heiko Hirschmueller
@@ -69,7 +69,7 @@ void printHelp()
 {
   // show help
 
-  std::cout << "gc_stream -h | [-c] [-f <fmt>] [-t] [<interface-id>:]<device-id> [n=<n>] [<key>=<value>] ..." << std::endl;
+  std::cout << "gc_stream -h | [-c] [-f <fmt>] [-t] [<interface-id>:]<device-id> [n=<n>] [@<file>] [<key>=<value>] ..." << std::endl;
   std::cout << std::endl;
   std::cout << "Stores images from the specified device after applying the given optional GenICam parameters." << std::endl;
   std::cout << std::endl;
@@ -83,6 +83,7 @@ void printHelp()
   std::cout << "<interface-id> Optional GenICam ID of interface for connecting to the device" << std::endl;
   std::cout << "<device-id>    GenICam device ID, serial number or user defined name of device" << std::endl;
   std::cout << "n=<n>          Optional number of images to be received (default is 1)" << std::endl;
+  std::cout << "@<file>        Optional file with parameters as store with parameter 'gc_info -p ...'" << std::endl;
   std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
 #ifdef _WIN32
   std::cout << std::endl;
@@ -477,31 +478,50 @@ int main(int argc, char *argv[])
         int n=1;
         while (i < argc)
         {
-          // split argument in key and value
-
           std::string key=argv[i++];
-          std::string value;
 
-          size_t k=key.find('=');
-          if (k != std::string::npos)
+          if (key.size() > 0 && key[0] == '@')
           {
-            value=key.substr(k+1);
-            key=key.substr(0, k);
-          }
+            // load streamable parameters from file into nodemap
 
-          if (key == "n") // set number of images
-          {
-            n=std::max(1, std::stoi(value));
-          }
-          else // set key=value pair through GenICam
-          {
-            if (value.size() > 0)
+            try
             {
-              rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+              rcg::loadStreamableParameters(nodemap, key.substr(1).c_str(), true);
             }
-            else
+            catch (const std::exception &ex)
             {
-              rcg::callCommand(nodemap, key.c_str(), true);
+              std::cerr << "Warning: Loading of parameters from file '" << key.substr(1) <<
+                "' failed at least partially" << std::endl;
+              std::cerr << ex.what() << std::endl;
+            }
+          }
+          else
+          {
+            // split argument in key and value
+
+            std::string value;
+
+            size_t k=key.find('=');
+            if (k != std::string::npos)
+            {
+              value=key.substr(k+1);
+              key=key.substr(0, k);
+            }
+
+            if (key == "n") // set number of images
+            {
+              n=std::max(1, std::stoi(value));
+            }
+            else // set key=value pair through GenICam
+            {
+              if (value.size() > 0)
+              {
+                rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+              }
+              else
+              {
+                rcg::callCommand(nodemap, key.c_str(), true);
+              }
             }
           }
         }

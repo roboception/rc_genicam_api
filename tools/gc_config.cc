@@ -1,7 +1,7 @@
 /*
  * This file is part of the rc_genicam_api package.
  *
- * Copyright (c) 2017 Roboception GmbH
+ * Copyright (c) 2017-2024 Roboception GmbH
  * All rights reserved
  *
  * Author: Heiko Hirschmueller
@@ -187,6 +187,21 @@ int main(int argc, char *argv[])
                 exit(1);
               }
             }
+            else if (p.size() > 0 && p[0] == '@')
+            {
+              // load streamable parameters from file into nodemap
+
+              try
+              {
+                rcg::loadStreamableParameters(nodemap, p.substr(1).c_str(), true);
+              }
+              catch (const std::exception &ex)
+              {
+                std::cerr << "Warning: Loading of parameters from file '" << p.substr(1) <<
+                  "' failed at least partially" << std::endl;
+                std::cerr << ex.what() << std::endl;
+              }
+            }
             else if (p.find('=') != std::string::npos)
             {
               // split argument in key and value
@@ -316,6 +331,7 @@ int main(int argc, char *argv[])
       std::cout << "-s <ip>        Set subnet mask for persistent IP address" << std::endl;
       std::cout << "-g <ip>        Set default gateway for persistent IP address" << std::endl;
       std::cout << "--iponly       Show current IP of device instead of full summary" << std::endl;
+      std::cout << "@<file>        Optional file with parameters as store with parameter 'gc_info -p ...'" << std::endl;
       std::cout << "<key>=<value>  Optional GenICam parameters to be changed in the given order" << std::endl;
       ret=1;
     }

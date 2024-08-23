@@ -379,6 +379,32 @@ std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const 
 bool saveFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
   const std::string &data, bool exception=false);
 
+/**
+  Load all streamable parameters from file into the nodemap.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of file from which the streamable parameters can be loaded.
+  @param exception True if an error should be signaled via exception.
+  @return          True if the parameters have been loaded successfully. False
+                   in case of an error.
+*/
+
+bool loadStreamableParameters(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  bool exception=false);
+
+/**
+  Store all streamable parameters from the nodemap into the file.
+
+  @param nodemap   Initialized nodemap.
+  @param name      Name of file to which the streamable parameters should be stored.
+  @param exception True if an error should be signaled via exception.
+  @return          True if the parameters have been saved successfully. False
+                   in case of an error.
+*/
+
+bool saveStreamableParameters(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
+  bool exception=false);
+
 }
 
 #endif
