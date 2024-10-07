@@ -650,20 +650,22 @@ int main(int argc, char *argv[])
 
                         if (name.size() == 0)
                         {
-                          if (component == "IntensityCombined")
+                          if (component == "IntensityCombined" || component == "RawCombined")
                           {
                             // splitting left and right image of combined format of
                             // Roboceptions rc_visard camera
 
+                            std::string comp_name = component.substr(0, component.size() - 8);
+
                             size_t h2=buffer->getHeight(part)/2;
-                            name=storeBuffer(fmt, nodemap, "Intensity", buffer, part, 0, h2);
+                            name=storeBuffer(fmt, nodemap, comp_name, buffer, part, 0, h2);
 
                             if (name.size() > 0)
                             {
                               std::cout << "Image '" << name << "' stored" << std::endl;
                             }
 
-                            name=storeBuffer(fmt, nodemap, "IntensityRight", buffer, part, h2, h2);
+                            name=storeBuffer(fmt, nodemap, comp_name.append("Right"), buffer, part, h2, h2);
 
                             if (name.size() > 0)
                             {
@@ -692,10 +694,11 @@ int main(int argc, char *argv[])
                           {
                             storeParameter(nodemap, component, buffer, 0, true);
                           }
-                          else if (component == "IntensityCombined")
+                          else if (component == "IntensityCombined" || component == "RawCombined")
                           {
+                            std::string comp_name = component.substr(0, component.size() - 8);
                             size_t h2=buffer->getHeight(part)/2;
-                            storeParameter(nodemap, "Intensity", buffer, h2, false);
+                            storeParameter(nodemap, comp_name, buffer, h2, false);
                           }
                         }
 
