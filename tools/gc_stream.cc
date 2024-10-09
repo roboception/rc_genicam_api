@@ -468,6 +468,7 @@ int main(int argc, char *argv[])
         i++;
         dev->open(rcg::Device::CONTROL);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
+        std::vector<std::pair<std::string, std::string> > chunk_param;
 
         // try to enable chunks by default (can be disabed by the user)
 
@@ -516,7 +517,24 @@ int main(int argc, char *argv[])
             {
               if (value.size() > 0)
               {
-                rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+                try
+                {
+                  rcg::setString(nodemap, key.c_str(), value.c_str(), true);
+                }
+                catch (const std::exception &)
+                {
+                  // chunk parameters may fail, try to apply them after
+                  // attaching the buffer
+
+                  if (key.compare(0, 5, "Chunk") == 0)
+                  {
+                    chunk_param.push_back(std::pair<std::string, std::string>(key, value));
+                  }
+                  else
+                  {
+                    throw;
+                  }
+                }
               }
               else
               {
@@ -734,6 +752,16 @@ int main(int argc, char *argv[])
 
                   if (print_chunk_data)
                   {
+                    // apply chunk parameters
+
+                    for (size_t i=0; i<chunk_param.size(); i++)
+                    {
+                      rcg::setString(nodemap, chunk_param[i].first.c_str(),
+                        chunk_param[i].second.c_str(), true);
+                    }
+
+                    // print chunk data
+
                     std::cout << std::endl;
 
                     if (!rcg::printNodemap(nodemap, "ChunkDataControl", 100, false))
