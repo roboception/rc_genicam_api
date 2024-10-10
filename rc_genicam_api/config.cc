@@ -1168,7 +1168,7 @@ std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const 
 
   if (rf.openFile(name, std::ios::in))
   {
-    size_t length=std::numeric_limits<size_t>::max();
+    int length=std::numeric_limits<int>::max();
     try
     {
       // limit read operation to file size, if available
@@ -1182,7 +1182,7 @@ std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const 
 
     while (n > 0 && length > 0)
     {
-      n=rf.read(buffer.data(), off, std::min(length, buffer.size()), name);
+      n=rf.read(buffer.data(), off, std::min(length, static_cast<int>(buffer.size())), name);
 
       if (n == 0)
       {
