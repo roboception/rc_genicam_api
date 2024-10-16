@@ -1,3 +1,13 @@
+2.6.8 (2024-10-16)
+------------------
+
+- gc_stream:
+  - split RawCombined like IntensityCombined
+  - apply writable chunk parameters every time after attaching the buffer
+
+- gc_file:
+  - Fixed possible problem when reading file via gc_file
+
 2.6.7 (2024-08-23)
 ------------------
 
