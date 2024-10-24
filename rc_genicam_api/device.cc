@@ -127,7 +127,7 @@ void Device::open(ACCESS access)
     if (err != GenTL::GC_ERR_SUCCESS)
     {
       parent->close();
-      throw GenTLException("Device::open() failed", gentl);
+      throw GenTLException("Device::open() failed: "+std::to_string(err), gentl);
     }
   }
 
