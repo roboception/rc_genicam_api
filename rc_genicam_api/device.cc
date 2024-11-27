@@ -133,6 +133,8 @@ void Device::open(ACCESS access, bool register_module_event)
       err=true;
     }
 
+    eventadapter.reset();
+
     // check if open was successful
 
     if (err != GenTL::GC_ERR_SUCCESS)
@@ -155,6 +157,8 @@ void Device::close()
 
     if (n_open == 0)
     {
+      eventadapter.reset();
+
       if (event)
       {
         gentl->GCUnregisterEvent(dev, GenTL::EVENT_MODULE);
@@ -232,7 +236,7 @@ std::string cDevGetInfo(const Device *obj, const std::shared_ptr<const GenTLWrap
 
 int64_t Device::getModuleEvent(int64_t _timeout)
 {
-  int64_t ret=-1;
+  int64_t eventid=-1;
 
   uint64_t timeout=GENTL_INFINITE;
   if (_timeout >= 0)
@@ -251,14 +255,15 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
   if (event_buffer.size() == 0)
   {
-    size_t ret=0;
+    size_t value=0;
 
     GenTL::INFO_DATATYPE type;
-    size_t size=sizeof(ret);
+    size_t size=sizeof(value);
 
-    if (gentl->EventGetInfo(event, GenTL::EVENT_SIZE_MAX, &type, &ret, &size) == GenTL::GC_ERR_SUCCESS)
+    if (gentl->EventGetInfo(event, GenTL::EVENT_SIZE_MAX, &type, &value, &size) == GenTL::GC_ERR_SUCCESS)
     {
-      event_buffer.resize(ret);
+      event_buffer.resize(value);
+      event_value.resize(value);
     }
   }
 
@@ -267,6 +272,7 @@ int64_t Device::getModuleEvent(int64_t _timeout)
   for (size_t i=0; i<event_buffer.size(); i++)
   {
     event_buffer[i]=0;
+    event_value[i]=0;
   }
 
   // get event data
@@ -291,24 +297,68 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
   {
     GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
-    size_t tmp_size=4;
-    int32_t value=0;
+    char tmp[80];
+    size_t tmp_size=sizeof(tmp);
 
     err=gentl->EventGetDataInfo(event, event_buffer.data(), size, GenTL::EVENT_DATA_ID,
-      &type, &value, &tmp_size);
+      &type, tmp, &tmp_size);
 
     if (err != GenTL::GC_ERR_SUCCESS)
     {
       throw GenTLException("Device::getModuleEvent()", gentl);
     }
 
-    if (type == GenTL::INFO_DATATYPE_INT32)
+    if (type == GenTL::INFO_DATATYPE_STRING)
     {
-      ret=value;
+      eventid=std::stoi(std::string(tmp), 0, 16);
+    }
+    else if (type == GenTL::INFO_DATATYPE_INT32)
+    {
+      int32_t value=0;
+      memcpy(&value, tmp, sizeof(value));
+      eventid=value;
     }
   }
 
-  return ret;
+  // get event value
+
+  {
+    GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
+    size=event_value.size();
+
+    err=gentl->EventGetDataInfo(event, event_buffer.data(), size, GenTL::EVENT_DATA_VALUE,
+      &type, event_value.data(), &size);
+
+    if (err != GenTL::GC_ERR_SUCCESS)
+    {
+      throw GenTLException("Device::getModuleEvent()", gentl);
+    }
+  }
+
+  std::lock_guard<std::mutex> lock(mtx);
+
+  if (!nodemap)
+  {
+    cport=std::shared_ptr<CPort>(new CPort(gentl, &dev));
+    nodemap=allocNodeMap(gentl, dev, cport.get(), 0);
+  }
+
+  try
+  {
+    if (!eventadapter)
+    {
+      eventadapter=std::shared_ptr<GenApi::CEventAdapterGeneric>(new GenApi::CEventAdapterGeneric(nodemap->_Ptr));
+    }
+
+    if (eventid > 0)
+    {
+      eventadapter->DeliverMessage(event_value.data(), size, static_cast<uint64_t>(eventid));
+    }
+  }
+  catch (const std::exception &)
+  { }
+
+  return eventid;
 }
 
 namespace

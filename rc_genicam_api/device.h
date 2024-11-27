@@ -40,6 +40,8 @@
 
 #include <mutex>
 
+#include <GenApi/EventAdapterGeneric.h>
+
 namespace rcg
 {
 
@@ -298,9 +300,11 @@ class Device : public std::enable_shared_from_this<Device>
     void *rp;
     void *event;
     std::vector<uint8_t> event_buffer;
+    std::vector<uint8_t> event_value;
 
     std::shared_ptr<CPort> cport, rport;
     std::shared_ptr<GenApi::CNodeMapRef> nodemap, rnodemap;
+    std::shared_ptr<GenApi::CEventAdapterGeneric> eventadapter;
 
     std::vector<std::weak_ptr<Stream> > slist;
 };
