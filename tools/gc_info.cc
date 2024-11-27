@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
 
         // get parameters, if any
 
+        int module_event_timeout=-1;
         const char *xml=0;
         const char *paramfile=0;
         bool local_nodemap=false;
@@ -177,6 +178,11 @@ int main(int argc, char *argv[])
             {
               xml="";
             }
+          }
+          else if (std::string(argv[k]) == "-m")
+          {
+            k++;
+            module_event_timeout=std::stoi(std::string(argv[k++]));
           }
           else if (std::string(argv[k]) == "-p")
           {
@@ -245,17 +251,17 @@ int main(int argc, char *argv[])
 
               if (k < argc || edit || paramfile)
               {
-                dev->open(rcg::Device::CONTROL);
+                dev->open(rcg::Device::CONTROL, module_event_timeout >= 0);
               }
               else
               {
-                dev->open(rcg::Device::READONLY);
+                dev->open(rcg::Device::READONLY, module_event_timeout >= 0);
               }
 
               std::shared_ptr<GenApi::CNodeMapRef> nodemap;
               if (local_nodemap)
               {
-                nodemap=dev->getNodeMap();
+                nodemap=dev->getNodeMap(xml);
               }
               else
               {
@@ -291,6 +297,24 @@ int main(int argc, char *argv[])
                     // call the command
                     rcg::callCommand(nodemap, p.c_str(), true);
                   }
+                }
+
+                if (module_event_timeout >= 0)
+                {
+                  int64_t eventid=dev->getModuleEvent(1000*module_event_timeout);
+
+                  if (eventid < 0)
+                  {
+                    std::cout << "Received no module events" << std::endl;
+                  }
+
+                  while (eventid >= 0)
+                  {
+                    std::cout << "Received module event with ID: " << eventid << std::endl;
+                    eventid=dev->getModuleEvent(0);
+                  }
+
+                  std::cout << std::endl;
                 }
 
                 if (edit)
@@ -379,7 +403,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cout << argv[0] << " -h | -L | -l | -s | ([-o <xml-output-file>|.] [-p <file>] [-d] [-e] [<interface-id>:]<device-id>[?<node>] [@<file>] [<key>=<value>] ...)" << std::endl;
+      std::cout << argv[0] << " -h | -L | -l | -s | ([-o <xml-output-file>|.] [-m <timeout>] [-p <file>] [-d] [-e] [<interface-id>:]<device-id>[?<node>] [@<file>] [<key>=<value>] ...)" << std::endl;
       std::cout << std::endl;
       std::cout << "Provides information about GenICam transport layers, interfaces and devices." << std::endl;
       std::cout << std::endl;
@@ -389,6 +413,7 @@ int main(int argc, char *argv[])
       std::cout << "-l   List all available devices on all interfaces" << std::endl;
       std::cout << "-s   List all available devices on all interfaces (short format)" << std::endl;
       std::cout << "-o   Store XML description from specified device" << std::endl;
+      std::cout << "-m   Registers for module events and waits for the given number of seconds for such events" << std::endl;
       std::cout << "-d   Use local device nodemap, instead of remote nodemap" << std::endl;
       std::cout << "-e   Open nodemap editor instead of printing nodemap" << std::endl;
       std::cout << "-p   Store all streamable parameters to the given file, after applying all parameters" << std::endl;
