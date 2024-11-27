@@ -86,9 +86,13 @@ class Device : public std::enable_shared_from_this<Device>
       Opens the device for working with it. The interface may be opened
       multiple times. However, for each open(), the close() method must be
       called as well.
+
+      @param access                Access mode.
+      @param register_module_event If true, module events can be received
+                                   with getModuleEvent() method.
     */
 
-    void open(ACCESS access);
+    void open(ACCESS access, bool register_module_event=false);
 
     /**
       Closes the device. Each call of open() must be followed by a call to
@@ -96,6 +100,23 @@ class Device : public std::enable_shared_from_this<Device>
     */
 
     void close();
+
+    /**
+      Returns the number of module events that are currently in the queue.
+
+      @return Module event count.
+    */
+
+    int getAvailableModuleEvents();
+
+    /**
+      Gets the next module event for the device.
+
+      @param timeout Timeout in ms. A value < 0 sets waiting time to infinite.
+      @return        Event ID or -1 if the method returned due to timeout.
+    */
+
+    int64_t getModuleEvent(int64_t timeout=-1);
 
     /**
       Returns the currently available streams of this device.
@@ -222,10 +243,13 @@ class Device : public std::enable_shared_from_this<Device>
       NOTE: open() must be called before calling this method. The returned
       pointer remains valid until close() of this object is called.
 
+      @param xml Path and name for storing the received XML file. An empty
+                 string for using the filename on the device or 0 if xml
+                 file should not be stored.
       @return Node map of this object.
     */
 
-    std::shared_ptr<GenApi::CNodeMapRef> getNodeMap();
+    std::shared_ptr<GenApi::CNodeMapRef> getNodeMap(const char *xml=0);
 
     /**
       Returns the node map of the remote device.
@@ -272,6 +296,8 @@ class Device : public std::enable_shared_from_this<Device>
     int n_open;
     void *dev;
     void *rp;
+    void *event;
+    std::vector<uint8_t> event_buffer;
 
     std::shared_ptr<CPort> cport, rport;
     std::shared_ptr<GenApi::CNodeMapRef> nodemap, rnodemap;
