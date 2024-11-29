@@ -251,12 +251,14 @@ int main(int argc, char *argv[])
 
               if (k < argc || edit || paramfile)
               {
-                dev->open(rcg::Device::CONTROL, module_event_timeout >= 0);
+                dev->open(rcg::Device::CONTROL);
               }
               else
               {
-                dev->open(rcg::Device::READONLY, module_event_timeout >= 0);
+                dev->open(rcg::Device::READONLY);
               }
+
+              // get nodemap
 
               std::shared_ptr<GenApi::CNodeMapRef> nodemap;
               if (local_nodemap)
@@ -268,8 +270,29 @@ int main(int argc, char *argv[])
                 nodemap=dev->getRemoteNodeMap(xml);
               }
 
+              // register and enable module events
+
+              if (module_event_timeout >= 0)
+              {
+                dev->enableModuleEvents();
+
+                std::shared_ptr<GenApi::CNodeMapRef> lnodemap;
+                lnodemap=dev->getNodeMap();
+
+                std::vector<std::string> list;
+                rcg::getEnum(lnodemap, "EventSelector", list, false);
+
+                for (size_t i=0; i<list.size(); i++)
+                {
+                  rcg::setEnum(lnodemap, "EventSelector", list[i].c_str(), true);
+                  rcg::setEnum(lnodemap, "EventNotification", "On", false);
+                }
+              }
+
               if (nodemap)
               {
+                // interpret all remaining parameters
+
                 while (k < argc)
                 {
                   std::string p=argv[k++];
@@ -301,6 +324,8 @@ int main(int argc, char *argv[])
 
                 if (module_event_timeout >= 0)
                 {
+                  std::cout << "Waiting for events" << std::endl;
+
                   int64_t eventid=dev->getModuleEvent(1000*module_event_timeout);
 
                   if (eventid < 0)

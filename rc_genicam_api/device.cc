@@ -84,7 +84,7 @@ const std::string &Device::getID() const
   return id;
 }
 
-void Device::open(ACCESS access, bool register_module_event)
+void Device::open(ACCESS access)
 {
   std::lock_guard<std::mutex> lock(mtx);
 
@@ -124,15 +124,7 @@ void Device::open(ACCESS access, bool register_module_event)
       i++;
     }
 
-    // register for device module events if requested
-
     event=0;
-    if (!err && register_module_event && gentl->GCRegisterEvent(dev, GenTL::EVENT_MODULE, &event) !=
-        GenTL::GC_ERR_SUCCESS)
-    {
-      err=true;
-    }
-
     eventadapter.reset();
 
     // check if open was successful
@@ -180,8 +172,22 @@ void Device::close()
   }
 }
 
+void Device::enableModuleEvents()
+{
+  std::lock_guard<std::mutex> lock(mtx);
+
+  if (dev && !event)
+  {
+    if (gentl->GCRegisterEvent(dev, GenTL::EVENT_MODULE, &event) != GenTL::GC_ERR_SUCCESS)
+    {
+      throw GenTLException("Device::enableModuleEvents()", gentl);
+    }
+  }
+}
+
 int Device::getAvailableModuleEvents()
 {
+  std::lock_guard<std::mutex> lock(mtx);
   size_t ret=0;
 
   GenTL::INFO_DATATYPE type;
@@ -237,42 +243,46 @@ std::string cDevGetInfo(const Device *obj, const std::shared_ptr<const GenTLWrap
 int64_t Device::getModuleEvent(int64_t _timeout)
 {
   int64_t eventid=-1;
-
   uint64_t timeout=GENTL_INFINITE;
-  if (_timeout >= 0)
+
   {
-    timeout=static_cast<uint64_t>(_timeout);
-  }
+    std::lock_guard<std::mutex> lock(mtx);
 
-  // check that streaming had been started
-
-  if (event == 0)
-  {
-    throw GenTLException("Device::getModuleEvent(): Device is not open or module events are not registered");
-  }
-
-  // determine memory for receiving the event
-
-  if (event_buffer.size() == 0)
-  {
-    size_t value=0;
-
-    GenTL::INFO_DATATYPE type;
-    size_t size=sizeof(value);
-
-    if (gentl->EventGetInfo(event, GenTL::EVENT_SIZE_MAX, &type, &value, &size) == GenTL::GC_ERR_SUCCESS)
+    if (_timeout >= 0)
     {
-      event_buffer.resize(value);
-      event_value.resize(value);
+      timeout=static_cast<uint64_t>(_timeout);
     }
-  }
 
-  // clear buffer
+    // check that streaming had been started
 
-  for (size_t i=0; i<event_buffer.size(); i++)
-  {
-    event_buffer[i]=0;
-    event_value[i]=0;
+    if (event == 0)
+    {
+      return -3;
+    }
+
+    // determine memory for receiving the event
+
+    if (event_buffer.size() == 0)
+    {
+      size_t value=0;
+
+      GenTL::INFO_DATATYPE type;
+      size_t size=sizeof(value);
+
+      if (gentl->EventGetInfo(event, GenTL::EVENT_SIZE_MAX, &type, &value, &size) == GenTL::GC_ERR_SUCCESS)
+      {
+        event_buffer.resize(value);
+        event_value.resize(value);
+      }
+    }
+
+    // clear buffer
+
+    for (size_t i=0; i<event_buffer.size(); i++)
+    {
+      event_buffer[i]=0;
+      event_value[i]=0;
+    }
   }
 
   // get event data
@@ -281,12 +291,18 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
   GenTL::GC_ERROR err=gentl->EventGetData(event, event_buffer.data(), &size, timeout);
 
+  std::lock_guard<std::mutex> lock(mtx);
+
   // return 0 in case of abort and timeout and throw exception in case of
   // another error
 
-  if (err == GenTL::GC_ERR_ABORT || err == GenTL::GC_ERR_TIMEOUT)
+  if (err == GenTL::GC_ERR_TIMEOUT)
   {
     return -1;
+  }
+  else if (err == GenTL::GC_ERR_ABORT)
+  {
+    return -2;
   }
   else if (err != GenTL::GC_ERR_SUCCESS)
   {
@@ -335,8 +351,6 @@ int64_t Device::getModuleEvent(int64_t _timeout)
     }
   }
 
-  std::lock_guard<std::mutex> lock(mtx);
-
   if (!nodemap)
   {
     cport=std::shared_ptr<CPort>(new CPort(gentl, &dev));
@@ -359,6 +373,16 @@ int64_t Device::getModuleEvent(int64_t _timeout)
   { }
 
   return eventid;
+}
+
+void Device::abortWaitingForModuleEvents()
+{
+  std::lock_guard<std::mutex> lock(mtx);
+
+  if (event != 0)
+  {
+    gentl->EventKill(event);
+  }
 }
 
 namespace

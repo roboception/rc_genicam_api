@@ -89,12 +89,10 @@ class Device : public std::enable_shared_from_this<Device>
       multiple times. However, for each open(), the close() method must be
       called as well.
 
-      @param access                Access mode.
-      @param register_module_event If true, module events can be received
-                                   with getModuleEvent() method.
+      @param access Access mode.
     */
 
-    void open(ACCESS access, bool register_module_event=false);
+    void open(ACCESS access);
 
     /**
       Closes the device. Each call of open() must be followed by a call to
@@ -104,7 +102,15 @@ class Device : public std::enable_shared_from_this<Device>
     void close();
 
     /**
-      Returns the number of module events that are currently in the queue.
+      Enable module events for the local device. Does nothing if they are
+      already enabled.
+    */
+
+    void enableModuleEvents();
+
+    /**
+      Returns the number of module events that are currently in the queue. This
+      returns 0 if modules events have not been enabled.
 
       @return Module event count.
     */
@@ -112,13 +118,25 @@ class Device : public std::enable_shared_from_this<Device>
     int getAvailableModuleEvents();
 
     /**
-      Gets the next module event for the device.
+      Gets the next module event for the device and attaches it to the local
+      device nodemap.
+
+      NOTE: This can be called from a different thread to wait for the event.
 
       @param timeout Timeout in ms. A value < 0 sets waiting time to infinite.
-      @return        Event ID or -1 if the method returned due to timeout.
+      @return        Event ID or
+                     -1 if the method returned due to timeout,
+                     -2 if waiting was interrupted due to calling abortWaitingForModuleEvents(),
+                     -3 if module events have not been enabled.
     */
 
     int64_t getModuleEvent(int64_t timeout=-1);
+
+    /**
+      Aborts waiting for module events.
+    */
+
+    void abortWaitingForModuleEvents();
 
     /**
       Returns the currently available streams of this device.
