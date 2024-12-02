@@ -70,7 +70,12 @@ Stream::~Stream()
   try
   {
     stopStreaming();
+  }
+  catch (...) // do not throw exceptions in destructor
+  { }
 
+  try
+  {
     if (stream != 0)
     {
       gentl->DSClose(stream);
@@ -123,14 +128,22 @@ void Stream::close()
 
     if (n_open == 0)
     {
-      stopStreaming();
-      gentl->DSClose(stream);
-      stream=0;
+      try
+      {
+        stopStreaming();
+      }
+      catch (...)
+      {
+        gentl->DSClose(stream);
+        stream=0;
 
-      buffer.setNodemap(0, "");
+        buffer.setNodemap(0, "");
 
-      nodemap=0;
-      cport=0;
+        nodemap=0;
+        cport=0;
+
+        throw;
+      }
     }
   }
 }
