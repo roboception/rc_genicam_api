@@ -1,3 +1,11 @@
+2.7.0 (2024-12-02)
+------------------
+
+- Added possibility to receive module events for a device
+- gc_info: Added interface to test receiving module events
+- Improved exception message when opening device is failing
+- Fixed crashing when stream and device is closed after loosing connection
+
 2.6.8 (2024-10-16)
 ------------------
 
