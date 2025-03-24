@@ -1,3 +1,8 @@
+2.7.0 (2025-03-24)
+------------------
+
+- Extended class for GenTL exceptions to access error codes and messages through seperate methods
+
 2.7.0 (2024-12-02)
 ------------------
 
