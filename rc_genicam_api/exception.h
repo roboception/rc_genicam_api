@@ -36,6 +36,8 @@
 #ifndef RC_GENICAM_API_EXCEPTION
 #define RC_GENICAM_API_EXCEPTION
 
+#include <GenTL/GenTL_v1_6.h>
+
 #include <memory>
 #include <string>
 
@@ -48,7 +50,9 @@ class GenTLException : public std::exception
 {
   private:
 
-    std::string s;
+    std::string msg;
+    std::string gentl_msg;
+    GenTL::GC_ERROR gentl_code;
 
   public:
 
@@ -56,6 +60,10 @@ class GenTLException : public std::exception
     GenTLException(const std::string &msg, const std::shared_ptr<const GenTLWrapper> &gentl);
 
     virtual ~GenTLException();
+
+    GenTL::GC_ERROR getGenTLCode() const noexcept { return gentl_code; }
+    const char *getGenTLMessage() const noexcept { return gentl_msg.c_str(); }
+
     virtual const char *what() const noexcept;
 };
 

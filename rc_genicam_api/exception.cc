@@ -44,36 +44,38 @@ namespace rcg
 
 class GenTLWrapper;
 
-GenTLException::GenTLException(const std::string &msg)
+GenTLException::GenTLException(const std::string &_msg)
 {
-  s=msg;
+  msg=_msg;
+  gentl_msg=_msg;
+  gentl_code=GenTL::GC_ERR_ERROR;
 }
 
-GenTLException::GenTLException(const std::string &msg,
+GenTLException::GenTLException(const std::string &_msg,
                                const std::shared_ptr<const GenTLWrapper> &gentl)
 {
-  GenTL::GC_ERROR err;
   char tmp[1024]="";
   size_t tmp_size=sizeof(tmp);
 
-  gentl->GCGetLastError(&err, tmp, &tmp_size);
+  gentl->GCGetLastError(&gentl_code, tmp, &tmp_size);
+  gentl_msg=tmp;
 
   std::ostringstream out;
 
-  if (msg.size() > 0 && err != GenTL::GC_ERR_SUCCESS)
+  if (_msg.size() > 0 && gentl_code != GenTL::GC_ERR_SUCCESS)
   {
-    out << msg << ": " << tmp << " (" << err << ")";
+    out << _msg << ": " << tmp << " (" << gentl_code << ")";
   }
-  else if (msg.size() > 0)
+  else if (_msg.size() > 0)
   {
-    out << msg;
+    out << _msg;
   }
   else
   {
-    out << tmp << " (" << err << ")";
+    out << tmp << " (" << gentl_code << ")";
   }
 
-  s=out.str();
+  msg=out.str();
 }
 
 GenTLException::~GenTLException()
@@ -81,7 +83,7 @@ GenTLException::~GenTLException()
 
 const char *GenTLException::what() const noexcept
 {
-  return s.c_str();
+  return msg.c_str();
 }
 
 }
