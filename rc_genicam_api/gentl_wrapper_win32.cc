@@ -115,7 +115,7 @@ inline FARPROC getFunction(HMODULE lib, const char *name)
     FreeLibrary(lib);
 
     std::ostringstream out;
-    out << "Cannot resolve GenTL symbol. Error code: " << err;
+    out << "Cannot resolve GenTL symbol '" << name << "'. Error code: " << err;
 
     throw std::invalid_argument(out.str());
   }
