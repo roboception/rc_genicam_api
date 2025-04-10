@@ -44,6 +44,11 @@
 #include <iostream>
 #include <iomanip>
 
+#ifdef WIN32
+#undef min
+#undef max
+#endif
+
 namespace rcg
 {
 
