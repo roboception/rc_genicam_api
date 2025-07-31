@@ -1,4 +1,9 @@
-2.7.0 (2025-03-24)
+2.8.1 (2025-07-31)
+------------------
+
+- Windows: Fixed build issue and report missing GenTL symbol if loading of transport layer fails due to missing symbols
+
+2.8.0 (2025-03-24)
 ------------------
 
 - Extended class for GenTL exceptions to access error codes and messages through seperate methods
