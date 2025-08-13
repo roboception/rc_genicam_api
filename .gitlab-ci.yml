@@ -48,7 +48,13 @@ variables:
   tags:
     - armhf
     - docker
-    
+
+.amd64_noble_t: &amd64_noble_job
+  image: registry.roboception.de/tools/docker_images:noble-buildimage
+  tags:
+    - amd64
+    - docker
+
 #############
 # Templates
 #############
@@ -129,7 +135,7 @@ variables:
 #### Jobs ####
 ##############
 gen_dox:
-  <<: *amd64_focal_job
+  <<: *amd64_jammy_job
   variables:
     TESTING_DEBS: "true"
   stage: deploy
@@ -175,6 +181,10 @@ test:jammy:armhf:
   <<: *armhf_jammy_job
   extends: .test_latest
 
+test:noble:amd64:
+  <<: *amd64_noble_job
+  extends: .test_latest
+
 # Test against stable (is allowed to fail)
 ##########################################
 test_stable:focal:amd64:
@@ -199,6 +209,10 @@ test_stable:jammy:arm64:
 
 test_stable:jammy:armhf:
   <<: *armhf_jammy_job
+  extends: .test_stable
+
+test_stable:noble:amd64:
+  <<: *amd64_noble_job
   extends: .test_stable
 
 # Deploy testing (only on master)
@@ -226,7 +240,11 @@ package_testing:jammy:arm64:
 package_testing:jammy:armhf:
   <<: *armhf_jammy_job
   extends: .package_testing
-  
+
+package_testing:noble:amd64:
+  <<: *amd64_noble_job
+  extends: .package_testing
+
 ################
 # Stable builds
 ################
@@ -256,7 +274,12 @@ test_release:jammy:arm64:
 test_release:jammy:armhf:
   <<: *armhf_jammy_job
   extends: .test_release
-  
+
+test_release:noble:amd64:
+  <<: *amd64_noble_job
+  extends: .test_release
+
+
 # Deploy stable (only for releases, version tags)
 #################################################
 package_stable:focal:amd64:
@@ -281,6 +304,10 @@ package_stable:jammy:arm64:
 
 package_stable:jammy:armhf:
   <<: *armhf_jammy_job
+  extends: .package_stable
+
+package_stable:noble:amd64:
+  <<: *amd64_noble_job
   extends: .package_stable
 
 ########################
