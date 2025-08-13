@@ -1,2 +1,2 @@
-rc-genicam-api embedded-library
+rc-genicam-api: embedded-library usr/lib/x86_64-linux-gnu/libXmlParser_gcc48_v3_4.so: expat
 
