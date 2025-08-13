@@ -1,3 +1,8 @@
+2.8.2 (2025-08-13)
+------------------
+
+- Added CI build job for noble and fixed lintian issues
+
 2.8.1 (2025-07-31)
 ------------------
 
