@@ -125,7 +125,7 @@ install(FILES net_perf_check.sh COMPONENT dev DESTINATION share/${PROJECT_NAME_L
 # - Define information for packaging -
 
 if (UNIX)
-  install(FILES ${CMAKE_SOURCE_DIR}/debian/rc-genicam-api.lintian-overrides DESTINATION /usr/share/lintian/overrides)
+  install(FILES ${CMAKE_SOURCE_DIR}/debian/rc-genicam-api.lintian-overrides DESTINATION /usr/share/lintian/overrides/rc-genicam-api)
 endif ()
 
 # optionally set description and maintainer (if not set will use defaults from package_debian.cmake)
