@@ -69,7 +69,7 @@ void printHelp()
 {
   // show help
 
-  std::cout << "gc_stream -h | [-c] [-f <fmt>] [-t] [<interface-id>:]<device-id> [n=<n>] [@<file>] [<key>=<value>] ..." << std::endl;
+  std::cout << "gc_stream -h | [-c] [-f <fmt>] [-r <n>] [-t] [<interface-id>:]<device-id> [n=<n>] [@<file>] [<key>=<value>] ..." << std::endl;
   std::cout << std::endl;
   std::cout << "Stores images from the specified device after applying the given optional GenICam parameters." << std::endl;
   std::cout << std::endl;
@@ -77,6 +77,7 @@ void printHelp()
   std::cout << "-h         Prints help information and exits" << std::endl;
   std::cout << "-c         Print ChunkDataControl category for all received buffers" << std::endl;
   std::cout << "-t         Testmode, which does not store images and provides extended statistics" << std::endl;
+  std::cout << "-r <n>     Number of times grabbing is retried. Default: 5" << std::endl;
   std::cout << "-f pnm|png Format for storing images. Default is pnm" << std::endl;
   std::cout << std::endl;
   std::cout << "Parameters:" << std::endl;
@@ -400,6 +401,7 @@ int main(int argc, char *argv[])
   {
     bool print_chunk_data=false;
     bool store=true;
+    int nretry=5;
     rcg::ImgFmt fmt=rcg::PNM;
     int i=1;
 
@@ -423,6 +425,20 @@ int main(int argc, char *argv[])
       {
         store=false;
         i++;
+      }
+      else if (param == "-r")
+      {
+        i++;
+
+        if (i < argc)
+        {
+          nretry=std::stoi(argv[i]);
+          i++;
+        }
+        else
+        {
+          throw std::invalid_argument("Argument expected after '-r'!");
+        }
       }
       else if (param == "-f")
       {
@@ -620,7 +636,7 @@ int main(int argc, char *argv[])
           {
             // grab next image with timeout of 3 seconds
 
-            int retry=5;
+            int retry=nretry;
             while (retry > 0 && !user_interrupt)
             {
               const rcg::Buffer *buffer=stream[0]->grab(3000);
