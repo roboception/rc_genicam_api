@@ -1,3 +1,8 @@
+2.8.3 (2025-12-23)
+------------------
+
+- Added parameter to gc_stream to change the number of retrys
+
 2.8.2 (2025-08-13)
 ------------------
 
