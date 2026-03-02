@@ -38,6 +38,9 @@
 
 #include <rc_genicam_api/config.h>
 
+#include <vector>
+#include <string>
+
 namespace rcg
 {
 
@@ -46,9 +49,22 @@ namespace rcg
 
   @param nodemap Nodemap.
   @param root    Name of root node, which must be a category.
+  @return False in case of an error, e.g. unknown root node.
 */
 
 bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[]);
+
+/**
+  Shows nodemap in a curses gui in the terminal and allows editing of parameters.
+
+  @param nodemap Nodemap.
+  @param root    Name of root node, which must be a category.
+  @param changed List of changed parameters in the order of changes.
+  @return False in case of an error, e.g. unknown root node.
+*/
+
+bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[],
+  std::vector<std::string> &changed);
 
 }
 

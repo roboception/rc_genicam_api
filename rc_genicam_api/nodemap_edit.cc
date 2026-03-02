@@ -89,6 +89,7 @@ class NodeParam
     void setValueColumn(int column);
     int getValueColumn();
 
+    std::string getName();
     std::string getValue(bool add_unit_range);
     std::string getAllowedCharacters();
 
@@ -118,6 +119,11 @@ void NodeParam::setValueColumn(int column)
 int NodeParam::getValueColumn()
 {
   return value_column;
+}
+
+std::string NodeParam::getName()
+{
+  return std::string(node->GetName().c_str());
 }
 
 std::string NodeParam::getValue(bool add_unit_range)
@@ -707,7 +713,8 @@ void redraw(std::vector<NodeParam> &list, int &top_row, int focus_row, const cha
   Editing loop for executing a command node.
 */
 
-std::string editNodeExecute(std::vector<NodeParam> &list, int &top_row, int focus_row)
+std::string editNodeExecute(std::vector<NodeParam> &list, int &top_row, int focus_row,
+  std::vector<std::string> &changed)
 {
   std::string ret;
 
@@ -732,6 +739,7 @@ std::string editNodeExecute(std::vector<NodeParam> &list, int &top_row, int focu
         ret=list[focus_row].execute();
         if (ret.size() == 0)
         {
+          changed.push_back(list[focus_row].getName());
           ret="Command executed!";
         }
         edit=false;
@@ -756,8 +764,9 @@ std::string editNodeExecute(std::vector<NodeParam> &list, int &top_row, int focu
 */
 
 std::string editNodeOption(std::vector<NodeParam> &list, int &top_row, int focus_row,
-  const std::vector<std::string> &option, int current)
+  const std::vector<std::string> &option, int current, std::vector<std::string> &changed)
 {
+  std::string old_value=list[focus_row].getValue(false);
   std::string ret;
 
   redraw_line(focus_row-top_row, list[focus_row], false, false);
@@ -797,6 +806,10 @@ std::string editNodeOption(std::vector<NodeParam> &list, int &top_row, int focus
       case '\n':
       case '\r':
         ret=list[focus_row].setValue(option[current]);
+        {
+          std::string value=list[focus_row].getValue(false);
+          changed.push_back(list[focus_row].getName()+"="+value);
+        }
         edit=false;
         break;
 
@@ -818,10 +831,12 @@ std::string editNodeOption(std::vector<NodeParam> &list, int &top_row, int focus
   Editing loop for entering a value as string.
 */
 
-std::string editNodeString(std::vector<NodeParam> &list, int &top_row, int focus_row)
+std::string editNodeString(std::vector<NodeParam> &list, int &top_row, int focus_row,
+  std::vector<std::string> &changed)
 {
   std::string allowed=list[focus_row].getAllowedCharacters();
   std::string value=list[focus_row].getValue(false);
+  std::string old_value=value;
   std::string message="Current value: "+list[focus_row].getValue(true);
   std::string ret;
 
@@ -902,6 +917,8 @@ std::string editNodeString(std::vector<NodeParam> &list, int &top_row, int focus
       case '\n':
       case '\r':
         ret=list[focus_row].setValue(value);
+        value=list[focus_row].getValue(false);
+        changed.push_back(list[focus_row].getName()+"="+value);
         edit=false;
         break;
 
@@ -942,6 +959,13 @@ std::string editNodeString(std::vector<NodeParam> &list, int &top_row, int focus
 }
 
 bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[])
+{
+  std::vector<std::string> tmp;
+  return editNodemap(nodemap, root, tmp);
+}
+
+bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[],
+  std::vector<std::string> &changed)
 {
   // get list of all nodes
 
@@ -1072,7 +1096,7 @@ bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char
 
             if (list[focus_row].isExecutable())
             {
-              message=editNodeExecute(list, top_row, focus_row);
+              message=editNodeExecute(list, top_row, focus_row, changed);
             }
             else
             {
@@ -1081,11 +1105,11 @@ bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char
 
               if (option.size() > 0)
               {
-                message=editNodeOption(list, top_row, focus_row, option, current);
+                message=editNodeOption(list, top_row, focus_row, option, current, changed);
               }
               else
               {
-                message=editNodeString(list, top_row, focus_row);
+                message=editNodeString(list, top_row, focus_row, changed);
               }
             }
 
@@ -1123,7 +1147,14 @@ bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char
 namespace rcg
 {
 
-bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[])
+bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &, const char [])
+{
+  std::cerr << "Editing of nodemap is not implemented! Recompile with ncurses." << std::endl;
+  return false;
+}
+
+bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &, const char [],
+  std::vector<std::string> &)
 {
   std::cerr << "Editing of nodemap is not implemented! Recompile with ncurses." << std::endl;
   return false;
