@@ -1,3 +1,9 @@
+2.8.4 (2026-05-07)
+------------------
+
+* Added noble arm64 jobs
+* Add possibility to edit nodemap interactively in gc_stream before starting to stream
+
 2.8.3 (2025-12-23)
 ------------------
 
