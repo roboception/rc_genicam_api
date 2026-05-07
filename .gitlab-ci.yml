@@ -55,6 +55,12 @@ variables:
     - amd64
     - docker
 
+.arm64_noble_t: &arm64_noble_job
+  image: registry.roboception.de/tools/docker_images:noble-buildimage
+  tags:
+    - arm64
+    - docker
+
 #############
 # Templates
 #############
@@ -185,6 +191,10 @@ test:noble:amd64:
   <<: *amd64_noble_job
   extends: .test_latest
 
+test:noble:arm64:
+  <<: *arm64_noble_job
+  extends: .test_latest
+
 # Test against stable (is allowed to fail)
 ##########################################
 test_stable:focal:amd64:
@@ -215,6 +225,10 @@ test_stable:noble:amd64:
   <<: *amd64_noble_job
   extends: .test_stable
 
+test_stable:noble:arm64:
+  <<: *arm64_noble_job
+  extends: .test_stable
+
 # Deploy testing (only on master)
 #################################
 package_testing:focal:amd64:
@@ -243,6 +257,10 @@ package_testing:jammy:armhf:
 
 package_testing:noble:amd64:
   <<: *amd64_noble_job
+  extends: .package_testing
+
+package_testing:noble:arm64:
+  <<: *arm64_noble_job
   extends: .package_testing
 
 ################
@@ -279,6 +297,9 @@ test_release:noble:amd64:
   <<: *amd64_noble_job
   extends: .test_release
 
+test_release:noble:arm64:
+  <<: *arm64_noble_job
+  extends: .test_release
 
 # Deploy stable (only for releases, version tags)
 #################################################
@@ -310,6 +331,10 @@ package_stable:noble:amd64:
   <<: *amd64_noble_job
   extends: .package_stable
 
+package_stable:noble:arm64:
+  <<: *arm64_noble_job
+  extends: .package_stable
+  
 ########################
 # package as ROS package
 ########################
