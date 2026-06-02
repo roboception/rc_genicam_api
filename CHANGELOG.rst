@@ -1,3 +1,8 @@
+2.8.5 (2026-06-02)
+------------------
+
+* set CMP0045 policy to NEW to support newer cmake versions
+
 2.8.4 (2026-05-07)
 ------------------
 
