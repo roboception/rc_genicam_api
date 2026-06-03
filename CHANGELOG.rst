@@ -1,3 +1,8 @@
+2.8.6 (2026-06-03)
+------------------
+
+* don't try to install lintian overrides file via cmake
+
 2.8.5 (2026-06-02)
 ------------------
 
