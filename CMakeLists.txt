@@ -124,13 +124,6 @@ install(FILES net_perf_check.sh COMPONENT dev DESTINATION share/${PROJECT_NAME_L
 
 # - Define information for packaging -
 
-# Only install Lintian overrides when CPack is explicitly generating a DEB package
-if (CPACK_BINARY_DIR AND CPACK_GENERATOR STREQUAL "DEB")
-  install(FILES ${CMAKE_SOURCE_DIR}/debian/rc-genicam-api.lintian-overrides
-          RENAME rc-genicam-api
-          DESTINATION share/lintian/overrides)
-endif()
-
 # optionally set description and maintainer (if not set will use defaults from package_debian.cmake)
 #set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Roboception package description")
 
