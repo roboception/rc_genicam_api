@@ -63,6 +63,86 @@
 #undef max
 #endif
 
+#ifndef _WIN32
+
+#include <iostream>
+#include <termios.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
+
+/*
+  Calling software trigger command if key 't' is pressed.
+
+  NOTE: This implementation does not work for Windows.
+*/
+
+class SoftwareTrigger
+{
+  private:
+
+    struct termios oldt, newt;
+    std::shared_ptr<GenApi::CNodeMapRef> nodemap;
+
+    std::atomic_bool running;
+    std::thread trigger_thread;
+
+    void run()
+    {
+      while (running)
+      {
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(STDIN_FILENO, &fds);
+
+        struct timeval tv={0, 100000};
+
+        if (select(STDIN_FILENO+1, &fds, NULL, NULL, &tv) > 0)
+        {
+          if (getchar() == 't')
+          {
+            rcg::callCommand(nodemap, "TriggerSoftware", false);
+          }
+        }
+      }
+    }
+
+  public:
+
+    SoftwareTrigger(const std::shared_ptr<GenApi::CNodeMapRef> &_nodemap)
+    {
+      // store current terminal settings and activate non-canonical mode
+      tcgetattr(STDIN_FILENO, &oldt);
+      newt=oldt;
+      newt.c_lflag &= ~(ICANON | ECHO);
+      tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+      nodemap=_nodemap;
+
+      running=true;
+      trigger_thread=std::thread(&SoftwareTrigger::run, this);
+
+      std::cout << "Press 't' for sending a software trigger." << std::endl;
+      std::cout << std::endl;
+    }
+
+    ~SoftwareTrigger()
+    {
+      running=false;
+
+      if (trigger_thread.joinable())
+      {
+        trigger_thread.join();
+      }
+
+      // restore old terminal settings
+      tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    }
+};
+
+#endif
+
 namespace
 {
 
@@ -666,6 +746,16 @@ int main(int argc, char *argv[])
           auto time_start=std::chrono::steady_clock::now();
           double latency_ns=0;
 
+          bool triggered=(rcg::getEnum(nodemap, "TriggerMode", false) == "On");
+
+#ifndef _WIN32
+          std::shared_ptr<SoftwareTrigger> swtrigger;
+          if (triggered && rcg::getEnum(nodemap, "TriggerSource", false) == "Software")
+          {
+            swtrigger=std::make_shared<SoftwareTrigger>(nodemap);
+          }
+#endif
+
           for (int k=0; k<n && !user_interrupt; k++)
           {
             // grab next image with timeout of 3 seconds
@@ -830,11 +920,17 @@ int main(int argc, char *argv[])
               }
               else
               {
-                std::cerr << "Cannot grab images" << std::endl;
-                break;
+                if (!triggered)
+                {
+                  std::cerr << "Cannot grab images" << std::endl;
+                  break;
+                }
               }
 
-              retry--;
+              if (!triggered)
+              {
+                retry--;
+              }
             }
           }
 
