@@ -19,6 +19,7 @@ Contents
 - [Compiling and Installing](#compiling-and-installing)
   - [Linux](#linux)
   - [Windows](#windows)
+- [Examples](#examples)
 - [Description of Tools](#description-of-tools)
   - [gc_info](#gc_info)
   - [gc_config](#gc_config)
@@ -78,6 +79,12 @@ compilation with your favorite compiler.
 NOTE: For using the libraries in own projects, define the symbol
 `GENICAM_NO_AUTO_IMPLIB` in your project file to avoid linker problems with the
 GenICam libraries.
+
+Examples
+--------
+
+There are some self explanatory example programs for streaming 2d and 3d data
+with this API in the sub folder 'examples'.
 
 Description of Tools
 --------------------
