@@ -465,5 +465,13 @@ int main(int argc, char *argv[])
 
   rcg::System::clearSystems();
 
+  if (ret != 0)
+  {
+    std::cerr << std::endl;
+    std::cerr << "Something went wrong. Please check the logs of the used device. If you are using" << std::endl;
+    std::cerr << "the SGM Producer, enable logging by setting the environment variable" << std::endl;
+    std::cerr << "RC_SGM_PRODCUER_LEVEL=5 in the system or source code of this example and rerun." << std::endl;
+  }
+
   return ret;
 }
