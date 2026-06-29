@@ -1,3 +1,9 @@
+2.8.7 (2026-06-29)
+------------------
+
+* Added examples for streaming 2d and 3d data
+* Added support for software triggering into gc_stream
+
 2.8.6 (2026-06-03)
 ------------------
 
