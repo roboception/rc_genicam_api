@@ -1172,7 +1172,7 @@ std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const 
     try
     {
       // limit read operation to file size, if available
-      length=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
+      length=static_cast<int>(rcg::getInteger(nodemap, "FileSize", 0, 0, true));
     }
     catch (const std::exception &)
     { }

@@ -96,12 +96,21 @@ int main(int argc, char *argv[])
       // rc_viscore, i.e. 12 MPixel, with a minimum depth range, see
       // documentation of SGM Producer)
 
+#ifdef WIN32
+      _putenv_s("RC_SGM_MAXMEM", "3312");
+#else
       setenv("RC_SGM_MAXMEM", "3312", 1);
+#endif
 
       // logging SGM Producer activity can be activated with
 
+#ifdef WIN32
+//      _putenv_s("RC_SGM_PRODUCER_LOG", "/tmp/stream3d.log");
+//      _putenv_s("RC_SGM_PRODUCER_LEVEL", "5");
+#else
 //      setenv("RC_SGM_PRODUCER_LOG", "/tmp/stream3d.log", 1);
 //      setenv("RC_SGM_PRODUCER_LEVEL", "5", 1);
+#endif
     }
 
     // find specific device accross all systems and interfaces and open it
