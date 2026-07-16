@@ -636,6 +636,12 @@ uint64_t Device::getTimestampFrequency()
   return freq;
 }
 
+std::string Device::getCustomInfoString(int id)
+{
+  std::lock_guard<std::mutex> lock(mtx);
+  return cDevGetInfo(this, gentl, id);
+}
+
 std::shared_ptr<GenApi::CNodeMapRef> Device::getNodeMap(const char *xml)
 {
   std::lock_guard<std::mutex> lock(mtx);

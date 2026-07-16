@@ -258,6 +258,18 @@ class Device : public std::enable_shared_from_this<Device>
     uint64_t getTimestampFrequency();
 
     /**
+      Get custom information string from the underlying device. It depends on
+      the used producer what information may be available with which ID. The
+      Returned string will be empty in case of a type mismatch or any other
+      error.
+
+      @param  ID (Custom IDs are >= 1000 according to GenTL standard).
+      @return Requested custom string that is empty in case of an error.
+    */
+
+    std::string getCustomInfoString(int id);
+
+    /**
       Returns the node map of this object.
 
       NOTE: open() must be called before calling this method. The returned
