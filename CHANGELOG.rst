@@ -1,5 +1,5 @@
-unreleased
-----------
+2.8.8 (2026-09-17)
+------------------
 
 * Added method for getting custom device info string
 * Fixed Stream::close() not releasing the data stream and its nodemap
