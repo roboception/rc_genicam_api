@@ -44,6 +44,7 @@
 #include <iomanip>
 #include <limits>
 #include <algorithm>
+#include <memory>
 
 #ifdef INCLUDE_PNG
 #include <png.h>
@@ -215,6 +216,14 @@ std::string storeImagePNM(const std::string &name, const Image &image, size_t yo
     case YCbCr422_8:
     case YUV422_8:
       {
+        // four pixels are packed into one group of bytes
+
+        if ((width&0x3) != 0)
+        {
+          throw IOException("storeImage(): Image width must be a multiple of 4 for YCbCr and "
+                            "YUV pixel formats");
+        }
+
         full_name=ensureNewFileName(name+".ppm");
         std::ofstream out(full_name, std::ios::binary);
 
@@ -315,6 +324,75 @@ std::string storeImagePNM(const std::string &name, const Image &image, size_t yo
 
 #ifdef INCLUDE_PNG
 
+/*
+  RAII wrapper around the libpng write structures. It opens the file, creates
+  the png structures and connects them. All resources are released in the
+  destructor, i.e. also if an exception is thrown while writing the image.
+*/
+
+class PNGWriter
+{
+  public:
+
+    PNGWriter(const std::string &name)
+    {
+      file=0;
+      png=0;
+      info=0;
+
+      file=fopen(name.c_str(), "wb");
+
+      if (file == 0)
+      {
+        throw IOException("Cannot store file: "+name);
+      }
+
+      png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+
+      if (png == 0)
+      {
+        fclose(file);
+        throw IOException("Cannot create png write structure for file: "+name);
+      }
+
+      info=png_create_info_struct(png);
+
+      if (info == 0)
+      {
+        png_destroy_write_struct(&png, 0);
+        fclose(file);
+        throw IOException("Cannot create png info structure for file: "+name);
+      }
+
+      png_init_io(png, file);
+    }
+
+    ~PNGWriter()
+    {
+      if (png != 0)
+      {
+        png_destroy_write_struct(&png, &info);
+      }
+
+      if (file != 0)
+      {
+        fclose(file);
+      }
+    }
+
+    png_structp getPng() const { return png; }
+    png_infop getInfo() const { return info; }
+
+  private:
+
+    PNGWriter(const PNGWriter &); // forbidden
+    PNGWriter &operator=(const PNGWriter &); // forbidden
+
+    FILE *file;
+    png_structp png;
+    png_infop info;
+};
+
 std::string storeImagePNG(const std::string &name, const Image &image, size_t yoffset,
   size_t height)
 {
@@ -326,7 +404,10 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
   yoffset=std::min(yoffset, real_height);
   height=std::min(height, real_height-yoffset);
 
-  const unsigned char *p=static_cast<const unsigned char *>(image.getPixels());
+  // NOTE: This pointer must not be modified, as its value would be
+  // indeterminate after a longjmp() from libpng
+
+  const unsigned char *const p=static_cast<const unsigned char *>(image.getPixels());
 
   size_t px=image.getXPadding();
 
@@ -342,20 +423,18 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
         // open file and init
 
         full_name=ensureNewFileName(name+".png");
-        FILE *out=fopen(full_name.c_str(), "wb");
 
-        if (!out)
+        PNGWriter writer(full_name);
+        png_structp png=writer.getPng();
+        png_infop info=writer.getInfo();
+
+        if (setjmp(png_jmpbuf(png)))
         {
-          throw new IOException("Cannot store file: "+full_name);
+          throw IOException("Error while writing file: "+full_name);
         }
-
-        png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-        png_infop info=png_create_info_struct(png);
-        setjmp(png_jmpbuf(png));
 
         // write header
 
-        png_init_io(png, out);
         png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_GRAY,
           PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
           PNG_FILTER_TYPE_DEFAULT);
@@ -363,18 +442,18 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
 
         // write image body
 
-        p+=(width+px)*yoffset;
+        // NOTE: A local pointer is used, as modifying p across setjmp() would
+        // leave it with an indeterminate value
+
+        const unsigned char *q=p+(width+px)*yoffset;
+
         for (size_t k=0; k<height; k++)
         {
-          png_write_row(png, const_cast<png_bytep>(p));
-          p+=width+px;
+          png_write_row(png, const_cast<png_bytep>(q));
+          q+=width+px;
         }
 
-        // close file
-
         png_write_end(png, info);
-        fclose(out);
-        png_destroy_write_struct(&png, &info);
       }
       break;
 
@@ -384,20 +463,18 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
         // open file and init
 
         full_name=ensureNewFileName(name+".png");
-        FILE *out=fopen(full_name.c_str(), "wb");
 
-        if (!out)
+        PNGWriter writer(full_name);
+        png_structp png=writer.getPng();
+        png_infop info=writer.getInfo();
+
+        if (setjmp(png_jmpbuf(png)))
         {
-          throw new IOException("Cannot store file: "+full_name);
+          throw IOException("Error while writing file: "+full_name);
         }
-
-        png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-        png_infop info=png_create_info_struct(png);
-        setjmp(png_jmpbuf(png));
 
         // write header
 
-        png_init_io(png, out);
         png_set_IHDR(png, info, width, height, 16, PNG_COLOR_TYPE_GRAY,
           PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
           PNG_FILTER_TYPE_DEFAULT);
@@ -410,18 +487,15 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
           png_set_swap(png);
         }
 
-        p+=(2*width+px)*yoffset;
+        const unsigned char *q=p+(2*width+px)*yoffset;
+
         for (size_t k=0; k<height; k++)
         {
-          png_write_row(png, const_cast<png_bytep>(p));
-          p+=2*width+px;
+          png_write_row(png, const_cast<png_bytep>(q));
+          q+=2*width+px;
         }
 
-        // close file
-
         png_write_end(png, info);
-        fclose(out);
-        png_destroy_write_struct(&png, &info);
       }
       break;
 
@@ -431,21 +505,27 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
       {
         // open file and init
 
-        full_name=ensureNewFileName(name+".png");
-        FILE *out=fopen(full_name.c_str(), "wb");
+        // four pixels are packed into one group of bytes
 
-        if (!out)
+        if ((width&0x3) != 0)
         {
-          throw new IOException("Cannot store file: "+full_name);
+          throw IOException("storeImage(): Image width must be a multiple of 4 for YCbCr and "
+                            "YUV pixel formats");
         }
 
-        png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-        png_infop info=png_create_info_struct(png);
-        setjmp(png_jmpbuf(png));
+        full_name=ensureNewFileName(name+".png");
+
+        PNGWriter writer(full_name);
+        png_structp png=writer.getPng();
+        png_infop info=writer.getInfo();
+
+        if (setjmp(png_jmpbuf(png)))
+        {
+          throw IOException("Error while writing file: "+full_name);
+        }
 
         // write header
 
-        png_init_io(png, out);
         png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
           PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
           PNG_FILTER_TYPE_DEFAULT);
@@ -453,7 +533,7 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
 
         // write image body
 
-        uint8_t *tmp=new uint8_t [3*width];
+        std::unique_ptr<uint8_t []> tmp(new uint8_t [3*width]);
 
         size_t pstep;
         if (format == YCbCr411_8)
@@ -465,33 +545,30 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
           pstep=(width>>2)*8+px;
         }
 
-        p+=pstep*yoffset;
+        const unsigned char *q=p+pstep*yoffset;
+
         for (size_t k=0; k<height; k++)
         {
           if (format == YCbCr411_8)
           {
             for (size_t i=0; i<width; i+=4)
             {
-              convYCbCr411toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+              convYCbCr411toQuadRGB(tmp.get()+3*i, q, static_cast<int>(i));
             }
           }
           else
           {
             for (size_t i=0; i<width; i+=4)
             {
-              convYCbCr422toQuadRGB(tmp+3*i, p, static_cast<int>(i));
+              convYCbCr422toQuadRGB(tmp.get()+3*i, q, static_cast<int>(i));
             }
           }
 
-          png_write_row(png, tmp);
-          p+=pstep;
+          png_write_row(png, tmp.get());
+          q+=pstep;
         }
 
-        // close file
-
         png_write_end(png, info);
-        fclose(out);
-        png_destroy_write_struct(&png, &info);
       }
       break;
 
@@ -499,36 +576,34 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
       {
         std::unique_ptr<uint8_t []> rgb_pixel(new uint8_t [3*width*height]);
 
+        const unsigned char *raw=p;
+
         if (format == RGB8)
         {
-          p+=(3*width+px)*yoffset;
+          raw+=(3*width+px)*yoffset;
         }
         else
         {
-          p+=(width+px)*yoffset;
+          raw+=(width+px)*yoffset;
         }
 
-        if (convertImage(rgb_pixel.get(), 0, p, format, width, height, px))
+        if (convertImage(rgb_pixel.get(), 0, raw, format, width, height, px))
         {
-          p=rgb_pixel.get();
-
           // open file and init
 
           full_name=ensureNewFileName(name+".png");
-          FILE *out=fopen(full_name.c_str(), "wb");
 
-          if (!out)
+          PNGWriter writer(full_name);
+          png_structp png=writer.getPng();
+          png_infop info=writer.getInfo();
+
+          if (setjmp(png_jmpbuf(png)))
           {
-            throw new IOException("Cannot store file: "+full_name);
+            throw IOException("Error while writing file: "+full_name);
           }
-
-          png_structp png=png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-          png_infop info=png_create_info_struct(png);
-          setjmp(png_jmpbuf(png));
 
           // write header
 
-          png_init_io(png, out);
           png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
             PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
             PNG_FILTER_TYPE_DEFAULT);
@@ -536,17 +611,15 @@ std::string storeImagePNG(const std::string &name, const Image &image, size_t yo
 
           // write image body
 
+          const unsigned char *q=rgb_pixel.get();
+
           for (size_t k=0; k<height; k++)
           {
-            png_write_row(png, const_cast<png_bytep>(p));
-            p+=3*width;
+            png_write_row(png, const_cast<png_bytep>(q));
+            q+=3*width;
           }
 
-          // close file
-
           png_write_end(png, info);
-          fclose(out);
-          png_destroy_write_struct(&png, &info);
         }
         else
         {
@@ -607,11 +680,19 @@ std::string storeImageAsDisparityPFM(const std::string &name, const Image &image
   size_t px=image.getXPadding();
   size_t width=image.getWidth();
   size_t height=image.getHeight();
-  const unsigned char *p=static_cast<const unsigned char *>(image.getPixels())+
-    2*(width+px)*(height+1);
+
+  // size of one image row in bytes, including padding
+
+  const size_t lstep=2*width+px;
+  const unsigned char *pixels=static_cast<const unsigned char *>(image.getPixels());
 
   std::string full_name=ensureNewFileName(name+".pfm");
   std::ofstream out(full_name, std::ios::binary);
+
+  if (!out)
+  {
+    throw IOException("storeImageAsDisparityPFM(): Cannot store file: "+full_name);
+  }
 
   out << "Pf" << std::endl;
   out << width << " " << height << std::endl;
@@ -631,7 +712,10 @@ std::string storeImageAsDisparityPFM(const std::string &name, const Image &image
 
   for (size_t k=0; k<height && out.good(); k++)
   {
-    p-=(width+px)<<2;
+    // pfm stores the image rows from bottom to top
+
+    const unsigned char *p=pixels+(height-1-k)*lstep;
+
     for (size_t i=0; i<width; i++)
     {
       int val;
@@ -668,12 +752,15 @@ std::string storeImageAsDisparityPFM(const std::string &name, const Image &image
         sb->sputc(c[1]);
         sb->sputc(c[0]);
       }
-
-      p+=px;
     }
   }
 
   out.close();
+
+  if (!out)
+  {
+    throw IOException("storeImageAsDisparityPFM(): Error while writing file: "+full_name);
+  }
 
   return full_name;
 }

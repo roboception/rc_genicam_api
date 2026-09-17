@@ -36,15 +36,10 @@
 #include "nodemap_out.h"
 
 #include <iostream>
-
-#ifdef USE_NCURSES
-#include <ncurses.h>
-#endif
-
-#include <iostream>
 #include <iomanip>
+#include <algorithm>
 
-#ifdef WIN32
+#ifdef _WIN32
 #undef min
 #undef max
 #endif
@@ -110,9 +105,13 @@ std::string formatValue(GenApi::IInteger *node, int64_t value)
        break;
 
     case GenApi::MACAddress:
-       out << std::hex << ((value>>40)&0xff) << ':' << ((value>>32)&0xff) << ':'
-                       << ((value>>24)&0xff) << ':' << ((value>>16)&0xff) << ':'
-                       << ((value>>8)&0xff) << ':' << (value&0xff);
+       out << std::hex << std::setfill('0');
+       out << std::setw(2) << ((value>>40)&0xff) << ':'
+           << std::setw(2) << ((value>>32)&0xff) << ':'
+           << std::setw(2) << ((value>>24)&0xff) << ':'
+           << std::setw(2) << ((value>>16)&0xff) << ':'
+           << std::setw(2) << ((value>>8)&0xff) << ':'
+           << std::setw(2) << (value&0xff);
        break;
 
     default:
@@ -217,20 +216,26 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool s
 
           if (p)
           {
-            int len=static_cast<int>(p->GetLength());
+            int64_t len=p->GetLength();
 
             std::cout << prefix << "Register: " << node->GetName() << "[" << len << "] "
-              << getAccessMode(node) << ": " << std::hex;
+              << getAccessMode(node) << ": ";
 
-            if (GenApi::IsReadable(p))
+            if (GenApi::IsReadable(p) && len > 0)
             {
-              uint8_t buffer[32];
-              p->Get(buffer, std::min(len, 32));
+              const int64_t n=std::min(len, static_cast<int64_t>(32));
 
-              for (int i=0; i<len && i<32; i++)
+              uint8_t buffer[32]={};
+              p->Get(buffer, n);
+
+              std::cout << std::hex << std::setfill('0');
+
+              for (int64_t i=0; i<n; i++)
               {
-                std::cout << std::setfill('0') << std::setw(2) << static_cast<int>(buffer[i]);
+                std::cout << std::setw(2) << static_cast<int>(buffer[i]);
               }
+
+              std::cout << std::dec << std::setfill(' ');
 
               if (len > 32)
               {
@@ -238,7 +243,7 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool s
               }
             }
 
-            std::cout << std::dec << std::endl;
+            std::cout << std::endl;
           }
         }
 
@@ -329,6 +334,11 @@ void printNode(const std::string &prefix, GenApi::INode *node, int depth, bool s
 bool printNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char root[],
   int depth, bool show_enum_list)
 {
+  if (!nodemap)
+  {
+    return false;
+  }
+
   GenApi::INode *p=nodemap->_GetNode(root);
   bool ret=false;
 

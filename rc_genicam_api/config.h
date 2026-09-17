@@ -338,6 +338,8 @@ std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<Gen
   parameters, then the component name is guessed from the pixel format of the
   requested part. The heuristic of this is designed for Roboceptions rc_visard.
 
+  The value of ChunkComponentSelector is restored before returning.
+
   @param nodemap Feature nodemap that should already have been attached to the
                  buffer.
   @param buffer  Buffer that should already have been attached to the nodemap.
@@ -347,6 +349,14 @@ std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<Gen
 */
 
 class Buffer;
+
+std::string getComponentOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                               const Buffer *buffer, uint32_t part);
+
+/**
+  NOTE: This function is deprecated due to a typo in its name. Use
+  getComponentOfPart() instead, to which this function forwards.
+*/
 
 std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
                               const Buffer *buffer, uint32_t part);

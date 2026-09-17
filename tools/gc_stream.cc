@@ -73,7 +73,12 @@
 #include <sys/types.h>
 
 /*
-  Calling software trigger command if key 't' is pressed.
+  Watches the keyboard and requests a software trigger if the key 't' is
+  pressed.
+
+  NOTE: The nodemap must only be used by one thread. The watching thread
+  therefore only raises a flag, which the main thread checks via pending() and
+  turns into the actual TriggerSoftware command.
 
   NOTE: This implementation does not work for Windows.
 */
@@ -83,9 +88,9 @@ class SoftwareTrigger
   private:
 
     struct termios oldt, newt;
-    std::shared_ptr<GenApi::CNodeMapRef> nodemap;
 
     std::atomic_bool running;
+    std::atomic_bool requested;
     std::thread trigger_thread;
 
     void run()
@@ -102,7 +107,7 @@ class SoftwareTrigger
         {
           if (getchar() == 't')
           {
-            rcg::callCommand(nodemap, "TriggerSoftware", false);
+            requested=true;
           }
         }
       }
@@ -110,7 +115,7 @@ class SoftwareTrigger
 
   public:
 
-    SoftwareTrigger(const std::shared_ptr<GenApi::CNodeMapRef> &_nodemap)
+    SoftwareTrigger()
     {
       // store current terminal settings and activate non-canonical mode
       tcgetattr(STDIN_FILENO, &oldt);
@@ -118,9 +123,8 @@ class SoftwareTrigger
       newt.c_lflag &= ~(ICANON | ECHO);
       tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-      nodemap=_nodemap;
-
       running=true;
+      requested=false;
       trigger_thread=std::thread(&SoftwareTrigger::run, this);
 
       std::cout << "Press 't' for sending a software trigger." << std::endl;
@@ -138,6 +142,16 @@ class SoftwareTrigger
 
       // restore old terminal settings
       tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    }
+
+    /*
+      Returns true (once) if a software trigger has been requested since the
+      last call. Must only be called from the thread that owns the nodemap.
+    */
+
+    bool pending()
+    {
+      return requested.exchange(false);
     }
 };
 
@@ -399,24 +413,24 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
 
       try
       {
-        float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcNoise", 0, 0, true));
-        out << "camera.noise=" << v << std::endl;
+        float val=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcNoise", 0, 0, true));
+        out << "camera.noise=" << val << std::endl;
       }
       catch (const std::exception &)
       { }
 
       try
       {
-        float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcBrightness", 0, 0, true));
-        out << "camera.brightness=" << v << std::endl;
+        float val=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcBrightness", 0, 0, true));
+        out << "camera.brightness=" << val << std::endl;
       }
       catch (const std::exception &)
       { }
 
       try
       {
-        float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcOut1Reduction", 0, 0, true));
-        out << "camera.out1_reduction=" << v << std::endl;
+        float val=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcOut1Reduction", 0, 0, true));
+        out << "camera.out1_reduction=" << val << std::endl;
       }
       catch (const std::exception &)
       { }
@@ -426,8 +440,8 @@ void storeParameter(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
         try
         {
           rcg::setEnum(nodemap, "ChunkLineSelector", ("Out"+std::to_string(i)).c_str(), true);
-          float v=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcLineRatio", 0, 0, true));
-          out << "camera.out" << i << "_ratio=" << v << std::endl;
+          float val=static_cast<float>(rcg::getFloat(nodemap, "ChunkRcLineRatio", 0, 0, true));
+          out << "camera.out" << i << "_ratio=" << val << std::endl;
         }
         catch (const std::exception &)
         { }
@@ -452,7 +466,8 @@ std::atomic<bool> user_interrupt(false);
 
 void interruptHandler(int)
 {
-  std::cout << "Stopping ..." << std::endl;
+  // NOTE: Only async signal safe operations are permitted here, i.e. no
+  // output to std::cout
 
   user_interrupt=true;
 }
@@ -752,7 +767,7 @@ int main(int argc, char *argv[])
           std::shared_ptr<SoftwareTrigger> swtrigger;
           if (triggered && rcg::getEnum(nodemap, "TriggerSource", false) == "Software")
           {
-            swtrigger=std::make_shared<SoftwareTrigger>(nodemap);
+            swtrigger=std::make_shared<SoftwareTrigger>();
           }
 #endif
 
@@ -763,7 +778,26 @@ int main(int argc, char *argv[])
             int retry=nretry;
             while (retry > 0 && !user_interrupt)
             {
-              const rcg::Buffer *buffer=stream[0]->grab(3000);
+              int64_t grab_timeout=3000;
+
+#ifndef _WIN32
+              // send a software trigger if the user requested one, which must
+              // happen in this thread as the nodemap is not thread safe
+
+              if (swtrigger)
+              {
+                if (swtrigger->pending())
+                {
+                  rcg::callCommand(nodemap, "TriggerSoftware", false);
+                }
+
+                // poll more often so that key presses are handled quickly
+
+                grab_timeout=100;
+              }
+#endif
+
+              const rcg::Buffer *buffer=stream[0]->grab(grab_timeout);
 
               if (buffer != 0)
               {
@@ -789,7 +823,7 @@ int main(int argc, char *argv[])
 
                         // get component name
 
-                        std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
+                        std::string component=rcg::getComponentOfPart(nodemap, buffer, part);
 
                         // try storing disparity as float image with meta information
 
@@ -894,10 +928,10 @@ int main(int argc, char *argv[])
                   {
                     // apply chunk parameters
 
-                    for (size_t i=0; i<chunk_param.size(); i++)
+                    for (size_t j=0; j<chunk_param.size(); j++)
                     {
-                      rcg::setString(nodemap, chunk_param[i].first.c_str(),
-                        chunk_param[i].second.c_str(), true);
+                      rcg::setString(nodemap, chunk_param[j].first.c_str(),
+                        chunk_param[j].second.c_str(), true);
                     }
 
                     // print chunk data
@@ -939,15 +973,25 @@ int main(int argc, char *argv[])
           stream[0]->stopStreaming();
           stream[0]->close();
 
+          if (user_interrupt)
+          {
+            std::cout << "Stopping ..." << std::endl;
+          }
+
           // report received and incomplete buffers
 
           std::cout << std::endl;
           std::cout << "Received buffers:   " << buffers_received << std::endl;
           std::cout << "Incomplete buffers: " << buffers_incomplete << std::endl;
 
-          std::cout << "Buffers per second: " << std::setprecision(3)
-                    << 1000.0*buffers_received/std::chrono::duration_cast<std::chrono::milliseconds>(time_stop-time_start).count()
-                    << std::endl;
+          const int64_t duration_ms=
+            std::chrono::duration_cast<std::chrono::milliseconds>(time_stop-time_start).count();
+
+          if (duration_ms > 0)
+          {
+            std::cout << "Buffers per second: " << std::setprecision(3)
+                      << 1000.0*buffers_received/static_cast<double>(duration_ms) << std::endl;
+          }
 
           if (!store)
           {

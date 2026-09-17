@@ -41,6 +41,7 @@
 #include <cctype>
 #include <string>
 #include <algorithm>
+#include <stdexcept>
 
 #ifdef _WIN32
 #undef min
@@ -61,16 +62,9 @@ void CPort::Read(void *buffer, int64_t addr, int64_t length)
 
   if (*port != 0)
   {
-    int retry=1;
-    GenTL::GC_ERROR err=GenTL::GC_ERR_ERROR;
+    size=static_cast<size_t>(length);
 
-    while (err != GenTL::GC_ERR_SUCCESS && retry > 0)
-    {
-      retry--;
-
-      size=static_cast<size_t>(length);
-      err=gentl->GCReadPort(*port, static_cast<uint64_t>(addr), buffer, &size);
-    }
+    GenTL::GC_ERROR err=gentl->GCReadPort(*port, static_cast<uint64_t>(addr), buffer, &size);
 
     if (err != GenTL::GC_ERR_SUCCESS)
     {
@@ -85,6 +79,8 @@ void CPort::Read(void *buffer, int64_t addr, int64_t length)
     {
       throw GenTLException("CPort::Read(): Returned size is 0");
     }
+
+    // pad with zeros if the producer returned less than requested
 
     while (size < static_cast<size_t>(length))
     {
@@ -205,8 +201,18 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
       std::getline(in, saddress, ';');
       std::getline(in, slength, ';');
 
-      uint64_t address=std::stoull(saddress, 0, 16);
-      size_t length=static_cast<size_t>(std::stoull(slength, 0, 16));
+      uint64_t address=0;
+      size_t length=0;
+
+      try
+      {
+        address=std::stoull(saddress, 0, 16);
+        length=static_cast<size_t>(std::stoull(slength, 0, 16));
+      }
+      catch (const std::exception &)
+      {
+        throw GenTLException("allocNodeMap(): Cannot interpret address or length in URL: "+url);
+      }
 
       // read XML or ZIP from registers
 
@@ -229,6 +235,11 @@ std::shared_ptr<GenApi::CNodeMapRef> allocNodeMap(std::shared_ptr<const GenTLWra
         }
 
         std::ofstream out(xml, std::ios::binary);
+
+        if (!out)
+        {
+          throw GenTLException(std::string("allocNodeMap(): Cannot store xml file: ")+xml);
+        }
 
         out.rdbuf()->sputn(buffer.get(), static_cast<std::streamsize>(length));
       }

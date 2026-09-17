@@ -43,6 +43,8 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
+#include <algorithm>
+#include <cstring>
 
 namespace rcg
 {
@@ -82,6 +84,7 @@ class NodeParam
     NodeParam(int _level, GenApi::INode *_node)
     {
       level=_level;
+      value_column=0;
       node=_node;
     }
 
@@ -178,18 +181,22 @@ std::string NodeParam::getValue(bool add_unit_range)
 
         if (GenApi::IsReadable(p))
         {
-          int len=static_cast<int>(p->GetLength());
+          // limit to the register size, the space that is left in the terminal
+          // and the size of the buffer, but never go below 0
 
-          len=std::min(len, (getmaxx(stdscr)-value_column)/2-1);
-          len=std::min(len, 128);
+          int64_t len=p->GetLength();
 
-          uint8_t buffer[128];
+          len=std::min(len, static_cast<int64_t>((getmaxx(stdscr)-value_column)/2-1));
+          len=std::min(len, static_cast<int64_t>(128));
+          len=std::max(len, static_cast<int64_t>(0));
+
+          uint8_t buffer[128]={};
           p->Get(buffer, len);
 
-          out << std::hex;
-          for (int i=0; i<len && i<len; i++)
+          out << std::hex << std::setfill('0');
+          for (int64_t i=0; i<len; i++)
           {
-            out << std::setfill('0') << std::setw(2) << static_cast<int>(buffer[i]);
+            out << std::setw(2) << static_cast<int>(buffer[i]);
           }
         }
       }
@@ -407,7 +414,7 @@ int NodeParam::getOptions(std::vector<std::string> &option)
 
             if (opt == value)
             {
-              ret=i;
+              ret=static_cast<int>(i);
             }
           }
         }
@@ -490,7 +497,7 @@ std::string NodeParam::setValue(const std::string &value)
                   std::stringstream in(value);
                   std::string elem;
 
-                  for (int i=0; i<4; i++)
+                  for (int i=0; i<6; i++)
                   {
                     getline(in, elem, ':');
                     mac=(mac<<8)|(stoi(elem, 0, 16)&0xff);
@@ -512,19 +519,19 @@ std::string NodeParam::setValue(const std::string &value)
             GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
 
             std::vector<uint8_t> buffer;
-            for (size_t i=0; i<value.size()-1; i+=2)
+            for (size_t i=0; i+1<value.size(); i+=2)
             {
-              buffer.push_back(stoi(value.substr(i, 2), 0, 16));
+              buffer.push_back(static_cast<uint8_t>(stoi(value.substr(i, 2), 0, 16)));
             }
 
-            p->Set(buffer.data(), buffer.size());
+            p->Set(buffer.data(), static_cast<int64_t>(buffer.size()));
           }
           break;
 
         case GenApi::intfIFloat:
           {
             GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
-            p->SetValue(std::stof(std::string(value)));
+            p->SetValue(std::stod(std::string(value)));
           }
           break;
 
@@ -702,7 +709,7 @@ void redraw(std::vector<NodeParam> &list, int &top_row, int focus_row, const cha
     {
       mvaddstr_eol(rows, 0, message, true);
     }
-    else
+    else if (focus_row >= 0 && focus_row < static_cast<int>(list.size()))
     {
       list[focus_row].printTooltip(rows, true);
     }
@@ -986,6 +993,11 @@ bool editNodemap(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char
     if (list.size() > 0 && std::string(root) == "Root")
     {
       list.erase(list.begin());
+    }
+
+    if (list.size() == 0)
+    {
+      return false;
     }
   }
 

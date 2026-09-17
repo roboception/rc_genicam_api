@@ -47,6 +47,8 @@
 
 #include <Base/GCException.h>
 
+#include <iostream>
+
 namespace
 {
 
@@ -92,6 +94,17 @@ int main(int argc, char *argv[])
       if (std::string(argv[i]) == "-o")
       {
         i++;
+
+        if (i >= argc)
+        {
+          std::cerr << "Argument expected after '-o'!" << std::endl;
+          std::cerr << std::endl;
+
+          printHelp(argv[0]);
+
+          return 1;
+        }
+
         name=argv[i++];
       }
       else
@@ -113,7 +126,8 @@ int main(int argc, char *argv[])
 
     // find specific device accross all systems and interfaces and open it
 
-    std::shared_ptr<rcg::Device> dev=rcg::getDevice(argv[i++]);
+    std::string devid=argv[i++];
+    std::shared_ptr<rcg::Device> dev=rcg::getDevice(devid.c_str());
 
     if (dev)
     {
@@ -282,7 +296,7 @@ int main(int argc, char *argv[])
                   uint64_t left_tol=0;
                   uint64_t disp_tol=0;
 
-                  std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
+                  std::string component=rcg::getComponentOfPart(nodemap, buffer, part);
 
                   if (component == "Intensity")
                   {
@@ -379,7 +393,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      std::cerr << "Device '" << argv[1] << "' not found!" << std::endl;
+      std::cerr << "Device '" << devid << "' not found!" << std::endl;
       ret=1;
     }
   }

@@ -40,6 +40,8 @@
 #include <rc_genicam_api/nodemap_out.h>
 #include <rc_genicam_api/nodemap_edit.h>
 
+#include <Base/GCException.h>
+
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -454,7 +456,17 @@ int main(int argc, char *argv[])
   }
   catch (const std::exception &ex)
   {
-    std::cerr << ex.what() << std::endl;
+    std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
+  }
+  catch (...)
+  {
+    std::cerr << "Unknown exception!" << std::endl;
     ret=2;
   }
 

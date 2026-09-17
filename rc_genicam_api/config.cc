@@ -40,6 +40,7 @@
 #include <iomanip>
 #include <limits>
 #include <fstream>
+#include <algorithm>
 
 #include "Base/GCException.h"
 
@@ -328,8 +329,7 @@ bool setEnum(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *na
           if (entry != 0)
           {
             val->SetIntValue(entry->GetValue());
-
-            return true;
+            ret=true;
           }
           else if (exception)
           {
@@ -442,6 +442,8 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
               {
                 p->SetValue(static_cast<bool>(std::stoi(v)));
               }
+
+              ret=true;
             }
             break;
 
@@ -479,7 +481,7 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
                     std::stringstream in(value);
                     std::string elem;
 
-                    for (int i=0; i<4; i++)
+                    for (int i=0; i<6; i++)
                     {
                       getline(in, elem, ':');
                       mac=(mac<<8)|(stoi(elem, 0, 16)&0xff);
@@ -493,13 +495,16 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
                   p->SetValue(std::stoll(std::string(value)));
                   break;
               }
+
+              ret=true;
             }
             break;
 
           case GenApi::intfIFloat:
             {
               GenApi::IFloat *p=dynamic_cast<GenApi::IFloat *>(node);
-              p->SetValue(std::stof(std::string(value)));
+              p->SetValue(std::stod(std::string(value)));
+              ret=true;
             }
             break;
 
@@ -518,6 +523,7 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
               if (entry != 0)
               {
                 p->SetIntValue(entry->GetValue());
+                ret=true;
               }
               else if (exception)
               {
@@ -537,16 +543,23 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
               if (n != std::string::npos)
               {
                 throw std::invalid_argument(std::string("Register '")+name+
-                  "only accepts hedadecimal values: "+s);
+                  "' only accepts hexadecimal values: "+s);
+              }
+
+              if ((s.size()&0x1) != 0)
+              {
+                throw std::invalid_argument(std::string("Register '")+name+
+                  "' expects an even number of hexadecimal digits: "+s);
               }
 
               std::vector<uint8_t> buffer;
-              for (size_t i=0; i<s.size()-1; i+=2)
+              for (size_t i=0; i+1<s.size(); i+=2)
               {
-                buffer.push_back(stoi(s.substr(i, 2), 0, 16));
+                buffer.push_back(static_cast<uint8_t>(stoi(s.substr(i, 2), 0, 16)));
               }
 
               p->Set(buffer.data(), std::min(buffer.size(), static_cast<size_t>(p->GetLength())));
+              ret=true;
             }
             break;
 
@@ -554,6 +567,7 @@ bool setString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *
             {
               GenApi::IString *p=dynamic_cast<GenApi::IString *>(node);
               p->SetValue(value);
+              ret=true;
             }
             break;
 
@@ -886,7 +900,7 @@ size_t getRegister(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const ch
           if (total) *total=n;
 
           len=std::min(len, n);
-          p->Get(buffer, static_cast<int64_t>(len));
+          p->Get(buffer, static_cast<int64_t>(len), false, igncache);
           ret=len;
         }
         else if (exception)
@@ -988,15 +1002,16 @@ std::string getString(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const
             {
               GenApi::IRegister *p=dynamic_cast<GenApi::IRegister *>(node);
 
-              int len=std::min(static_cast<int>(p->GetLength()), 32);
+              const int64_t len=std::max(static_cast<int64_t>(0),
+                                         std::min(p->GetLength(), static_cast<int64_t>(32)));
 
-              uint8_t buffer[32];
-              p->Get(buffer, len);
+              uint8_t buffer[32]={};
+              p->Get(buffer, len, false, igncache);
 
-              out << std::hex;
-              for (int i=0; i<len; i++)
+              out << std::hex << std::setfill('0');
+              for (int64_t i=0; i<len; i++)
               {
-                out << std::setfill('0') << std::setw(2) << static_cast<int>(buffer[i]);
+                out << std::setw(2) << static_cast<int>(buffer[i]);
               }
             }
             break;
@@ -1045,7 +1060,7 @@ void checkFeature(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const cha
   if (cvalue != "" && cvalue != value)
   {
     std::ostringstream out;
-    out << name << " == " << value << " expected: " << cvalue;
+    out << "Expected " << name << " == " << value << ", but it is: " << cvalue;
     throw std::invalid_argument(out.str());
   }
 }
@@ -1074,8 +1089,8 @@ std::shared_ptr<GenApi::CChunkAdapter> getChunkAdapter(const std::shared_ptr<Gen
   return chunkadapter;
 }
 
-std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
-                              const Buffer *buffer, uint32_t ipart)
+std::string getComponentOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                               const Buffer *buffer, uint32_t ipart)
 {
   std::string component;
 
@@ -1090,6 +1105,18 @@ std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodema
     {
       if (GenApi::IsReadable(sel) && GenApi::IsWritable(sel) && GenApi::IsReadable(part))
       {
+        // remember the current selection, so that it can be restored after
+        // the search
+
+        int64_t previous=0;
+        bool restore=false;
+
+        if (sel->GetCurrentEntry() != 0)
+        {
+          previous=sel->GetCurrentEntry()->GetValue();
+          restore=true;
+        }
+
         // go through all available enumerations
 
         GenApi::NodeList_t list;
@@ -1104,11 +1131,16 @@ std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodema
             sel->SetIntValue(entry->GetValue());
 
             int64_t val=part->GetValue();
-            if (val == ipart)
+            if (val == static_cast<int64_t>(ipart))
             {
-              component=dynamic_cast<GenApi::IEnumEntry *>(list[i])->GetSymbolic();
+              component=entry->GetSymbolic();
             }
           }
+        }
+
+        if (restore)
+        {
+          sel->SetIntValue(previous);
         }
       }
     }
@@ -1156,6 +1188,12 @@ std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodema
   return component;
 }
 
+std::string getComponetOfPart(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap,
+                              const Buffer *buffer, uint32_t part)
+{
+  return getComponentOfPart(nodemap, buffer, part);
+}
+
 std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const char *name,
                      bool exception)
 {
@@ -1168,41 +1206,53 @@ std::string loadFile(const std::shared_ptr<GenApi::CNodeMapRef> &nodemap, const 
 
   if (rf.openFile(name, std::ios::in))
   {
-    int length=std::numeric_limits<int>::max();
+    int64_t length=std::numeric_limits<int64_t>::max();
     try
     {
       // limit read operation to file size, if available
-      length=static_cast<int>(rcg::getInteger(nodemap, "FileSize", 0, 0, true));
+      length=rcg::getInteger(nodemap, "FileSize", 0, 0, true);
     }
     catch (const std::exception &)
     { }
 
-    size_t off=0, n=512;
+    size_t off=0;
+    int64_t n=512;
     std::vector<char> buffer(512);
 
     while (n > 0 && length > 0)
     {
-      n=rf.read(buffer.data(), off, std::min(length, static_cast<int>(buffer.size())), name);
+      int64_t request=std::min(length, static_cast<int64_t>(buffer.size()));
 
-      if (n == 0)
+      n=std::min(rf.read(buffer.data(), static_cast<int64_t>(off), request, name), request);
+
+      if (n <= 0)
       {
         // workaround for reading last partial block if camera reports failure
 
-        n=rcg::getInteger(nodemap, "FileOperationResult");
+        // NOTE: FileOperationResult may also report a negative error code,
+        // which must never be used as a length, and a length that is larger
+        // than the buffer
 
-        if (n > 0)
+        int64_t rest=rcg::getInteger(nodemap, "FileOperationResult");
+
+        if (rest > 0)
         {
-          n=rf.read(buffer.data(), off, n, name);
+          request=std::min(rest, static_cast<int64_t>(buffer.size()));
+          n=std::min(rf.read(buffer.data(), static_cast<int64_t>(off), request, name), request);
         }
       }
 
       if (n > 0)
       {
-        ret.append(buffer.data(), n);
-      }
+        ret.append(buffer.data(), static_cast<size_t>(n));
 
-      off+=n;
-      length-=n;
+        off+=static_cast<size_t>(n);
+        length-=n;
+      }
+      else
+      {
+        n=0; // stop reading
+      }
     }
 
     rf.closeFile(name);

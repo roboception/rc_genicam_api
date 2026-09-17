@@ -132,6 +132,7 @@ Buffer::Buffer(const std::shared_ptr<const GenTLWrapper> &_gentl, Stream *_paren
   parent=_parent;
   gentl=_gentl;
   buffer=0;
+  payload_type=PAYLOAD_TYPE_UNKNOWN;
   multipart=false;
 }
 
@@ -180,8 +181,7 @@ void Buffer::setHandle(void *handle)
     payload_type=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
                                         GenTL::BUFFER_INFO_PAYLOADTYPE);
 
-    multipart=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
-                                     GenTL::BUFFER_INFO_PAYLOADTYPE) == PAYLOAD_TYPE_MULTI_PART;
+    multipart=(payload_type == PAYLOAD_TYPE_MULTI_PART);
 
     if (chunkadapter && !getBufferBool(gentl, parent->getHandle(), buffer,
       GenTL::BUFFER_INFO_IS_INCOMPLETE))
@@ -208,15 +208,9 @@ uint32_t Buffer::getNumberOfParts() const
   {
     gentl->DSGetNumBufferParts(parent->getHandle(), buffer, &ret);
   }
-  else
+  else if (payload_type != PAYLOAD_TYPE_CHUNK_ONLY)
   {
-    size_t type=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
-                                       GenTL::BUFFER_INFO_PAYLOADTYPE);
-
-    if (type != PAYLOAD_TYPE_CHUNK_ONLY)
-    {
-      ret=1;
-    }
+    ret=1;
   }
 
   return ret;
@@ -269,6 +263,14 @@ size_t Buffer::getSize(uint32_t part) const
 
     size_t offset=getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
                                          GenTL::BUFFER_INFO_IMAGEOFFSET);
+
+    // guard against an inconsistent offset reported by the producer, which
+    // would otherwise underflow
+
+    if (offset >= size)
+    {
+      return 0;
+    }
 
     return size-offset;
   }
@@ -512,8 +514,9 @@ bool Buffer::getImagePresent(uint32_t part) const
 
 size_t Buffer::getPayloadType() const
 {
-  return getBufferValue<size_t>(gentl, parent->getHandle(), buffer,
-                                GenTL::BUFFER_INFO_PAYLOADTYPE);
+  // the payload type is cached by setHandle()
+
+  return payload_type;
 }
 
 uint64_t Buffer::getPixelFormat(uint32_t part) const

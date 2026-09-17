@@ -49,6 +49,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 
 #ifdef _WIN32
 #undef min
@@ -96,7 +97,7 @@ int main(int argc, char *argv[])
       // rc_viscore, i.e. 12 MPixel, with a minimum depth range, see
       // documentation of SGM Producer)
 
-#ifdef WIN32
+#ifdef _WIN32
       _putenv_s("RC_SGM_MAXMEM", "3312");
 #else
       setenv("RC_SGM_MAXMEM", "3312", 1);
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
 
       // logging SGM Producer activity can be activated with
 
-#ifdef WIN32
+#ifdef _WIN32
 //      _putenv_s("RC_SGM_PRODUCER_LOG", "/tmp/stream3d.log");
 //      _putenv_s("RC_SGM_PRODUCER_LEVEL", "5");
 #else
@@ -306,7 +307,7 @@ int main(int argc, char *argv[])
               {
                 if (buffer->getImagePresent(part)) // check if part contains an image
                 {
-                  std::string component=rcg::getComponetOfPart(nodemap, buffer, part);
+                  std::string component=rcg::getComponentOfPart(nodemap, buffer, part);
 
                   if (component == "Intensity")
                   {
@@ -479,7 +480,7 @@ int main(int argc, char *argv[])
     std::cerr << std::endl;
     std::cerr << "Something went wrong. Please check the logs of the used device. If you are using" << std::endl;
     std::cerr << "the SGM Producer, enable logging by setting the environment variable" << std::endl;
-    std::cerr << "RC_SGM_PRODCUER_LEVEL=5 in the system or source code of this example and rerun." << std::endl;
+    std::cerr << "RC_SGM_PRODUCER_LEVEL=5 in the system or source code of this example and rerun." << std::endl;
   }
 
   return ret;

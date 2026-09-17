@@ -40,8 +40,11 @@
 #include "exception.h"
 #include "cport.h"
 
+#include <Base/GCException.h>
+
 #include <iostream>
 #include <algorithm>
+#include <exception>
 
 #ifdef _WIN32
 #undef min
@@ -111,7 +114,7 @@ void Stream::open()
     }
     else
     {
-      throw GenTLException("Stream::open(): Device must be opened before open before opening a stream");
+      throw GenTLException("Stream::open(): Device must be opened before opening a stream");
     }
   }
 
@@ -128,21 +131,34 @@ void Stream::close()
 
     if (n_open == 0)
     {
+      // stop streaming, but remember a possible exception so that the stream
+      // is released in any case
+
+      std::exception_ptr pending;
+
       try
       {
         stopStreaming();
       }
       catch (...)
       {
+        pending=std::current_exception();
+      }
+
+      if (stream != 0)
+      {
         gentl->DSClose(stream);
         stream=0;
+      }
 
-        buffer.setNodemap(0, "");
+      buffer.setNodemap(0, "");
 
-        nodemap=0;
-        cport=0;
+      nodemap=0;
+      cport=0;
 
-        throw;
+      if (pending)
+      {
+        std::rethrow_exception(pending);
       }
     }
   }
@@ -214,6 +230,19 @@ void Stream::startStreaming(int nacquire, int min_buffers)
     }
   }
 
+  if (size == 0)
+  {
+    // unlock parameters again before reporting the error
+
+    if (GenApi::IsWritable(p))
+    {
+      p->SetValue(0);
+    }
+
+    throw GenTLException("Stream::startStreaming(): Cannot determine buffer size, neither the "
+                         "stream nor the remote device provide a payload size");
+  }
+
   // announce and queue the minimum number of buffers
 
   bool err=false;
@@ -270,6 +299,11 @@ void Stream::startStreaming(int nacquire, int min_buffers)
 
   if (err)
   {
+    // create the exception before cleaning up, as the cleanup calls below
+    // would otherwise overwrite the error that is reported by GCGetLastError()
+
+    GenTLException ex("Stream::startStreaming()", gentl);
+
     gentl->DSFlushQueue(stream, GenTL::ACQ_QUEUE_ALL_DISCARD);
 
     GenTL::BUFFER_HANDLE pp=0;
@@ -277,6 +311,11 @@ void Stream::startStreaming(int nacquire, int min_buffers)
     {
       gentl->DSRevokeBuffer(stream, pp, 0, 0);
     }
+
+    // reset state, as streaming has not been started
+
+    event=0;
+    bn=0;
 
     // unlock parameters
 
@@ -287,7 +326,7 @@ void Stream::startStreaming(int nacquire, int min_buffers)
       pi->SetValue(0);
     }
 
-    throw GenTLException("Stream::startStreaming()", gentl);
+    throw ex;
   }
 }
 
@@ -299,10 +338,18 @@ void Stream::stopStreaming()
   {
     buffer.setHandle(0);
 
-    // do not throw exceptions as this method is also called in destructor
+    // executing AcquisitionStop may throw, but the transport layer resources
+    // below must be released in any case
 
-    GenApi::CCommandPtr stop=parent->getRemoteNodeMap()->_GetNode("AcquisitionStop");
-    stop->Execute();
+    try
+    {
+      GenApi::CCommandPtr stop=parent->getRemoteNodeMap()->_GetNode("AcquisitionStop");
+      stop->Execute();
+    }
+    catch (const GENICAM_NAMESPACE::GenericException &)
+    { }
+    catch (const std::exception &)
+    { }
 
     gentl->DSStopAcquisition(stream, GenTL::ACQ_STOP_FLAGS_DEFAULT);
     gentl->GCUnregisterEvent(stream, GenTL::EVENT_NEW_BUFFER);
@@ -324,18 +371,26 @@ void Stream::stopStreaming()
 
     // unlock parameters
 
-    std::shared_ptr<GenApi::CNodeMapRef> nmap=parent->getRemoteNodeMap();
-    GenApi::IInteger *pi=dynamic_cast<GenApi::IInteger *>(nmap->_GetNode("TLParamsLocked"));
-
-    if (GenApi::IsWritable(pi))
+    try
     {
-      pi->SetValue(0);
+      std::shared_ptr<GenApi::CNodeMapRef> nmap=parent->getRemoteNodeMap();
+      GenApi::IInteger *pi=dynamic_cast<GenApi::IInteger *>(nmap->_GetNode("TLParamsLocked"));
+
+      if (GenApi::IsWritable(pi))
+      {
+        pi->SetValue(0);
+      }
     }
+    catch (const GENICAM_NAMESPACE::GenericException &)
+    { }
+    catch (const std::exception &)
+    { }
   }
 }
 
 int Stream::getAvailableBufferCount()
 {
+  std::lock_guard<std::recursive_mutex> lock(mtx);
   size_t ret=0;
 
   GenTL::INFO_DATATYPE type;

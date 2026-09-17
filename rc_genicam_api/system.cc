@@ -331,24 +331,6 @@ void System::close()
   }
 }
 
-namespace
-{
-
-int find(const std::vector<std::shared_ptr<Interface> > &list, const std::string &id)
-{
-  for (size_t i=0; i<list.size(); i++)
-  {
-    if (list[i]->getID() == id)
-    {
-      return static_cast<int>(i);
-    }
-  }
-
-  return -1;
-}
-
-}
-
 std::vector<std::shared_ptr<Interface> > System::getInterfaces()
 {
   std::lock_guard<std::recursive_mutex> lock(mtx);
@@ -361,20 +343,9 @@ std::vector<std::shared_ptr<Interface> > System::getInterfaces()
 
   if (tl != 0 && ilist.size() == 0)
   {
-    // get list of previously requested interfaces that are still in use
-
-    std::vector<std::shared_ptr<Interface> > current;
-
-/*
-    for (size_t i=0; i<ilist.size(); i++)
-    {
-      std::shared_ptr<Interface> p=ilist[i].lock();
-      if (p)
-      {
-        current.push_back(p);
-      }
-    }
-*/
+    // NOTE: As part of the ENUM-WORKAROUND, ilist holds shared pointers and is
+    // only filled once. This branch is therefore only entered if no interface
+    // has been created yet, i.e. there are never existing interfaces to reuse.
 
     // update available interfaces
 
@@ -402,16 +373,7 @@ std::vector<std::shared_ptr<Interface> > System::getInterfaces()
         throw GenTLException("System::getInterfaces()", gentl);
       }
 
-      int k=find(current, tmp);
-
-      if (k >= 0)
-      {
-        ret.push_back(current[static_cast<size_t>(k)]);
-      }
-      else
-      {
-        ret.push_back(std::shared_ptr<Interface>(new Interface(shared_from_this(), gentl, tmp)));
-      }
+      ret.push_back(std::shared_ptr<Interface>(new Interface(shared_from_this(), gentl, tmp)));
     }
 
     // update internal list of interfaces for reusage on next call

@@ -172,6 +172,10 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
   Converts image to RGB and monochrome format. Supported formats can be checked
   with isFormatSupported().
 
+  NOTE: The YCbCr and YUV formats pack four pixels into one group of bytes.
+  Images in these formats are only converted if the width is a multiple of 4.
+  The Bayer formats require a width of at least 2 pixel.
+
   @param rgb_out     Pointer to target array for rgb image. The array must have
                      a size of 3*width*height pixel. The pointer can be 0.
   @param mono_out    Pointer to target array for monochrome image. The array
@@ -181,8 +185,9 @@ void getColor(uint8_t rgb[3], const std::shared_ptr<const Image> &img,
   @param width       Width of image.
   @param height      Height of image.
   @param xpadding    Padding of input image.
-  @return            False, if pixelformat is not supported. In this case,
-                     nothing is written to the target pointers.
+  @return            False, if pixelformat is not supported or the image size is
+                     not compatible with the pixel format. In this case, nothing
+                     is written to the target pointers.
 */
 
 bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint64_t pixelformat,

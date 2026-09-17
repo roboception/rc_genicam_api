@@ -263,11 +263,12 @@ class Device : public std::enable_shared_from_this<Device>
       Returned string will be empty in case of a type mismatch or any other
       error.
 
-      @param  ID (Custom IDs are >= 1000 according to GenTL standard).
+      @param  info_id Info ID (custom IDs are >= 1000 according to the GenTL
+                      standard).
       @return Requested custom string that is empty in case of an error.
     */
 
-    std::string getCustomInfoString(int id);
+    std::string getCustomInfoString(int info_id);
 
     /**
       Returns the node map of this object.

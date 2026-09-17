@@ -38,7 +38,10 @@
 #include <rc_genicam_api/device.h>
 #include <rc_genicam_api/config.h>
 
+#include <Base/GCException.h>
+
 #include <iostream>
+#include <stdexcept>
 
 int main(int argc, char *argv[])
 {
@@ -183,8 +186,7 @@ int main(int argc, char *argv[])
               }
               else
               {
-                std::cerr << "Unknown parameter: " << p << std::endl;
-                exit(1);
+                throw std::invalid_argument("Unknown parameter: "+p);
               }
             }
             else if (p.size() > 0 && p[0] == '@')
@@ -244,11 +246,11 @@ int main(int argc, char *argv[])
               // just test if GEV interface parameters are available
               rcg::getString(nodemap, "GevCurrentIPAddress", true);
 
-              for (int64_t i=0; i<=n; i++)
+              for (int64_t k=0; k<=n; k++)
               {
-                rcg::setInteger(nodemap, "GevInterfaceSelector", i);
+                rcg::setInteger(nodemap, "GevInterfaceSelector", k);
 
-                std::cout << "Interface " << i << ":" << std::endl;
+                std::cout << "Interface " << k << ":" << std::endl;
 
                 std::cout << "  MAC Address:              " << rcg::getString(nodemap, "GevMACAddress") << std::endl;
                 std::cout << std::endl;
@@ -338,7 +340,17 @@ int main(int argc, char *argv[])
   }
   catch (const std::exception &ex)
   {
-    std::cerr << ex.what() << std::endl;
+    std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
+  }
+  catch (const GENICAM_NAMESPACE::GenericException &ex)
+  {
+    std::cerr << "Exception: " << ex.what() << std::endl;
+    ret=2;
+  }
+  catch (...)
+  {
+    std::cerr << "Unknown exception!" << std::endl;
     ret=2;
   }
 

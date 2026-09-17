@@ -42,6 +42,8 @@
 #include "cport.h"
 
 #include <iostream>
+#include <cstring>
+#include <stdexcept>
 
 namespace rcg
 {
@@ -131,8 +133,14 @@ void Device::open(ACCESS access)
 
     if (err != GenTL::GC_ERR_SUCCESS)
     {
+      // create the exception before closing the parent, as the close call
+      // would otherwise overwrite the error reported by GCGetLastError()
+
+      GenTLException ex("Device::open() failed: "+std::to_string(err), gentl);
+
       parent->close();
-      throw GenTLException("Device::open() failed: "+std::to_string(err), gentl);
+
+      throw ex;
     }
   }
 
@@ -287,9 +295,9 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
   // get event data
 
-  size_t size=event_buffer.size();
+  size_t datasize=event_buffer.size();
 
-  GenTL::GC_ERROR err=gentl->EventGetData(event, event_buffer.data(), &size, timeout);
+  GenTL::GC_ERROR err=gentl->EventGetData(event, event_buffer.data(), &datasize, timeout);
 
   std::lock_guard<std::mutex> lock(mtx);
 
@@ -313,10 +321,10 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
   {
     GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
-    char tmp[80];
+    char tmp[80]="";
     size_t tmp_size=sizeof(tmp);
 
-    err=gentl->EventGetDataInfo(event, event_buffer.data(), size, GenTL::EVENT_DATA_ID,
+    err=gentl->EventGetDataInfo(event, event_buffer.data(), datasize, GenTL::EVENT_DATA_ID,
       &type, tmp, &tmp_size);
 
     if (err != GenTL::GC_ERR_SUCCESS)
@@ -326,7 +334,19 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
     if (type == GenTL::INFO_DATATYPE_STRING)
     {
-      eventid=std::stoi(std::string(tmp), 0, 16);
+      // ensure termination, as the producer may return an unterminated string
+
+      tmp[sizeof(tmp)-1]='\0';
+
+      try
+      {
+        eventid=std::stoll(std::string(tmp), 0, 16);
+      }
+      catch (const std::exception &)
+      {
+        throw GenTLException(std::string("Device::getModuleEvent(): Cannot interpret event id: ")+
+          tmp);
+      }
     }
     else if (type == GenTL::INFO_DATATYPE_INT32)
     {
@@ -338,12 +358,13 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
   // get event value
 
+  size_t valuesize=event_value.size();
+
   {
     GenTL::INFO_DATATYPE type=GenTL::INFO_DATATYPE_UNKNOWN;
-    size=event_value.size();
 
-    err=gentl->EventGetDataInfo(event, event_buffer.data(), size, GenTL::EVENT_DATA_VALUE,
-      &type, event_value.data(), &size);
+    err=gentl->EventGetDataInfo(event, event_buffer.data(), datasize, GenTL::EVENT_DATA_VALUE,
+      &type, event_value.data(), &valuesize);
 
     if (err != GenTL::GC_ERR_SUCCESS)
     {
@@ -366,7 +387,7 @@ int64_t Device::getModuleEvent(int64_t _timeout)
 
     if (eventid > 0)
     {
-      eventadapter->DeliverMessage(event_value.data(), size, static_cast<uint64_t>(eventid));
+      eventadapter->DeliverMessage(event_value.data(), valuesize, static_cast<uint64_t>(eventid));
     }
   }
   catch (const std::exception &)
@@ -550,7 +571,7 @@ std::string Device::getAccessStatus()
           break;
 
         case GenTL::DEVICE_ACCESS_STATUS_OPEN_READONLY:
-          ret="OpenReadWrite";
+          ret="OpenReadOnly";
           break;
 
         default:
@@ -636,10 +657,10 @@ uint64_t Device::getTimestampFrequency()
   return freq;
 }
 
-std::string Device::getCustomInfoString(int id)
+std::string Device::getCustomInfoString(int info_id)
 {
   std::lock_guard<std::mutex> lock(mtx);
-  return cDevGetInfo(this, gentl, id);
+  return cDevGetInfo(this, gentl, info_id);
 }
 
 std::shared_ptr<GenApi::CNodeMapRef> Device::getNodeMap(const char *xml)

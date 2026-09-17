@@ -42,6 +42,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <stdexcept>
 
 #ifdef _WIN32
 #undef min
@@ -89,12 +90,23 @@ void storePointCloud(std::string name, double f, double t, double scale,
                      std::shared_ptr<const Image> conf,
                      std::shared_ptr<const Image> error)
 {
+  if (!left || !disp)
+  {
+    throw std::invalid_argument("storePointCloud(): Intensity and disparity image are required");
+  }
+
   // get size and scale factor between left image and disparity image
 
   size_t width=disp->getWidth();
   size_t height=disp->getHeight();
   bool bigendian=disp->isBigEndian();
-  size_t ds=(left->getWidth()+disp->getWidth()-1)/disp->getWidth();
+
+  if (width == 0 || height == 0)
+  {
+    throw std::invalid_argument("storePointCloud(): Disparity image must not be empty");
+  }
+
+  size_t ds=(left->getWidth()+width-1)/width;
 
   // convert focal length factor into focal length in (disparity) pixels
 
@@ -199,6 +211,16 @@ void storePointCloud(std::string name, double f, double t, double scale,
 
   std::ofstream out(name);
 
+  if (!out)
+  {
+    throw std::invalid_argument("storePointCloud(): Cannot store file: "+name);
+  }
+
+  // store coordinates with enough significant digits, as the default
+  // precision of 6 is not sufficient for 3D points in meter
+
+  out << std::setprecision(9);
+
   out << "ply" << std::endl;
   out << "format ascii 1.0" << std::endl;
   out << "comment Created with gc_pointcloud from Roboception GmbH" << std::endl;
@@ -278,8 +300,11 @@ void storePointCloud(std::string name, double f, double t, double scale,
     }
 
     dps+=dstep;
-    cps+=cstep;
-    eps+=estep;
+
+    // confidence and error images are optional, do not advance null pointers
+
+    if (cps != 0) cps+=cstep;
+    if (eps != 0) eps+=estep;
   }
 
   dps=disp->getPixels();

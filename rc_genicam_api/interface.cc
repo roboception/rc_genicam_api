@@ -60,8 +60,13 @@ Interface::~Interface()
 {
   if (n_open > 0)
   {
-    gentl->IFClose(ifh);
-    parent->close();
+    try // do not throw exceptions in destructor
+    {
+      gentl->IFClose(ifh);
+      parent->close();
+    }
+    catch (...)
+    { }
   }
 }
 
@@ -89,8 +94,14 @@ void Interface::open()
 
     if (gentl->TLOpenInterface(parent->getHandle(), id.c_str(), &ifh) != GenTL::GC_ERR_SUCCESS)
     {
+      // create the exception before closing the parent, as the close call
+      // would otherwise overwrite the error reported by GCGetLastError()
+
+      GenTLException ex("Interface::open()", gentl);
+
       parent->close();
-      throw GenTLException("Interface::open()", gentl);
+
+      throw ex;
     }
   }
 
@@ -163,7 +174,11 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices(uint64_t timeout)
 
     if (err == GenTL::GC_ERR_INVALID_HANDLE)
     {
-      // the interface handle is invalid, try to reopen the interface
+      // the interface handle is invalid, release it and try to reopen the
+      // interface
+
+      gentl->IFClose(ifh);
+      ifh=0;
 
       if (gentl->TLUpdateInterfaceList(parent->getHandle(), 0, 10) != GenTL::GC_ERR_SUCCESS)
       {

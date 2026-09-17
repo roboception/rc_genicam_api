@@ -1,3 +1,26 @@
+unreleased
+----------
+
+* Added method for getting custom device info string
+* Fixed Stream::close() not releasing the data stream and its nodemap
+* Fixed throwing pointers to exceptions and a memory leak when storing PNG images
+* Fixed missing error handling of libpng (setjmp return value was ignored)
+* Fixed setString() always returning false
+* Fixed parsing of MAC addresses, which only considered 4 of 6 bytes
+* Fixed last row of images that are converted from a Bayer format
+* Fixed row offset of storeImageAsDisparityPFM() for images with x-padding
+* Fixed reporting device access status OpenReadOnly as OpenReadWrite
+* Fixed possible buffer overflow in loadFile()
+* Fixed uninitialized payload type in Buffer
+* Fixed passing igncache to getRegister() and getString()
+* gc_info and gc_config now catch GenICam exceptions instead of terminating
+* gc_stream sends software triggers from the main thread, as nodemaps are not
+  thread safe
+* Renamed getComponetOfPart() to getComponentOfPart(), the old name is kept as
+  deprecated alias, and the component selector is restored after the call
+* Images in YCbCr and YUV formats are only converted if the width is a multiple
+  of 4, instead of writing beyond the end of a row
+
 2.8.7 (2026-06-29)
 ------------------
 

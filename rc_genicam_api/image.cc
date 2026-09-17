@@ -64,12 +64,12 @@ Image::Image(const Buffer *buffer, uint32_t part)
     pixelformat=buffer->getPixelFormat(part);
     bigendian=buffer->isBigEndian();
 
-    const size_t size=std::min(buffer->getSize(part), buffer->getSizeFilled());
-
     if (buffer->getSizeFilled() == 0)
     {
       throw GenTLException("Image without data");
     }
+
+    const size_t size=std::min(buffer->getSize(part), buffer->getSizeFilled());
 
     pixel.reset(new uint8_t [size]);
 
@@ -77,7 +77,7 @@ Image::Image(const Buffer *buffer, uint32_t part)
   }
   else
   {
-    throw GenTLException("Image::Image(): Now image available.");
+    throw GenTLException("Image::Image(): No image available.");
   }
 }
 
@@ -520,6 +520,15 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
 
     case YCbCr411_8:
       {
+        // four pixels are packed into six bytes, so partial groups cannot be
+        // represented and must not be converted
+
+        if ((width&0x3) != 0)
+        {
+          ret=false;
+          break;
+        }
+
         size_t pstep=(width>>2)*6+xpadding;
         for (size_t k=0; k<height; k++)
         {
@@ -554,6 +563,15 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
     case YCbCr422_8:
     case YUV422_8:
       {
+        // four pixels are packed into eight bytes, so partial groups cannot be
+        // represented and must not be converted
+
+        if ((width&0x3) != 0)
+        {
+          ret=false;
+          break;
+        }
+
         size_t pstep=(width>>2)*8+xpadding;
         for (size_t k=0; k<height; k++)
         {
@@ -615,6 +633,15 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
     case BayerGR8:
     case BayerGB8:
       {
+        // demosaicing needs at least two pixels per row to mirror the image
+        // border
+
+        if (width < 2 || height < 1)
+        {
+          ret=false;
+          break;
+        }
+
         // In every row, every second pixel is green and every other pixel is
         // either red or blue. This flag specifies if the current row is red or
         // blue.
@@ -632,9 +659,18 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
         row[2]=row[1]+width+2;
 
         // initialize buffer with 2 rows, extended by two pixel to avoid a special
-        // treatment for the image border
+        // treatment for the image border (the second image row is mirrored if
+        // the image consists of a single row only)
 
-        memcpy(row[1]+1, raw+width+xpadding, width*sizeof(uint8_t));
+        if (height > 1)
+        {
+          memcpy(row[1]+1, raw+width+xpadding, width*sizeof(uint8_t));
+        }
+        else
+        {
+          memcpy(row[1]+1, raw, width*sizeof(uint8_t));
+        }
+
         memcpy(row[2]+1, raw, width*sizeof(uint8_t));
 
         row[1][0]=row[1][2]; row[1][width+1]=row[1][width-1];
@@ -644,18 +680,24 @@ bool convertImage(uint8_t *rgb_out, uint8_t *mono_out, const uint8_t *raw, uint6
 
         for (size_t k=0; k<height; k++)
         {
-          // store next extended row in buffer
+          // rotate rows and store next extended row in buffer
+
+          uint8_t *p=row[0];
+          row[0]=row[1];
+          row[1]=row[2];
+          row[2]=p;
 
           if (k+1 < height)
           {
-            uint8_t *p=row[0];
-            row[0]=row[1];
-            row[1]=row[2];
-            row[2]=p;
-
             memcpy(row[2]+1, raw+(k+1)*(width+xpadding), width*sizeof(uint8_t));
 
             row[2][0]=row[2][2]; row[2][width+1]=row[2][width-1];
+          }
+          else
+          {
+            // mirror the row above at the lower image border
+
+            memcpy(row[2], row[0], (width+2)*sizeof(uint8_t));
           }
 
           if (red)
