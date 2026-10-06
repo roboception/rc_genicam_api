@@ -24,58 +24,38 @@ set(GENICAM_LIB_SUFFIX)
 
 if ("${ARCHITECTURE}" STREQUAL "arm")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc494_v3_4
-    libGenApi_gcc494_v3_4
-    liblog4cpp_gcc494_v3_4
-    libLog_gcc494_v3_4
-    libMathParser_gcc494_v3_4
-    libNodeMapData_gcc494_v3_4
-    libXmlParser_gcc494_v3_4)
+    libGCBase_gcc8_v3_5
+    libGenApi_gcc8_v3_5
+    libLog_gcc8_v3_5
+    libMathParser_gcc8_v3_5
+    libNodeMapData_gcc8_v3_5
+    libXmlParser_gcc8_v3_5)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux32_ARMhf)
   set(GENICAM_LIB_SUFFIX ".so")
 elseif ("${ARCHITECTURE}" STREQUAL "aarch64")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc49_v3_4
-    libGenApi_gcc49_v3_4
-    liblog4cpp_gcc49_v3_4
-    libLog_gcc49_v3_4
-    libMathParser_gcc49_v3_4
-    libNodeMapData_gcc49_v3_4
-    libXmlParser_gcc49_v3_4)
+    libGCBase_gcc8_v3_5
+    libGenApi_gcc8_v3_5
+    libLog_gcc8_v3_5
+    libMathParser_gcc8_v3_5
+    libNodeMapData_gcc8_v3_5
+    libXmlParser_gcc8_v3_5)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux64_ARM)
-  set(GENICAM_LIB_SUFFIX ".so")
-elseif ("${ARCHITECTURE}" STREQUAL "i686")
-  set(GENICAM_LIBRARIES
-    libGCBase_gcc48_v3_4
-    libGenApi_gcc48_v3_4
-    liblog4cpp_gcc48_v3_4
-    libLog_gcc48_v3_4
-    libMathParser_gcc48_v3_4
-    libNodeMapData_gcc48_v3_4
-    libXmlParser_gcc48_v3_4)
-  set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux32_i86)
   set(GENICAM_LIB_SUFFIX ".so")
 elseif ("${ARCHITECTURE}" STREQUAL "x86_64")
   set(GENICAM_LIBRARIES
-    libGCBase_gcc48_v3_4
-    libGenApi_gcc48_v3_4
-    liblog4cpp_gcc48_v3_4
-    libLog_gcc48_v3_4
-    libMathParser_gcc48_v3_4
-    libNodeMapData_gcc48_v3_4
-    libXmlParser_gcc48_v3_4)
+    libGCBase_gcc8_v3_5
+    libGenApi_gcc8_v3_5
+    libLog_gcc8_v3_5
+    libMathParser_gcc8_v3_5
+    libNodeMapData_gcc8_v3_5
+    libXmlParser_gcc8_v3_5)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/bin/Linux64_x64)
   set(GENICAM_LIB_SUFFIX ".so")
-elseif ("${ARCHITECTURE}" STREQUAL "WIN32_i86")
-  set(GENICAM_LIBRARIES
-    GCBase_MD_VC141_v3_4
-    GenApi_MD_VC141_v3_4)
-  set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/library/CPP/lib/Win32_i86)
-  set(GENICAM_LIB_SUFFIX ".lib")
 elseif ("${ARCHITECTURE}" STREQUAL "WIN64_x64")
   set(GENICAM_LIBRARIES
-    GCBase_MD_VC141_v3_4
-    GenApi_MD_VC141_v3_4)
+    GCBase_MD_VC142_v3_5
+    GenApi_MD_VC142_v3_5)
   set(GENICAM_LIBRARIES_DIR ${PACKAGE_PREFIX_DIR}/library/CPP/lib/Win64_x64)
   set(GENICAM_LIB_SUFFIX ".lib")
 else ()
@@ -95,14 +75,14 @@ foreach(GENICAM_LIB ${GENICAM_LIBRARIES})
   if (UNIX)
 	  set_target_properties(${GENICAM_NAMESPACE_LIB}
 	      PROPERTIES
-			  INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/library/CPP/include/"
+		      INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/library/CPP/include/"
 		      IMPORTED_LOCATION_DEBUG "${GENICAM_LIB_FILE}"
 		      IMPORTED_LOCATION_RELEASE "${GENICAM_LIB_FILE}"
 		      IMPORTED_LOCATION "${GENICAM_LIB_FILE}")
   elseif (WIN32)
 	  set_target_properties(${GENICAM_NAMESPACE_LIB}
 	      PROPERTIES
-			  INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/library/CPP/include/"
+		      INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/library/CPP/include/"
 		      IMPORTED_IMPLIB_DEBUG  "${GENICAM_LIB_FILE}"
 		      IMPORTED_IMPLIB_RELEASE "${GENICAM_LIB_FILE}"
 		      IMPORTED_IMPLIB "${GENICAM_LIB_FILE}")

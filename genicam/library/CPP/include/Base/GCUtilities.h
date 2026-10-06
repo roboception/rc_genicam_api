@@ -1,9 +1,7 @@
 //-----------------------------------------------------------------------------
 //  (c) 2005 by Basler Vision Technologies
-//  Section: Vision Components
-//  Project: GenICam
 //  Author:  Fritz Dierks
-//  $Header$
+//
 //  License: This file is published under the license of the EMVA GenICam  Standard Group.
 //  A text file describing the legal terms is included in  your installation as 'GenICam_license.pdf'.
 //  If for some reason you are missing  this file please contact the EMVA or visit the website
@@ -12,14 +10,15 @@
 //  THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
 //  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 //  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD  GROUP
-//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL,
-//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT  LIMITED TO,
-//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  DATA, OR PROFITS;
-//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  THEORY OF LIABILITY,
+//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD GROUP
+//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 //  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)
 //  ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
+//  
 //-----------------------------------------------------------------------------
 /*!
 \file
@@ -66,24 +65,24 @@
 #   endif
 #elif defined (__GNUC__)
 #   define GENICAM_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#   if defined (__LP64__)
-#      if defined (__linux__)
+#   if defined (__linux__)
+#     if defined(__x86_64) || defined(__x86_64__) || defined(__amd64)
 #       define PLATFORM_NAME "Linux64_x64"
-#      elif defined (__APPLE__)
-#       define PLATFORM_NAME "Maci64_x64"
-#      else
-#       error Unknown Platform
-#      endif
-#   else
-#      if defined (__linux__)
+#     elif defined(__i386) || defined(__i386__)
 #       define PLATFORM_NAME "Linux32_i86"
-#      elif defined (__APPLE__)
+#     elif defined(__arm__) || defined(__TARGET_ARCH_ARM)
+#       define PLATFORM_NAME "Linux32_ARMhf"
+#     elif defined(__AARCH64EL__) || defined(__AARCH64_CMODEL_SMALL__)
+#       define PLATFORM_NAME "Linux64_ARM"
+#     endif
+#   elif defined (__APPLE__)
+#     if defined (__LP64__)
+#       define PLATFORM_NAME "Maci64_x64"
+#     else
 #       error Unsupported Platform
-#      elif defined (VXWORKS)
-#       define PLATFORM_NAME "VxWorks_PPC"
-#      else
+#     endif
+#   else
 #       error Unknown Platform
-#      endif
 #   endif
 #else
 #   error Unknown Platform

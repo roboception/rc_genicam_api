@@ -1,8 +1,6 @@
 //-----------------------------------------------------------------------------
 //  (c) 2007 by National Instruments
-//  Project: GenApi
 //  Author:  Eric Gross
-//  $Header$
 //
 //  License: This file is published under the license of the EMVA GenICam  Standard Group.
 //  A text file describing the legal terms is included in  your installation as 'GenICam_license.pdf'.
@@ -12,14 +10,15 @@
 //  THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
 //  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 //  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD  GROUP
-//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL,
-//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT  LIMITED TO,
-//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  DATA, OR PROFITS;
-//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  THEORY OF LIABILITY,
+//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD GROUP
+//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 //  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)
 //  ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
+//  
 //-----------------------------------------------------------------------------
 /*!
 \file
@@ -214,6 +213,22 @@ namespace GENAPI_NAMESPACE
 
         return s;
     }
+    
+    template <class ForwardIterator, class T>
+    inline ForwardIterator remove (ForwardIterator first, ForwardIterator last, const T& val)
+    {
+        ForwardIterator result = first;
+        while (first!=last) {
+            if (!(*first == val)) {
+            if (result!=first)
+                *result = *first;
+            ++result;
+            }
+            ++first;
+        }
+        return result;
+    }
+
     //! reads in persistent data from a stream
     // note: this method must be inlined because it uses istream in the parameter list
     // note: May not be used as inline if called against a library where it is already compiled.
@@ -226,9 +241,20 @@ namespace GENAPI_NAMESPACE
 
         FeatureBag.Clear();
 
+        std::ostringstream originalContent;
+        originalContent << is.rdbuf();
+        is.seekg(std::ios::beg);
+        std::string toBeNormalized(originalContent.str());
+        // Remove CRs from the source
+        toBeNormalized.erase(
+            GENAPI_NAMESPACE::remove(toBeNormalized.begin(),
+                                     toBeNormalized.end(), 13), toBeNormalized.end());
+        std::stringbuf normalizedBuffer(toBeNormalized.c_str());
+        std::istream normalizedStream(&normalizedBuffer);
+
         GENICAM_NAMESPACE::gcstring FirstLine;
         FirstLine.reserve( 128 );
-        GENICAM_NAMESPACE::getline( is, FirstLine, '\n' );
+        GENICAM_NAMESPACE::getline( normalizedStream, FirstLine, '\n' );
         // Check the magic
         GENICAM_NAMESPACE::gcstring MagicGUID(GENAPI_PERSISTENCE_MAGIC);
         if( GENICAM_NAMESPACE::gcstring::_npos() == FirstLine.find(MagicGUID) )
@@ -241,21 +267,21 @@ namespace GENAPI_NAMESPACE
             throw RUNTIME_EXCEPTION("The stream has been created using the CFeatureBagger class thus must be restored using the CFeatureBagger class as well");
         }
 
-        EatComments( is );
+        EatComments( normalizedStream );
 
         GENICAM_NAMESPACE::gcstring Name, Value;
         Name.reserve( 128 );
         Value.reserve( 128 );
-        while (!is.eof())
+        while (!normalizedStream.eof())
         {
-            GENICAM_NAMESPACE::getline( is, Name, '\t' );
-            if (is.fail())  // if reading from stream failed -> stop reading!
+            GENICAM_NAMESPACE::getline( normalizedStream, Name, '\t' );
+            if (normalizedStream.fail())  // if reading from stream failed -> stop reading!
             {
                 throw RUNTIME_EXCEPTION( "The stream holds excess data" );
                 break;
             }
 
-            Name = TrimSpace( Name, is );
+            Name = TrimSpace( Name, normalizedStream );
             if (Name.empty())
             {
                 continue;
@@ -268,10 +294,10 @@ namespace GENAPI_NAMESPACE
             }
 
 
-            if (is.peek() == '{')
+            if (normalizedStream.peek() == '{')
             {
-                GENICAM_NAMESPACE::getline( is, Value, '\t' );
-                if (is.fail())  // if reading from stream failed -> stop reading!
+                GENICAM_NAMESPACE::getline( normalizedStream, Value, '\t' );
+                if (normalizedStream.fail())  // if reading from stream failed -> stop reading!
                 {
                     break;
                 }
@@ -289,22 +315,23 @@ namespace GENAPI_NAMESPACE
                         break;
                     }
 
-                    GENICAM_NAMESPACE::getline( is, Value, '\t' );
-                    if (is.fail())
+                    GENICAM_NAMESPACE::getline( normalizedStream, Value, '\t' );
+                    if (normalizedStream.fail())
                     {
                         break;
                     }
                 }
             }
-            GENICAM_NAMESPACE::getline( is, Value, '\n' );
+            GENICAM_NAMESPACE::getline( normalizedStream, Value, '\n' );
             if (Value.empty())
             {
                 FeatureBag.DeleteSelector(pSelectorState);
                 throw RUNTIME_EXCEPTION( "The stream holds incomplete key - value - set" );
             }
+
             FeatureBag.Push( Name.c_str(), Value.c_str(), pSelectorState );
 
-            EatComments( is );
+            EatComments( normalizedStream );
         }
         return is;
     }

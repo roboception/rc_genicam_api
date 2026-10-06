@@ -76,12 +76,6 @@ const char *getAccessMode(const GenApi::INode *node)
     case GenApi::RW:
       return "(RW)";
 
-    case GenApi::_UndefinedAccesMode:
-      return "(undefined access mode)";
-
-    case GenApi::_CycleDetectAccesMode:
-      return "(cycle detection)";
-
     default:
       return "(unknown)";
   }

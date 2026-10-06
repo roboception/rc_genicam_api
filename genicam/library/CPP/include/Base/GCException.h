@@ -1,22 +1,8 @@
 //-----------------------------------------------------------------------------
 //  (c) 2004 by Basler Vision Technologies
-//  Section: Vision Components
-//  Project: GenICam
 //  Author:  Fritz Dierks
-//  $Header$
 //
-//  01.10.2014 Stemmer, SD
-//             prepared for remove of std::exception base class 
-//
-//  14.03.2005 Stemmer, RS
-//             changed minor things like namespace
-//             added a AccessException
-//             added a TimeoutException
-//
-//  21.02.2006 Stemmer, SD
-//             used _vsnprintf_s function for VS8 and higher (compiler fork)
-//
-//  License: This file is published under the license of the EMVA GenICam  Standard Group.
+//  License: This file is published under the license of the EMVA GenICam Standard Group.
 //  A text file describing the legal terms is included in  your installation as 'GenICam_license.pdf'.
 //  If for some reason you are missing  this file please contact the EMVA or visit the website
 //  (http://www.genicam.org) for a full copy.
@@ -24,20 +10,33 @@
 //  THIS SOFTWARE IS PROVIDED BY THE EMVA GENICAM STANDARD GROUP "AS IS"
 //  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 //  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD  GROUP
-//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  SPECIAL,
-//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT  LIMITED TO,
-//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  DATA, OR PROFITS;
-//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  THEORY OF LIABILITY,
+//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE EMVA GENICAM STANDARD GROUP
+//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 //  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)
 //  ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
+// 
+//  Contributions
+//             changed minor things like namespace
+//             added a AccessException
+//             added a TimeoutException
+//  Copyright (c) 2005 STEMMER IMAGING (Rupert Stelz) 
+//
+//             used _vsnprintf_s function for VS8 and higher (compiler fork)
+//  Copyright (c) 2006 STEMMER IMAGING (Sascha Dorenbeck)
+//
+//             prepared for remove of std::exception base class 
+//  Copyright (c) 2014 STEMMER IMAGING (Sascha Dorenbeck)
+//
 //-----------------------------------------------------------------------------
 /*!
-    \file
-    Standard GenICam Exceptions
-    \ingroup Base_PublicUtilities
-    */
+  \file
+  \brief   Standard GenICam Exceptions
+  \ingroup Base_PublicUtilities
+ */
 
 #ifndef GENCAM_EXCEPTION_H_
 #define GENCAM_EXCEPTION_H_

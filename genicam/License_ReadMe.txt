@@ -4,7 +4,7 @@
 
 GenICam comes in two versions
 ~ a runtime version
-  GenICam runtime and SDK files for developing and/or running GenICambased software.
+  GenICam runtime and SDK files for developing and/or running GenICam based software.
 ~ a development version.
   GenICam complete source code for developing and building the GenICam SDK.
 
@@ -39,57 +39,29 @@ The runtime version comes under the following license:
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 
-The development version comes under the GenICam license which can be found in licenses/GenICam_License.pdf
-or downloaded from  http://www.genicam.org.
-
 When distributing GenICam runtime libraries, this file and the license for the development version which
-also describes the GenICam compliancies and rules (GenICam_License.pdf) must also be distributed for the
+also describes GenICam compliancy and rules (GenICam_License.pdf) must be distributed for the
 sake of completeness of the license information.
 
-GenICam uses the following 3rd party software packages (*):
+GenICam runtime packages use the following 3rd party software packages (*):
 
-Package     License         Internet                                        Used by
-=====================================================================================================
-Mathparser  LGPL            http://kirya.narod.ru/mathparser.html           GenApi
-                            http://www.sama.ru/~despair/ccalc/
-Log4Cpp     LGPL            http://log4cpp.sourceforge.net                  GenApi
-CppUnit     LGPL            http://cppunit.sourceforge.net                  GenICam unit tests
-CLSerAll    NI              http://sourceforge.net/projects/clallserial     CLAllSerial, CLProtocol
-xs3p        DSTC            http://xml.fiforms.org/xs3p/index.html          GenApi Schema documentation
-xxhash      New BSD         https://code.google.com/p/xxhash/               GenApi
-XSLTProc    MIT license     http://xmlsoft.org/XSLT/xsltproc2.html          GenApi Schema documentation
-XSDe        Proprietary     NA                                              XmlParser, FirmwareUpdate
-PCRE2       BSD license     http://www.pcre.org/                            FirmwareUpdate
-Expat       MIT license     https://libexpat.github.io/                     XmlParser, FirmwareUpdate
-GenX        GPL compatible  http://www.tbray.org/ongoing/genx               XmlParser, FirmwareUpdate
-regexp      GPL2            NA                                              XmlParser, FirmwareUpdate
+Package     Version              License   File                                                                                                 Internet                                        Used by
+=======================================================================================================================================================================================================================
+CLSerAll    1.1.0                NI        CLSerAll_LICENSE.txt (http://sourceforge.net/projects/clallserial)                                   http://sourceforge.net/projects/clallserial     CLAllSerial, CLProtocol
+Expat       2.8.1                MIT       expat-COPYING.txt (https://github.com/libexpat/libexpat/blob/master/expat/COPYING)                   https://libexpat.github.io/                     FirmwareUpdate, XmlParser
+GenX        cs-1                 MIT       genx-LICENSE.txt  (http://www.tbray.org/ongoing/genx/COPYING)                                        http://www.tbray.org/ongoing/genx               FirmwareUpdate, XmlParser
+Mathparser  0.03b (modified)     MIT       MIT_License.txt                                                                                      http://kirya.narod.ru/mathparser.html           GenApi
+miniz       3.0.2                MIT       miniz_LICENSE.txt (https://github.com/richgel999/miniz/blob/master/LICENSE)                          https://github.com/richgel999/miniz             FirmwareUpdate, GenTL, XmlParser
+PCRE2       10.44                BSD       pcre2_License.txt (http://www.pcre.org/licence.txt)                                                  http://www.pcre.org/                            FirmwareUpdate
+regexp      3.2.0  (modified)    MIT       regexp-LICENSE.txt (https://git.codesynthesis.com/cgit/xsde/xsde/tree/libxsde/xsde/c/regexp/LICENSE) https://git.codesynthesis.com/cgit/xsde/        FirmwareUpdate
+xxhash      0.8.2                Free BSD  xxhash_License.txt (http://opensource.org/licenses/BSD-2-Clause)                                     https://code.google.com/p/xxhash/               GenApi
+zlib        1.3.1                Free                                                                                                           https://www.zlib.net/                           GenTL
+
 (*) When distributing subset of GenICam libraries, any unused 3rd party software packages and their
 license information may be omitted.
 
-Note that the XSDe license was purchased by one of the members of the committee but
-allows all members to re-compile the parser as long as only the GenApi XML vocabulary is used.
-The XSDe free proprietary license is used for the firmware update module.
-
 All license texts come as part of the GenICam distribution in the licenses
-subdiretory. If not, you can download them from the internet.
-
-License     File                    Where to find the license texts
-==================================================================================
-LGPL        LGPL.txt                http://www.gnu.org/licenses/lgpl.html
-GenICam     GenICam_License.pdf     http://www.genicam.org
-CLSerAll    CLSerAll_LICENSE.txt    http://sourceforge.net/projects/clallserial
-xs3p        xs3p_License.mht        http://xml.fiforms.org/xs3p/index.html
-xxhash      xxhash_License.txt      http://opensource.org/licenses/BSD-3-Clause
-XSLTProc    MIT_License.txt         http://opensource.org/licenses/mit-license.html
-XSDe        XSDe License.pdf        NA
-XSDe        Free                    NA
-            Proprietary
-            License
-PCRE2       pcre2_License.txt       http://www.pcre.org/licence.txt
-Expat       expat-COPYING.txt       https://github.com/libexpat/libexpat/blob/master/expat/COPYING
-GenX        genx-COPYING.txt        http://www.tbray.org/ongoing/genx/COPYING
-regexp      gpl-20.txt              https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+subdirectory. If not, you can download them from the Internet.
 
 Last but not least GenICam redistributes the C/C++ runtime DLLs of the
 Microsoft Visual C++ compiler.
-
