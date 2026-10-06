@@ -1,3 +1,9 @@
+2.8.9 (2026-10-06)
+------------------
+
+* Updated GenICam reference implementation to 3.5.1 and dropped it for Win32 and Linux32_x86
+* Using latest zlib and libpng under Windows
+
 2.8.8 (2026-09-17)
 ------------------
 
