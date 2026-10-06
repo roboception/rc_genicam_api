@@ -38,14 +38,14 @@ echo ----- Download zlib and libpng -----
 if not exist "zlib\" (
   git clone https://github.com/winlibs/zlib.git
   cd zlib
-  git checkout zlib-1.2.11
+  git checkout zlib-1.3.2
   cd ..
 )
 
 if not exist "libpng\" (
   git clone https://github.com/winlibs/libpng.git
   cd libpng
-  git checkout libpng-1.6.34
+  git checkout libpng-1.6.59
   cd ..
 )
 
