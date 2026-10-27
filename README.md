@@ -317,20 +317,31 @@ packets fast enough resulting in incomplete image buffers.
 
 ### Test Script
 
-The `net_perf_check.sh` script performs some simple checks and should be run
-while or after streaming images via GigE Vision.
+The `net_perf_check.sh` script checks link speed, MTU, dropped packets of the
+network card, receive ring buffer (if `ethtool` is installed), reverse path
+filtering, the socket receive buffer and the packet processing of the kernel.
+It should be run while or after streaming images via GigE Vision. By default,
+all physical network interfaces that are up are checked.
 
     ./net_perf_check.sh --help
 
 ### Jumbo Frames
 
-First of all increasing the UDP packet size (using jubo frames) is strongly
+First of all increasing the UDP packet size (using jumbo frames) is strongly
 recommended! Increase the MTU of your network interface to 9000, e.g.
 
-    sudo ifconfig eth0 mtu 9000
+    sudo ip link set eth0 mtu 9000
 
 Also make sure that all network devices/switches between your host and the
 sensor support this.
+
+### Receive ring buffer
+
+If the network card drops packets, increasing its receive ring buffer to the
+maximum usually helps, e.g.
+
+    ethtool -g eth0
+    sudo ethtool -G eth0 rx 4096
 
 ### sysctl settings
 
