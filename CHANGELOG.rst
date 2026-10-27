@@ -1,3 +1,9 @@
+2.8.10 (2026-11-27)
+-------------------
+
+* Added license, copyright and SBOM information to debian package
+* Rewrote net_perf_check.sh under the BSD license with additional checks
+
 2.8.9 (2026-10-06)
 ------------------
 
