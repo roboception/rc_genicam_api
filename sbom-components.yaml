@@ -1,0 +1,86 @@
+# Declaration of all third party code that is contained in the debian package
+# of this project for creating SBOMs.
+#
+# sbom_class:
+#   A: only own code, dynamically linked against Ubuntu or ROS packages
+#   B: self compiled or repackaged open source software
+#   C: own code that embeds third party code, e.g. as git submodules, copied
+#      sources, header-only libraries, statically linked libraries or binary
+#      blobs
+#
+# For classes B and C, all third party components must be listed, e.g.:
+#
+# components:
+#   - name: opencv
+#     version: 4.10.0
+#     supplier: OpenCV team
+#     purl: pkg:github/opencv/opencv@4.10.0
+#     cpe: cpe:2.3:a:opencv:opencv:4.10.0:*:*:*:*:*:*:*
+#     license: Apache-2.0
+#     source: https://github.com/opencv/opencv/archive/4.10.0.tar.gz
+#     modified: true     # if the source code has been changed
+#     patches:
+#       - debian/patches/0001-example.patch
+#
+# Statically linked libraries must not be listed, since they are determined
+# with their versions from the link commands when the SBOM fragment is created.
+
+sbom_class: C
+components:
+  # genicam: prebuilt libraries of the GenICam reference implementation
+  - name: genicam
+    version: 3.5.1
+    supplier: EMVA GenICam standard group
+    purl: pkg:generic/emva/genicam@3.5.1
+    license: LicenseRef-GenICam
+    source: https://www.emva.org/standards-technology/genicam/genicam-downloads/
+
+  # third party software in the shipped GenICam libraries, according to
+  # genicam/License_ReadMe.txt
+
+  - name: expat
+    version: 2.8.1
+    supplier: Expat maintainers
+    purl: pkg:github/libexpat/libexpat@R_2_8_1
+    cpe: cpe:2.3:a:libexpat_project:libexpat:2.8.1:*:*:*:*:*:*:*
+    license: MIT
+    source: https://github.com/libexpat/libexpat
+
+  - name: genx
+    version: cs-1
+    supplier: Code Synthesis Tools CC
+    purl: pkg:generic/genx@cs-1
+    license: MIT
+    source: http://www.tbray.org/ongoing/genx
+
+  - name: miniz
+    version: 3.0.2
+    supplier: Rich Geldreich
+    purl: pkg:github/richgel999/miniz@3.0.2
+    cpe: cpe:2.3:a:miniz_project:miniz:3.0.2:*:*:*:*:*:*:*
+    license: MIT
+    source: https://github.com/richgel999/miniz
+
+  - name: mathparser
+    version: 0.03b
+    supplier: Mathparser authors
+    purl: pkg:generic/mathparser@0.03b
+    license: MIT
+    source: http://kirya.narod.ru/mathparser.html
+    modified: true
+
+  - name: xxhash
+    version: 0.8.2
+    supplier: Yann Collet
+    purl: pkg:github/cyan4973/xxhash@v0.8.2
+    cpe: cpe:2.3:a:xxhash_project:xxhash:0.8.2:*:*:*:*:*:*:*
+    license: BSD-2-Clause
+    source: https://github.com/Cyan4973/xxHash
+
+  # baumer: prebuilt GenTL producer, which is loaded at runtime
+  - name: baumer-gentl-producer
+    version: 2.9.2.22969
+    supplier: Baumer Optronic GmbH
+    purl: pkg:generic/baumer/bgapi2-gentl@2.9.2.22969
+    license: LicenseRef-Baumer
+    source: https://www.baumer.com/de/en/product-overview/image-processing-identification/software/baumer-gapi-sdk/c/14174

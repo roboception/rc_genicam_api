@@ -2,7 +2,12 @@ before_script:
   - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME
   - echo -e "\e[0Ksection_start:`date +%s`:install_debs\r\e[0KInstall dependencies"
   - export DEBIAN_FRONTEND=noninteractive
-  - apt-get update -yq && apt-get install -y lintian libusb-1.0 libpng-dev libncurses-dev
+  - command -v curl > /dev/null || (apt-get update -yq && apt-get install -y --no-install-recommends curl)
+  - echo "deb http://apt.roboception.de/backports $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-backports.list
+  - echo "deb http://apt.roboception.de/stable $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-stable.list
+  - if [ "$TESTING_DEBS" = "true" ]; then echo "deb http://apt.roboception.de/testing $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-testing.list ; fi
+  - curl -fsSL http://apt.roboception.de/archive.key -o /etc/apt/trusted.gpg.d/roboception.asc
+  - apt-get update -yq && apt-get install -y --no-install-recommends lintian git rc-sbom-tools libusb-1.0 libpng-dev libncurses-dev
   - echo -e "\e[0Ksection_end:`date +%s`:install_debs\r\e[0K"
 
 variables:
@@ -13,18 +18,6 @@ variables:
 #########################
 # Templates using anchors
 #########################
-.amd64_focal_t: &amd64_focal_job
-  image: registry.roboception.de/tools/docker_images:focal-buildimage
-  tags:
-    - amd64
-    - docker
-
-.arm64_focal_t: &arm64_focal_job
-  image: registry.roboception.de/tools/docker_images:focal-buildimage
-  tags:
-    - arm64
-    - docker
-
 .armhf_focal_t: &armhf_focal_job
   image: registry.roboception.de/tools/docker_images:armhf-focal-buildimage
   tags:
@@ -57,6 +50,24 @@ variables:
 
 .arm64_noble_t: &arm64_noble_job
   image: registry.roboception.de/tools/docker_images:noble-buildimage
+  tags:
+    - arm64
+    - docker
+
+.armhf_noble_t: &armhf_noble_job
+  image: registry.roboception.de/tools/docker_images:armhf-noble-buildimage
+  tags:
+    - armhf
+    - docker
+
+.amd64_resolute_t: &amd64_resolute_job
+  image: registry.roboception.de/tools/docker_images:resolute-buildimage
+  tags:
+    - amd64
+    - docker
+
+.arm64_resolute_t: &arm64_resolute_job
+  image: registry.roboception.de/tools/docker_images:resolute-buildimage
   tags:
     - arm64
     - docker
@@ -163,16 +174,8 @@ gen_dox:
 
 # Test against latest (for testing builds)
 ##########################################
-test:focal:amd64:
-  <<: *amd64_focal_job
-  extends: .test_latest
-
 test:focal:armhf:
   <<: *armhf_focal_job
-  extends: .test_latest
-
-test:focal:arm64:
-  <<: *arm64_focal_job
   extends: .test_latest
 
 test:jammy:amd64:
@@ -191,22 +194,26 @@ test:noble:amd64:
   <<: *amd64_noble_job
   extends: .test_latest
 
+test:noble:armhf:
+  <<: *armhf_noble_job
+  extends: .test_latest
+
 test:noble:arm64:
   <<: *arm64_noble_job
   extends: .test_latest
 
+test:resolute:amd64:
+  <<: *amd64_resolute_job
+  extends: .test_latest
+
+test:resolute:arm64:
+  <<: *arm64_resolute_job
+  extends: .test_latest
+
 # Test against stable (is allowed to fail)
 ##########################################
-test_stable:focal:amd64:
-  <<: *amd64_focal_job
-  extends: .test_stable
-
 test_stable:focal:armhf:
   <<: *armhf_focal_job
-  extends: .test_stable
-
-test_stable:focal:arm64:
-  <<: *arm64_focal_job
   extends: .test_stable
 
 test_stable:jammy:amd64:
@@ -225,22 +232,26 @@ test_stable:noble:amd64:
   <<: *amd64_noble_job
   extends: .test_stable
 
+test_stable:noble:armhf:
+  <<: *armhf_noble_job
+  extends: .test_stable
+
 test_stable:noble:arm64:
   <<: *arm64_noble_job
   extends: .test_stable
 
+test_stable:resolute:amd64:
+  <<: *amd64_resolute_job
+  extends: .test_stable
+
+test_stable:resolute:arm64:
+  <<: *arm64_resolute_job
+  extends: .test_stable
+
 # Deploy testing (only on master)
 #################################
-package_testing:focal:amd64:
-  <<: *amd64_focal_job
-  extends: .package_testing
-
 package_testing:focal:armhf:
   <<: *armhf_focal_job
-  extends: .package_testing
-
-package_testing:focal:arm64:
-  <<: *arm64_focal_job
   extends: .package_testing
 
 package_testing:jammy:amd64:
@@ -259,8 +270,20 @@ package_testing:noble:amd64:
   <<: *amd64_noble_job
   extends: .package_testing
 
+package_testing:noble:armhf:
+  <<: *armhf_noble_job
+  extends: .package_testing
+
 package_testing:noble:arm64:
   <<: *arm64_noble_job
+  extends: .package_testing
+
+package_testing:resolute:amd64:
+  <<: *amd64_resolute_job
+  extends: .package_testing
+
+package_testing:resolute:arm64:
+  <<: *arm64_resolute_job
   extends: .package_testing
 
 ################
@@ -269,16 +292,8 @@ package_testing:noble:arm64:
 
 # Test against stable if it is a release
 ########################################
-test_release:focal:amd64:
-  <<: *amd64_focal_job
-  extends: .test_release
-
 test_release:focal:armhf:
   <<: *armhf_focal_job
-  extends: .test_release
-
-test_release:focal:arm64:
-  <<: *arm64_focal_job
   extends: .test_release
 
 test_release:jammy:amd64:
@@ -297,22 +312,26 @@ test_release:noble:amd64:
   <<: *amd64_noble_job
   extends: .test_release
 
+test_release:noble:armhf:
+  <<: *armhf_noble_job
+  extends: .test_release
+
 test_release:noble:arm64:
   <<: *arm64_noble_job
   extends: .test_release
 
+test_release:resolute:amd64:
+  <<: *amd64_resolute_job
+  extends: .test_release
+
+test_release:resolute:arm64:
+  <<: *arm64_resolute_job
+  extends: .test_release
+
 # Deploy stable (only for releases, version tags)
 #################################################
-package_stable:focal:amd64:
-  <<: *amd64_focal_job
-  extends: .package_stable
-
 package_stable:focal:armhf:
   <<: *armhf_focal_job
-  extends: .package_stable
-
-package_stable:focal:arm64:
-  <<: *arm64_focal_job
   extends: .package_stable
 
 package_stable:jammy:amd64:
@@ -331,10 +350,22 @@ package_stable:noble:amd64:
   <<: *amd64_noble_job
   extends: .package_stable
 
+package_stable:noble:armhf:
+  <<: *armhf_noble_job
+  extends: .package_stable
+
 package_stable:noble:arm64:
   <<: *arm64_noble_job
   extends: .package_stable
-  
+
+package_stable:resolute:amd64:
+  <<: *amd64_resolute_job
+  extends: .package_stable
+
+package_stable:resolute:arm64:
+  <<: *arm64_resolute_job
+  extends: .package_stable
+
 ########################
 # package as ROS package
 ########################

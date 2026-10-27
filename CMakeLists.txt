@@ -31,7 +31,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required (VERSION 3.5.1)
+cmake_minimum_required (VERSION 3.16)
 
 project(rc_genicam_api)
 
@@ -128,10 +128,29 @@ install(FILES net_perf_check.sh COMPONENT dev DESTINATION share/${PROJECT_NAME_L
 # optionally set description and maintainer (if not set will use defaults from package_debian.cmake)
 #set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Roboception package description")
 
-# optionally set package maintainer (otherwise defaults to Roboception <support@roboception.de>)
-#set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.name@roboception.de>")
-
 # optionally specify dependencies of the debian package here (comma separated!)
 #set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
 
+# LICENSE.md also contains notes about third party software, which are
+# described in copyright_extra for the copyright file of the package
+
+file(READ "${PROJECT_SOURCE_DIR}/LICENSE.md" RC_LICENSE_MD)
+string(FIND "${RC_LICENSE_MD}" "Third party software" RC_LICENSE_END)
+string(SUBSTRING "${RC_LICENSE_MD}" 0 ${RC_LICENSE_END} RC_LICENSE_MD)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/LICENSE" "${RC_LICENSE_MD}")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/LICENSE.md")
+
+set(RC_PACKAGE_LICENSE "BSD-3-Clause")
+set(RC_PACKAGE_LICENSE_FILE "${CMAKE_CURRENT_BINARY_DIR}/LICENSE")
+set(RC_COPYRIGHT_EXTRA_FILE "${PROJECT_SOURCE_DIR}/copyright_extra")
+
 include(cmake/package_debian.cmake)
+
+# The GenICam license requires distributing License_ReadMe.txt and the
+# licenses of the third party software in GenICam. They are installed next to
+# the copyright file of the package, which needs CPACK_PACKAGE_NAME.
+
+install(DIRECTORY genicam/licenses/ COMPONENT bin
+  DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME}/GenICam)
+install(FILES genicam/License_ReadMe.txt COMPONENT bin
+  DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME}/GenICam)
