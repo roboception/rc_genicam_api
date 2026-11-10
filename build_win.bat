@@ -1,5 +1,5 @@
 
-:: Build script for rc_sgm_producer under Windows
+:: Build script for rc_genicam_api under Windows
 
 @echo off
 setlocal enabledelayedexpansion
@@ -120,6 +120,4 @@ if not exist "%TARGET%\lib\" mkdir %TARGET%\lib
 copy %INSTALL_PATH%\lib\GCBase*lib %TARGET%\lib\
 copy %INSTALL_PATH%\lib\GenApi*lib %TARGET%\lib\
 copy %INSTALL_PATH%\lib\rc_genicam_api.lib %TARGET%\lib\
-if not exist "%TARGET%\lib\rc_genicam_api" mkdir %TARGET%\lib\rc_genicam_api
-copy %INSTALL_PATH%\lib\rc_genicam_api\* %TARGET%\lib\rc_genicam_api\
 
