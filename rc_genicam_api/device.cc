@@ -757,17 +757,7 @@ std::shared_ptr<Device> getDevice(const char *id, uint64_t timeout)
 
   if (id != 0 && *id != '\0')
   {
-    // split into interface and device id
-
-    std::string interfid;
     std::string devid=id;
-
-    size_t p=devid.find(':');
-    if (p != std::string::npos)
-    {
-      interfid=devid.substr(0, p);
-      devid=devid.substr(p+1);
-    }
 
     // go through all systems
 
@@ -781,27 +771,43 @@ std::shared_ptr<Device> getDevice(const char *id, uint64_t timeout)
 
       std::vector<std::shared_ptr<Interface> > interf=system[i]->getInterfaces();
 
-      if (interfid.size() > 0)
+      // The ID may be prefixed with the ID of an interface, followed by ':'.
+      // Interface and device IDs may contain ':' themselves, e.g. if they are
+      // derived from MAC addresses. Therefore, the ID is only split if it
+      // starts with the ID of an existing interface. The longest such
+      // interface ID is taken.
+
+      std::shared_ptr<Interface> prefixed;
+      std::string prefixed_devid;
+
+      for (size_t k=0; k<interf.size(); k++)
+      {
+        const std::string &iid=interf[k]->getID();
+
+        if (iid.size() > 0 && devid.size() > iid.size()+1 &&
+            devid.compare(0, iid.size(), iid) == 0 && devid[iid.size()] == ':' &&
+            (!prefixed || iid.size() > prefixed->getID().size()))
+        {
+          prefixed=interf[k];
+          prefixed_devid=devid.substr(iid.size()+1);
+        }
+      }
+
+      if (prefixed)
       {
         // if an interface is defined, then only search this interface
 
-        for (size_t k=0; k<interf.size(); k++)
+        prefixed->open();
+
+        std::shared_ptr<Device> dev=prefixed->getDevice(prefixed_devid.c_str(), timeout);
+
+        if (dev)
         {
-          if (interf[k]->getID() == interfid)
-          {
-            interf[k]->open();
-
-            std::shared_ptr<Device> dev=interf[k]->getDevice(devid.c_str(), timeout);
-
-            if (dev)
-            {
-              ret=dev;
-              found++;
-            }
-
-            interf[k]->close();
-          }
+          ret=dev;
+          found++;
         }
+
+        prefixed->close();
       }
       else
       {

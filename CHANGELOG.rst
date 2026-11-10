@@ -1,3 +1,9 @@
+unreleased
+----------
+
+* Fixed finding devices whose ID or interface ID contains ':', e.g. if derived
+  from MAC addresses
+
 2.8.10 (2026-11-27)
 -------------------
 

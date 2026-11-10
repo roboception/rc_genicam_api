@@ -357,6 +357,9 @@ std::vector<std::shared_ptr<Device> > getDevices();
   accepts optionally specifying the interface ID as prefix, followed by ':',
   i.e. "[<interfaca_id>[:]]<device_id>". If the interface ID is not given, then
   all interfaces are sought and the first device with the given ID returned.
+  Since interface and device IDs may contain ':' themselves, e.g. if they are
+  derived from MAC addresses, the ID is only split if it starts with the ID of
+  an existing interface, followed by ':'.
 
   @param devid   Device ID.
   @param timeout Timeout in ms for discovery of devices on each interface. The
