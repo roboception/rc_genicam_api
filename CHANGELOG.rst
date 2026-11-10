@@ -1,5 +1,5 @@
-unreleased
-----------
+2.8.11 (2026-11-10)
+-------------------
 
 * Replaced the Baumer GenTL producer by rc_gev_producer 0.1.2 of Roboception as
   default transport layer for GigE Vision. USB3 Vision is not supported by default
@@ -10,8 +10,9 @@ unreleased
   discovery, if the producer supports it
 * Fixed finding devices whose ID or interface ID contains ':', e.g. if derived
   from MAC addresses
+* build_win.bat does not try to copy a directory that Windows builds do not have
 
-2.8.10 (2026-11-27)
+2.8.10 (2026-10-27)
 -------------------
 
 * Added license, copyright and SBOM information to debian package
