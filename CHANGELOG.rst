@@ -1,6 +1,8 @@
 unreleased
 ----------
 
+* A device that is requested by its IP address is opened directly, without
+  discovery, if the producer supports it
 * Fixed finding devices whose ID or interface ID contains ':', e.g. if derived
   from MAC addresses
 

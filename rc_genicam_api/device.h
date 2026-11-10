@@ -361,6 +361,10 @@ std::vector<std::shared_ptr<Device> > getDevices();
   derived from MAC addresses, the ID is only split if it starts with the ID of
   an existing interface, followed by ':'.
 
+  If the device ID is an IPv4 address, then no discovery is done, but the
+  producers are asked to open the device with this address directly, see
+  Interface::getDevice().
+
   @param devid   Device ID.
   @param timeout Timeout in ms for discovery of devices on each interface. The
                  function without this parameter uses a timeout of 1000 ms.

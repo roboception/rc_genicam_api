@@ -45,6 +45,62 @@
 namespace rcg
 {
 
+namespace
+{
+
+/*
+  Returns true if the given string is an IPv4 address in dotted decimal
+  notation, i.e. four numbers between 0 and 255 separated by dots.
+*/
+
+bool isIPv4Address(const char *s)
+{
+  int parts=0;
+
+  while (*s != '\0')
+  {
+    int digits=0;
+    int value=0;
+
+    while (*s >= '0' && *s <= '9')
+    {
+      value=10*value+(*s-'0');
+      digits++;
+      s++;
+
+      if (digits > 3 || value > 255)
+      {
+        return false;
+      }
+    }
+
+    if (digits == 0)
+    {
+      return false;
+    }
+
+    parts++;
+
+    if (*s == '.')
+    {
+      s++;
+
+      if (*s == '\0')
+      {
+        return false;
+      }
+    }
+    else if (*s != '\0')
+    {
+      return false;
+    }
+  }
+
+  return parts == 4;
+}
+
+}
+
 Interface::Interface(const std::shared_ptr<System> &_parent,
                      const std::shared_ptr<const GenTLWrapper> &_gentl, const char *_id)
 {
@@ -250,13 +306,23 @@ std::vector<std::shared_ptr<Device> > Interface::getDevices()
 
 std::shared_ptr<Device> Interface::getDevice(const char *devid, uint64_t timeout)
 {
-  // get list of all devices
+  std::shared_ptr<Device> ret;
 
-  std::vector<std::shared_ptr<Device> > list=getDevices(timeout);
+  // A device that is requested by its IP address is directly opened, without
+  // a discovery before. Discovery uses broadcasts, which do not reach a device
+  // in another network, e.g. a GigE Vision server on the host if this runs in
+  // a Docker container. It is up to the producer to support this.
+
+  std::vector<std::shared_ptr<Device> > list;
+
+  if (!isIPv4Address(devid))
+  {
+    // get list of all devices
+
+    list=getDevices(timeout);
+  }
 
   // find requested device by ID or user defined name
-
-  std::shared_ptr<Device> ret;
 
   for (size_t i=0; i<list.size(); i++)
   {

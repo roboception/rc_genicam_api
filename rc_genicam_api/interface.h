@@ -109,7 +109,13 @@ class Interface : public std::enable_shared_from_this<Interface>
     std::vector<std::shared_ptr<Device> > getDevices();
 
     /**
-      Returns a device with the given device id.
+      Returns a device with the given device id, serial number or user defined
+      name.
+
+      If the given ID is an IPv4 address, then no discovery is done and the
+      producer is asked to open the device with this address directly. This
+      reaches devices that discovery cannot find, e.g. because broadcasts are
+      not forwarded, if the producer supports it.
 
       NOTE: open() must be called before calling this method.
 
