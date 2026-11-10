@@ -7,7 +7,7 @@ before_script:
   - echo "deb http://apt.roboception.de/stable $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-stable.list
   - if [ "$TESTING_DEBS" = "true" ]; then echo "deb http://apt.roboception.de/testing $DISTRO_CODENAME main" > /etc/apt/sources.list.d/roboception-testing.list ; fi
   - curl -fsSL http://apt.roboception.de/archive.key -o /etc/apt/trusted.gpg.d/roboception.asc
-  - apt-get update -yq && apt-get install -y --no-install-recommends lintian git rc-sbom-tools libusb-1.0 libpng-dev libncurses-dev
+  - apt-get update -yq && apt-get install -y --no-install-recommends lintian git rc-sbom-tools libpng-dev libncurses-dev
   - echo -e "\e[0Ksection_end:`date +%s`:install_debs\r\e[0K"
 
 variables:
@@ -18,12 +18,6 @@ variables:
 #########################
 # Templates using anchors
 #########################
-.armhf_focal_t: &armhf_focal_job
-  image: registry.roboception.de/tools/docker_images:armhf-focal-buildimage
-  tags:
-    - armhf
-    - docker
-
 .amd64_jammy_t: &amd64_jammy_job
   image: registry.roboception.de/tools/docker_images:jammy-buildimage
   tags:
@@ -36,12 +30,6 @@ variables:
     - arm64
     - docker
 
-.armhf_jammy_t: &armhf_jammy_job
-  image: registry.roboception.de/tools/docker_images:armhf-jammy-buildimage
-  tags:
-    - armhf
-    - docker
-
 .amd64_noble_t: &amd64_noble_job
   image: registry.roboception.de/tools/docker_images:noble-buildimage
   tags:
@@ -52,12 +40,6 @@ variables:
   image: registry.roboception.de/tools/docker_images:noble-buildimage
   tags:
     - arm64
-    - docker
-
-.armhf_noble_t: &armhf_noble_job
-  image: registry.roboception.de/tools/docker_images:armhf-noble-buildimage
-  tags:
-    - armhf
     - docker
 
 .amd64_resolute_t: &amd64_resolute_job
@@ -174,10 +156,6 @@ gen_dox:
 
 # Test against latest (for testing builds)
 ##########################################
-test:focal:armhf:
-  <<: *armhf_focal_job
-  extends: .test_latest
-
 test:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .test_latest
@@ -186,16 +164,8 @@ test:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .test_latest
 
-test:jammy:armhf:
-  <<: *armhf_jammy_job
-  extends: .test_latest
-
 test:noble:amd64:
   <<: *amd64_noble_job
-  extends: .test_latest
-
-test:noble:armhf:
-  <<: *armhf_noble_job
   extends: .test_latest
 
 test:noble:arm64:
@@ -212,10 +182,6 @@ test:resolute:arm64:
 
 # Test against stable (is allowed to fail)
 ##########################################
-test_stable:focal:armhf:
-  <<: *armhf_focal_job
-  extends: .test_stable
-
 test_stable:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .test_stable
@@ -224,16 +190,8 @@ test_stable:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .test_stable
 
-test_stable:jammy:armhf:
-  <<: *armhf_jammy_job
-  extends: .test_stable
-
 test_stable:noble:amd64:
   <<: *amd64_noble_job
-  extends: .test_stable
-
-test_stable:noble:armhf:
-  <<: *armhf_noble_job
   extends: .test_stable
 
 test_stable:noble:arm64:
@@ -250,10 +208,6 @@ test_stable:resolute:arm64:
 
 # Deploy testing (only on master)
 #################################
-package_testing:focal:armhf:
-  <<: *armhf_focal_job
-  extends: .package_testing
-
 package_testing:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .package_testing
@@ -262,16 +216,8 @@ package_testing:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .package_testing
 
-package_testing:jammy:armhf:
-  <<: *armhf_jammy_job
-  extends: .package_testing
-
 package_testing:noble:amd64:
   <<: *amd64_noble_job
-  extends: .package_testing
-
-package_testing:noble:armhf:
-  <<: *armhf_noble_job
   extends: .package_testing
 
 package_testing:noble:arm64:
@@ -292,10 +238,6 @@ package_testing:resolute:arm64:
 
 # Test against stable if it is a release
 ########################################
-test_release:focal:armhf:
-  <<: *armhf_focal_job
-  extends: .test_release
-
 test_release:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .test_release
@@ -304,16 +246,8 @@ test_release:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .test_release
 
-test_release:jammy:armhf:
-  <<: *armhf_jammy_job
-  extends: .test_release
-
 test_release:noble:amd64:
   <<: *amd64_noble_job
-  extends: .test_release
-
-test_release:noble:armhf:
-  <<: *armhf_noble_job
   extends: .test_release
 
 test_release:noble:arm64:
@@ -330,10 +264,6 @@ test_release:resolute:arm64:
 
 # Deploy stable (only for releases, version tags)
 #################################################
-package_stable:focal:armhf:
-  <<: *armhf_focal_job
-  extends: .package_stable
-
 package_stable:jammy:amd64:
   <<: *amd64_jammy_job
   extends: .package_stable
@@ -342,16 +272,8 @@ package_stable:jammy:arm64:
   <<: *arm64_jammy_job
   extends: .package_stable
 
-package_stable:jammy:armhf:
-  <<: *armhf_jammy_job
-  extends: .package_stable
-
 package_stable:noble:amd64:
   <<: *amd64_noble_job
-  extends: .package_stable
-
-package_stable:noble:armhf:
-  <<: *armhf_noble_job
   extends: .package_stable
 
 package_stable:noble:arm64:

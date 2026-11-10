@@ -1,0 +1,45 @@
+rc_gev_producer - License for the redistribution of the binary GenTL producer
+
+Copyright (c) 2026 Roboception GmbH, Munich, Germany
+All rights reserved.
+
+The software "rc_gev_producer" (hereinafter: the "software") consists of the
+GenTL producer libraries (files with the suffix .cti) and the accompanying
+documentation. It is provided by Roboception GmbH (hereinafter: "Roboception")
+in binary form only.
+
+1. Permission is hereby granted, free of charge, to any person obtaining a
+   copy of the software, to use, copy and distribute the software in
+   unmodified form, alone or together with other software, subject to the
+   following conditions:
+
+   a) This license text and the above copyright notice must be included in all
+      copies of the software.
+
+   b) The software must not be modified, reverse engineered, decompiled or
+      disassembled, except to the extent that this restriction is expressly
+      prohibited by applicable law.
+
+2. Roboception retains all rights, title and interest in the software,
+   including all intellectual property rights. Except for the rights that are
+   expressly granted above, no rights are granted.
+
+3. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+   ROBOCEPTION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE,
+   TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+
+Third party software contained in the software:
+
+- GenTL.h and PFNC.h of the EMVA GenICam Standard Group, which define the
+  GenTL interface and the pixel format values.
+
+- The GCC runtime libraries libstdc++ and libgcc, which are linked statically
+  under the terms of the GCC Runtime Library Exception 3.1.
+
+- Only in the Windows version: the MinGW-w64 runtime and winpthreads, which
+  are linked statically. Their copyright and license texts are contained in
+  the directory windows/x64/licenses.

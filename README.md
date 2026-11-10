@@ -283,8 +283,11 @@ Finding the Transport Layer
 
 The communication to the device is done through a so called transport layer
 (i.e. GenTL producer version 1.5 or higher). This package provides and installs
-a default transport layer that implements the GigE Vision protocol for
-connecting to the Roboception rc_visard. According to the GenICam
+rc_gev_producer as default transport layer, which implements the GigE Vision
+protocol for connecting to the Roboception rc_visard and other GigE Vision
+cameras. It is available for Linux on 64 bit x86 and ARM and for Windows on
+64 bit x86. It is not open source, but may be redistributed in binary form, see
+[gev_producer/LICENSE.txt](gev_producer/LICENSE.txt). According to the GenICam
 specification, the transport layer has the suffix '.cti'. The environment
 variable `GENICAM_GENTL32_PATH` (for 32 bit applications) or `GENICAM_GENTL64_PATH`
 (for 64 bit applications) must contain a list of paths that contain transport
@@ -307,6 +310,11 @@ Under Windows, as second fall back additionally to the install path, the
 directory of the executable is also added to the environment variable. Thus,
 the install directory can be moved, as long as the cti file stays in the same
 directory as the executable.
+
+rc_gev_producer is also available as a separate package, which installs it into
+`/opt/rc_gev_producer`. If `GENICAM_GENTL64_PATH` contains that directory as
+well as the one of this package, then the same producer is loaded twice and
+every device is reported twice. Only one of the directories should be used.
 
 Network Optimization under Linux
 --------------------------------

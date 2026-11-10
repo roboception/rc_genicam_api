@@ -1,0 +1,5 @@
+os=linux
+arch=aarch64
+distribution=ubuntu-20.04
+gcc=9.4.0
+glibc=2.17

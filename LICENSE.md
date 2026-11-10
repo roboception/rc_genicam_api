@@ -32,8 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
 Third party software
 --------------------
 
-The sub-directory 'baumer' contains a GenTL producer for GigE Vision from Baumer.
-See [baumer/license.txt](baumer/license.txt) for license information on this lib.
+The sub-directory 'gev_producer' contains rc_gev_producer, the GenTL producer for
+GigE Vision from Roboception, in binary form. It is not open source, see
+[gev_producer/LICENSE.txt](gev_producer/LICENSE.txt) for the terms of its use and
+redistribution.
 
 The sub-directory 'genicam' provides the full GenICam reference implementation.
 See [genicam/License_ReadMe.txt](genicam/License_ReadMe.txt) for license information of all files in this

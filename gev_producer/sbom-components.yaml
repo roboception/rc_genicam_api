@@ -1,0 +1,35 @@
+  # BEGIN rc_gev_producer (generated, do not edit)
+
+  # rc_gev_producer: prebuilt GenTL producer for GigE Vision, which is
+  # loaded at runtime
+  - name: rc-gev-producer
+    version: 0.1.2
+    supplier: Roboception GmbH
+    purl: pkg:generic/roboception/rc_gev_producer@0.1.2
+    license: LicenseRef-Roboception-rc-gev-producer
+
+  # third party code in rc_gev_producer
+
+  - name: genicam-gentl
+    version: "1.6"
+    supplier: EMVA GenICam Standard Group
+    purl: pkg:generic/genicam/gentl@1.6
+    license: LicenseRef-GenICam
+    source: https://www.emva.org/standards-technology/genicam/
+
+  - name: pfnc
+    version: "2022-12-22"
+    supplier: EMVA GenICam Standard Group
+    purl: pkg:generic/genicam/pfnc@2022-12-22
+    license: LicenseRef-PFNC
+    source: https://www.emva.org/standards-technology/genicam/
+
+  # statically linked libstdc++ and libgcc
+  - name: gcc-runtime
+    version: 9.4.0
+    supplier: Free Software Foundation
+    purl: pkg:generic/gnu/gcc@9.4.0
+    license: GPL-3.0-or-later WITH GCC-exception-3.1
+    source: https://gcc.gnu.org/
+
+  # END rc_gev_producer

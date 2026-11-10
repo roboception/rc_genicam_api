@@ -1,6 +1,11 @@
 unreleased
 ----------
 
+* Replaced the Baumer GenTL producer by rc_gev_producer 0.1.2 of Roboception as
+  default transport layer for GigE Vision. USB3 Vision is not supported by default
+  any more, and libusb is no longer needed.
+* Dropped the default transport layer for armhf, i686 and Win32, as well as the
+  CI builds for armhf
 * A device that is requested by its IP address is opened directly, without
   discovery, if the producer supports it
 * Fixed finding devices whose ID or interface ID contains ':', e.g. if derived

@@ -1,0 +1,5 @@
+os=windows
+arch=x64
+distribution=ubuntu-26.04
+gcc=13.2.0
+mingw_w64=13.0.0

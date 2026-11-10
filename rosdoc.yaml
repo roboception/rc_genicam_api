@@ -1,6 +1,6 @@
 - builder: doxygen
   file_patterns: '*.c *.cpp *.h *.cc *.hh *.dox *.md'
-  exclude_patterns: '*/baumer/*'
+  exclude_patterns: '*/gev_producer/*'
   use_mdfile_as_mainpage: README.md
   tab_size: 2
   javadoc_autobrief: YES

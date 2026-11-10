@@ -25,6 +25,7 @@
     <author email="heiko.hirschmueller@roboception.de">Heiko Hirschmueller</author>
 
     <license>BSD</license>
+    <license>LicenseRef-Roboception-rc-gev-producer</license>
 
     <url type="website">http://wiki.ros.org/rc_genicam_api</url>
     <url type="repository">https://github.com/roboception/rc_genicam_api</url>
@@ -33,7 +34,6 @@
     <buildtool_depend>cmake</buildtool_depend>
 
     <depend>libpng-dev</depend>
-    <depend>libusb-1.0</depend>
     <depend>libncurses-dev</depend>
 
     <doc_depend>doxygen</doc_depend>
