@@ -148,9 +148,9 @@ include(cmake/package_debian.cmake)
 
 # The GenICam license requires distributing License_ReadMe.txt and the
 # licenses of the third party software in GenICam. They are installed next to
-# the copyright file of the package, which needs CPACK_PACKAGE_NAME.
+# the copyright file of the package, i.e. in RC_DOC_INSTALL_DIR.
 
 install(DIRECTORY genicam/licenses/ COMPONENT bin
-  DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME}/GenICam)
+  DESTINATION ${RC_DOC_INSTALL_DIR}/GenICam)
 install(FILES genicam/License_ReadMe.txt COMPONENT bin
-  DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME}/GenICam)
+  DESTINATION ${RC_DOC_INSTALL_DIR}/GenICam)

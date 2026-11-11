@@ -196,10 +196,19 @@ ${RC_COPYRIGHT_EXTRA}License: ${RC_PACKAGE_LICENSE}
  ${RC_LICENSE_TEXT}
 ")
 
-# absolute path, since the install prefix may be e.g. /opt/ros/<distro>
+# Debian expects the copyright file in /usr/share/doc/<package>, also if the
+# install prefix is e.g. /opt/ros/<distro>. Other install prefixes, e.g. of
+# the workspace of the ROS buildfarm, are often not writable for /usr/share/doc
+# and therefore get it relative to the prefix.
+if ("${CMAKE_INSTALL_PREFIX}" MATCHES "^/usr/?$" OR "${CMAKE_INSTALL_PREFIX}" MATCHES "^/opt/ros/")
+    set(RC_DOC_INSTALL_DIR "/usr/share/doc/${CPACK_PACKAGE_NAME}")
+else ()
+    set(RC_DOC_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
+endif ()
+
 install(FILES "${COPYRIGHT_FILE}"
         COMPONENT bin
-        DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME})
+        DESTINATION ${RC_DOC_INSTALL_DIR})
 
 ###############################################
 # SBOM fragment, see rc_sbom_tools

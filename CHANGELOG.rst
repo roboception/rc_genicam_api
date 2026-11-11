@@ -1,3 +1,10 @@
+unreleased
+----------
+
+* Copyright and license files are installed relative to the install prefix,
+  unless it is /usr or /opt/ros/<distro>, so that installing without root
+  permissions works, e.g. on the ROS buildfarm
+
 2.8.11 (2026-11-10)
 -------------------
 

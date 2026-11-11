@@ -10,3 +10,4 @@ cmake-build-*
 !.dockerignore
 
 CMakeLists.txt.user
+scratch
