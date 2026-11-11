@@ -1,5 +1,5 @@
-unreleased
-----------
+2.8.12 (2026-11-11)
+-------------------
 
 * Copyright and license files are installed relative to the install prefix,
   unless it is /usr or /opt/ros/<distro>, so that installing without root
